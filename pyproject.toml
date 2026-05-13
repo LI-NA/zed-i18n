@@ -1,0 +1,22 @@
+[project]
+name = "zed-i18n"
+version = "0.1.0"
+description = "Tools for extracting, translating, and building localized Zed releases."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "tree-sitter>=0.25,<0.26",
+    "tree-sitter-rust>=0.24,<0.25",
+]
+
+[project.scripts]
+zed-i18n = "tools.zed_i18n.cli:main"
+
+[dependency-groups]
+dev = []
+
+[tool.uv]
+package = true
+
+[tool.setuptools.packages.find]
+include = ["tools*"]

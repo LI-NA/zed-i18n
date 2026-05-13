@@ -1,0 +1,326 @@
+name: localized Zed release
+
+on:
+  push:
+    tags:
+      - "v*-i18n.*"
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: "Comma-separated locales to build, or all."
+        required: false
+        default: "all"
+      platforms:
+        description: "Comma-separated platform ids/families, or all. Example: linux-x86_64,macos,windows-aarch64"
+        required: false
+        default: "all"
+      shard_size:
+        description: "How many locales to build sequentially in one platform job."
+        required: false
+        default: "1"
+      upload_to_release:
+        description: "Upload artifacts to a draft GitHub Release. Manual runs need release_tag unless running on a tag."
+        required: false
+        type: boolean
+        default: false
+      release_tag:
+        description: "Release tag for manual uploads. Tag pushes use the pushed tag."
+        required: false
+        default: ""
+      distribution_patches:
+        description: "Apply zed-i18n About, identity, and updater patches during release builds."
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: localized-zed-release-${{ github.ref_name || github.run_id }}
+  cancel-in-progress: false
+
+env:
+  CARGO_INCREMENTAL: "0"
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+
+jobs:
+  prepare:
+    name: Prepare build matrix
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      languages: ${{ steps.matrix.outputs.languages }}
+      zed-version: ${{ steps.matrix.outputs.zed-version }}
+      build-count: ${{ steps.matrix.outputs.build-count }}
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Generate matrix
+        id: matrix
+        env:
+          LANGUAGES: ${{ inputs.languages || 'all' }}
+          PLATFORMS: ${{ inputs.platforms || 'all' }}
+          SHARD_SIZE: ${{ inputs.shard_size || '4' }}
+          ZED_I18N_RUNNER_LINUX_X86_64: ${{ vars.ZED_I18N_RUNNER_LINUX_X86_64 || '' }}
+          ZED_I18N_RUNNER_LINUX_AARCH64: ${{ vars.ZED_I18N_RUNNER_LINUX_AARCH64 || '' }}
+          ZED_I18N_RUNNER_MACOS_X86_64: ${{ vars.ZED_I18N_RUNNER_MACOS_X86_64 || '' }}
+          ZED_I18N_RUNNER_MACOS_AARCH64: ${{ vars.ZED_I18N_RUNNER_MACOS_AARCH64 || '' }}
+          ZED_I18N_RUNNER_WINDOWS_X86_64: ${{ vars.ZED_I18N_RUNNER_WINDOWS_X86_64 || '' }}
+          ZED_I18N_RUNNER_WINDOWS_AARCH64: ${{ vars.ZED_I18N_RUNNER_WINDOWS_AARCH64 || '' }}
+        run: |
+          uv run python -m tools.zed_i18n.ci_release matrix \
+            --languages "$LANGUAGES" \
+            --platforms "$PLATFORMS" \
+            --shard-size "$SHARD_SIZE" >> "$GITHUB_OUTPUT"
+
+      - name: Summarize matrix
+        run: |
+          echo "Zed version: ${{ steps.matrix.outputs.zed-version }}"
+          echo "Languages: ${{ steps.matrix.outputs.languages }}"
+          echo "Build jobs: ${{ steps.matrix.outputs.build-count }}"
+
+  validate:
+    name: Validate translations
+    needs: prepare
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Validate selected locales
+        env:
+          LANGUAGES: ${{ needs.prepare.outputs.languages }}
+        run: |
+          IFS=',' read -ra LOCALES <<< "$LANGUAGES"
+          for locale in "${LOCALES[@]}"; do
+            uv run zed-i18n validate --language "$locale"
+          done
+
+  build:
+    name: Build ${{ matrix.id }}
+    needs:
+      - prepare
+      - validate
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 360
+    env:
+      ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
+      ZED_MINIDUMP_ENDPOINT: ${{ secrets.ZED_SENTRY_MINIDUMP_ENDPOINT }}
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      APPLE_NOTARIZATION_KEY: ${{ secrets.APPLE_NOTARIZATION_KEY }}
+      APPLE_NOTARIZATION_KEY_ID: ${{ secrets.APPLE_NOTARIZATION_KEY_ID }}
+      APPLE_NOTARIZATION_ISSUER_ID: ${{ secrets.APPLE_NOTARIZATION_ISSUER_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_SIGNING_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_SIGNING_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}
+      ACCOUNT_NAME: ${{ vars.AZURE_SIGNING_ACCOUNT_NAME }}
+      CERT_PROFILE_NAME: ${{ vars.AZURE_SIGNING_CERT_PROFILE_NAME }}
+      ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+      FILE_DIGEST: SHA256
+      TIMESTAMP_DIGEST: SHA256
+      TIMESTAMP_SERVER: http://timestamp.acs.microsoft.com
+      ZED_I18N_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name || '' }}
+      ZED_I18N_REPOSITORY: ${{ github.repository }}
+      DISTRIBUTION_PATCHES_ENABLED: ${{ github.event_name != 'workflow_dispatch' || inputs.distribution_patches }}
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Fetch Zed source
+        run: uv run zed-i18n fetch-zed
+
+      - name: Setup Linux dependencies
+        if: matrix.platform == 'linux'
+        working-directory: .cache/zed/${{ needs.prepare.outputs.zed-version }}
+        run: |
+          ./script/linux
+          ./script/download-wasi-sdk
+
+      - name: Setup macOS Node
+        if: matrix.platform == 'macos'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+
+      - name: Limit Cargo jobs on macOS arm64
+        if: matrix.platform == 'macos' && matrix.arch == 'aarch64'
+        shell: bash
+        run: |
+          echo "CARGO_BUILD_JOBS=2" >> "$GITHUB_ENV"
+          echo "Limiting Cargo build jobs to 2 for macOS arm64"
+
+      - name: Build localized artifacts
+        shell: bash
+        run: |
+          distribution_args=()
+          if [[ "$DISTRIBUTION_PATCHES_ENABLED" == "true" ]]; then
+            distribution_args=(--distribution-config config/distribution.toml)
+          fi
+
+          uv run python -m tools.zed_i18n.ci_release build-shard \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --bundle-target "${{ matrix.bundle_target }}" \
+            --languages "${{ matrix.languages }}" \
+            --dist-dir dist \
+            "${distribution_args[@]}"
+
+      - name: Upload shard artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 3
+
+  package:
+    name: Package release assets
+    needs:
+      - prepare
+      - build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Download shard artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: release-artifacts
+          pattern: zed-i18n-*
+          merge-multiple: true
+
+      - name: Generate manifest and checksums
+        env:
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: |
+          RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          uv run python -m tools.zed_i18n.ci_release metadata \
+            --dist-dir release-artifacts \
+            --manifest release-artifacts/manifest.json \
+            --checksums release-artifacts/SHA256SUMS.txt \
+            --release-tag "$RELEASE_TAG" \
+            --repository "$GITHUB_REPOSITORY" \
+            --run-id "$GITHUB_RUN_ID" \
+            --languages "${{ needs.prepare.outputs.languages }}" \
+            --platforms "${{ inputs.platforms || 'all' }}"
+
+      - name: Generate artifact attestation
+        uses: actions/attest@281a49d4cbb0a72c9575a50d18f6deb515a11deb # v4
+        with:
+          subject-path: release-artifacts/*
+
+      - name: Upload combined artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: zed-i18n-release-assets
+          path: release-artifacts/*
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    name: Publish GitHub Release
+    needs:
+      - prepare
+      - package
+    if: startsWith(github.ref, 'refs/tags/') || inputs.upload_to_release
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    environment:
+      name: release
+    steps:
+      - name: Download combined artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: zed-i18n-release-assets
+          path: release-artifacts
+
+      - name: Upload to draft GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: |
+          if [[ "$GITHUB_REF_TYPE" != "tag" && -z "$INPUT_RELEASE_TAG" ]]; then
+            echo "Manual release upload requires the release_tag input."
+            exit 1
+          fi
+
+          RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" >/dev/null; then
+            echo "Release tag does not exist: $RELEASE_TAG"
+            exit 1
+          fi
+
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --verify-tag \
+              --draft \
+              --title "$RELEASE_TAG" \
+              --notes "Localized Zed build for ${{ needs.prepare.outputs.zed-version }}."
+          fi
+
+          gh release upload "$RELEASE_TAG" release-artifacts/*
+
+      - name: Validate release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: |
+          RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          find release-artifacts -maxdepth 1 -type f -printf '%f\n' | sort > expected-assets.txt
+          gh release view "$RELEASE_TAG" --json assets -q '.assets[].name' | sort > actual-assets.txt
+          missing="$(comm -23 expected-assets.txt actual-assets.txt)"
+          if [[ -n "$missing" ]]; then
+            echo "Missing release assets:"
+            echo "$missing"
+            exit 1
+          fi
+          echo "All expected release assets are present."

@@ -1,0 +1,121 @@
+<div align="center">
+  <h1>zed-i18n</h1>
+  <p><strong>Translate the Zed editor into your own language with ease.</strong></p>
+
+  [![Zed v1.1.8](https://img.shields.io/badge/Zed-v1.1.8-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.1.8)
+  [![Python ≥3.12](https://img.shields.io/badge/Python-≥3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+  [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue)](LICENSE)
+  [![MIT components](https://img.shields.io/badge/MIT-components-yellow)](LICENSE-MIT)
+
+  <p>
+    <a href="docs/readme/cs-CZ.md">Čeština</a> ·
+    <a href="docs/readme/de-DE.md">Deutsch</a> ·
+    English ·
+    <a href="docs/readme/es-ES.md">Español</a> ·
+    <a href="docs/readme/fr-FR.md">Français</a> ·
+    <a href="docs/readme/it-IT.md">Italiano</a> ·
+    <a href="docs/readme/ja-JP.md">日本語</a> ·
+    <a href="docs/readme/ko-KR.md">한국어</a> ·
+    <a href="docs/readme/pl-PL.md">Polski</a> ·
+    <a href="docs/readme/pt-BR.md">Português</a> ·
+    <a href="docs/readme/ru-RU.md">Русский</a> ·
+    <a href="docs/readme/tr-TR.md">Türkçe</a> ·
+    <a href="docs/readme/zh-CN.md">简体中文</a> ·
+    <a href="docs/readme/zh-TW.md">繁體中文</a>
+  </p>
+</div>
+
+## Introduction
+
+zed-i18n is a tool that extracts UI strings from release versions of the [Zed](https://zed.dev) editor and applies translations to create multilingual builds.
+
+## Supported Languages
+
+Translations for 13 languages are currently bundled under `translations/`.
+
+cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
+
+## Downloads
+
+You can download the latest builds from [Releases](https://github.com/LI-NA/zed-i18n/releases). If you would rather build them manually, follow the steps below.
+
+## Installation
+
+Requires Python 3.12 or later and [`uv`](https://docs.astral.sh/uv/).
+
+```powershell
+uv sync
+```
+
+All commands are run as `uv run zed-i18n <command>`.
+
+## Usage
+
+The target Zed version is set in `config/project.toml`. `fetch-zed` prepares both the checkout used for applying translations and building, and the clean checkout used for string extraction and review.
+
+```powershell
+uv run zed-i18n fetch-zed
+uv run zed-i18n extract --zed-root .cache/zed/v1.1.8-clean-extract
+uv run zed-i18n audit-candidates --zed-root .cache/zed/v1.1.8-clean-extract
+uv run zed-i18n prepare-translation --language ko-KR --zed-root .cache/zed/v1.1.8-clean-extract
+uv run zed-i18n merge-translation --language ko-KR
+uv run zed-i18n validate --language ko-KR
+uv run zed-i18n apply --language ko-KR
+```
+
+`extract` scans the Zed Rust sources for UI string candidates and writes them to `catalog/en-US.json` and `manifest/ui-strings.json`. Translation results are stored in `translations/<language>.json`.
+
+Newly discovered strings are added to `manifest/ui-strings.json` with the `needs_review` status. Mark only strings that are actually shown in the UI as `accepted`, then translate them.
+
+## AI Translation
+
+For AI-driven translation runs, follow `prompts/commands/translation-start.md`. To compare and merge results from multiple models, use `prompts/commands/translation-review.md`.
+
+If you want to translate only newly added keys while leaving existing translations intact, refer to the files with `new-keys` in their names.
+
+To include VS Code translation references in the batches, prepare the repositories below before running `prepare-translation`. Translation batches are still generated normally if these repositories are not present.
+
+```powershell
+git clone https://github.com/microsoft/vscode-loc .cache/vscode-loc
+git clone https://github.com/microsoft/vscode .cache/vscode-upstream
+```
+
+When adding a new language:
+
+1. Write a style guide and glossary in `prompts/translation/<language>.md`.
+2. Generate batches with `prepare-translation`.
+3. Merge the AI-produced JSON results using `merge-translation`.
+4. Validate the result with `validate`.
+
+Per-language guidelines live in `prompts/translation/<language>.md`. If the file is missing, `prompts/translation/TEMPLATE.md` is used as the default.
+
+## Manual Build
+
+On Windows, you need [Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022), the Windows SDK, CMake, and [Rust](https://rustup.rs/). Sharing the build cache across versions via `.cache/zed/target` is recommended. A sample build looks like this:
+
+```powershell
+$env:CARGO_TARGET_DIR = (Resolve-Path .cache\zed\target).Path
+$env:CARGO_INCREMENTAL = "1"
+cd .cache\zed\v1.1.8
+cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
+```
+
+## Release Builds
+
+Release builds run automatically through GitHub Actions, defined in `.github/workflows/i18n-release.yml`. The Zed source is pinned to the `zed_version` tag and `zed_commit` SHA in `config/project.toml`.
+
+The release workflow applies `config/distribution.toml` to patch the zed-i18n identifier, About information, and updater manifest paths. This changes the automatic update path to `zed-i18n`.
+
+## Known Limitations
+
+Most UI strings — menus, buttons, tooltips, settings, action descriptions — are handled through direct substitution. However, some action names that are generated dynamically at runtime in the Command Palette or Keymap Editor require a separate patch and are not yet covered.
+
+If you know of a way to apply patches reliably across Zed versions, contributions are very welcome.
+
+## On AI Usage
+
+Most of the code in this project was written with the help of AI tools, and every translation was produced by AI. If you spot anything off in the code or translations, or think there is a better approach, please feel free to open a PR.
+
+## License
+
+Content derived from Zed sources (`catalog/`, `translations/`, `manifest/`, and release artifacts) is licensed under [GPL-3.0](LICENSE). The `zed-i18n` source code and the translation glossaries (`prompts/translation/glossary/`) extracted from [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) are licensed under [MIT](LICENSE-MIT). The VS Code language pack content is copyrighted by Microsoft Corporation.

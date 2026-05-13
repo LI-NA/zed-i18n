@@ -1,0 +1,30 @@
+# Optional release-only distribution overlay.
+# Normal `zed-i18n apply` builds do not read this file unless a build script
+# explicitly passes it with `--distribution-config`.
+
+product_name = "Zed i18n"
+product_slug = "zed-i18n"
+
+[identity]
+macos_bundle_id = "dev.zed-i18n.Zed"
+linux_app_id = "dev.zed-i18n.Zed"
+
+[windows]
+app_identifier = "ZedI18n-Editor-Stable"
+app_id = "{{48948123-2766-49EA-9C78-31B8096DE3D6}"
+app_user_id = "ZedI18n.Zed"
+appx_name = "ZedI18n.Zed"
+appx_full_name = "ZedI18n.Zed_1.0.0.0_neutral__japxn1gcva8rg"
+mutex = "Zed-i18n-Stable-Instance-Mutex"
+registry_value = "ZedI18n"
+setup_name = "Zed-i18n"
+shell_name_short = "Z&ed i18n"
+
+[publisher]
+name = "zed-i18n"
+url = "https://github.com/LI-NA/zed-i18n"
+
+[update]
+enabled = true
+# Empty means: https://github.com/{repository}/releases/latest/download/manifest.json
+manifest_url = ""
