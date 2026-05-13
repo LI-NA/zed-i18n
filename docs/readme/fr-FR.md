@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Vous pouvez récupérer les derniers binaires depuis la page [Releases](https://github.com/LI-NA/zed-i18n/releases). Si vous préférez compiler le projet vous-même, suivez les étapes ci-dessous.
 
+Les fichiers distribués ne disposent pas encore de signature de code. Si macOS bloque l'application, ouvrez uniquement les fichiers de confiance depuis le Finder avec clic droit puis `Ouvrir`, ou supprimez l'attribut de quarantaine avec `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Installation
 
 Python 3.12 ou version ultérieure et [`uv`](https://docs.astral.sh/uv/) sont requis.
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Les versions publiées sont générées automatiquement via GitHub Actions, définies dans `.github/workflows/i18n-release.yml`. Les sources de Zed sont épinglées à la balise `zed_version` et au SHA `zed_commit` dans `config/project.toml`.
 
-Le processus de publication applique `config/distribution.toml` pour patcher l'identifiant zed-i18n, les informations About et les chemins de l'updater manifest. Cela redirige le chemin de mise à jour automatique vers `zed-i18n`.
+Le processus de publication applique `config/distribution.toml` pour patcher l'identifiant zed-i18n, les informations About et le chemin de mise à jour automatique. Cela redirige le chemin de mise à jour automatique vers `zed-i18n`.
 
 ## Limitations connues
 
-La plupart des chaînes de l'interface — menus, boutons, infobulles, paramètres, descriptions d'actions — sont gérées par substitution directe. Cependant, certains noms d'actions générés dynamiquement à l'exécution dans la Command Palette ou le Keymap Editor nécessitent un correctif séparé et ne sont pas encore pris en charge.
+La plupart des chaînes de l'interface — menus, boutons, infobulles, paramètres, descriptions d'actions — sont gérées par substitution directe. Cependant, certains noms d'actions générés dynamiquement à l'exécution dans la palette de commandes ou l'Éditeur de raccourcis nécessitent un correctif séparé et ne sont pas encore pris en charge.
 
 Si vous connaissez un moyen d'appliquer des correctifs de façon fiable entre les versions de Zed, les contributions sont les bienvenues.
 

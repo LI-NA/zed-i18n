@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Os binários mais recentes estão disponíveis na página de [Releases](https://github.com/LI-NA/zed-i18n/releases). Se preferir compilar o projeto você mesmo, siga os passos abaixo.
 
+Os arquivos distribuídos ainda não têm assinatura de código. Se o macOS bloquear o app, faça isso apenas com arquivos em que você confia: abra pelo Finder com botão direito e `Abrir`, ou remova o atributo de quarentena com `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Instalação
 
 Requer Python 3.12 ou superior e [`uv`](https://docs.astral.sh/uv/).
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Os builds de lançamento são executados automaticamente por meio do GitHub Actions, conforme definido em `.github/workflows/i18n-release.yml`. O código-fonte do Zed é fixado pela tag `zed_version` e pelo SHA `zed_commit` em `config/project.toml`.
 
-O fluxo de lançamento aplica `config/distribution.toml` para ajustar o identificador do zed-i18n, as informações de About e o caminho do manifesto do atualizador. Isso redireciona o caminho de atualização automática para `zed-i18n`.
+O fluxo de lançamento aplica `config/distribution.toml` para ajustar o identificador do zed-i18n, as informações de About e o caminho de atualização automática. Isso redireciona o caminho de atualização automática para `zed-i18n`.
 
 ## Limitações conhecidas
 
-A maioria das strings de interface — menus, botões, tooltips, configurações, descrições de ações — é tratada por substituição direta. No entanto, alguns nomes de ações gerados dinamicamente em tempo de execução na Command Palette ou no Keymap Editor exigem um patch separado e ainda não são cobertos.
+A maioria das strings de interface — menus, botões, tooltips, configurações, descrições de ações — é tratada por substituição direta. No entanto, alguns nomes de ações gerados dinamicamente em tempo de execução na paleta de comandos ou no Editor de mapa de teclas exigem um patch separado e ainda não são cobertos.
 
 Se você conhecer uma forma de aplicar patches de maneira confiável entre versões do Zed, contribuições são muito bem-vindas.
 

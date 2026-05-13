@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 È possibile scaricare i binari più recenti dalla pagina [Releases](https://github.com/LI-NA/zed-i18n/releases). Per chi preferisce compilare il progetto autonomamente, seguire i passaggi indicati di seguito.
 
+I file distribuiti non sono ancora firmati. Se macOS blocca l'app, aprire solo file attendibili dal Finder con clic destro e `Apri`, oppure rimuovere l'attributo di quarantena con `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Installazione
 
 Richiede Python 3.12 o versione successiva e [`uv`](https://docs.astral.sh/uv/).
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Le build di rilascio vengono eseguite automaticamente tramite GitHub Actions; il workflow è definito in `.github/workflows/i18n-release.yml`. I sorgenti di Zed sono fissati al tag `zed_version` e al SHA `zed_commit` in `config/project.toml`.
 
-Il workflow di rilascio applica `config/distribution.toml` per aggiornare l'identificativo zed-i18n, le informazioni della schermata About e il percorso dell'updater manifest. In questo modo il percorso di aggiornamento automatico viene reindirizzato a `zed-i18n`.
+Il workflow di rilascio applica `config/distribution.toml` per aggiornare l'identificativo zed-i18n, le informazioni della schermata About e il percorso di aggiornamento automatico. In questo modo il percorso di aggiornamento automatico viene reindirizzato a `zed-i18n`.
 
 ## Limitazioni note
 
-La maggior parte delle stringhe dell'interfaccia utente — menu, pulsanti, tooltip, impostazioni, descrizioni delle azioni — viene gestita tramite sostituzione diretta. Tuttavia, alcuni nomi di azioni generati dinamicamente a runtime nella Command Palette o nel Keymap Editor richiedono una patch separata e non sono ancora coperti.
+La maggior parte delle stringhe dell'interfaccia utente — menu, pulsanti, tooltip, impostazioni, descrizioni delle azioni — viene gestita tramite sostituzione diretta. Tuttavia, alcuni nomi di azioni generati dinamicamente a runtime nel riquadro comandi o nell'Editor mappa tasti richiedono una patch separata e non sono ancora coperti.
 
 Se si conosce un metodo per applicare patch in modo affidabile tra le versioni di Zed, i contributi sono molto benvenuti.
 

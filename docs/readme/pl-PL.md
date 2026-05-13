@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Najnowsze kompilacje można pobrać ze strony [Releases](https://github.com/LI-NA/zed-i18n/releases). Jeśli wolisz zbudować je samodzielnie, wykonaj poniższe kroki.
 
+Pliki dystrybucyjne nie są obecnie podpisane kodem. Jeśli macOS je zablokuje, otwieraj w ten sposób tylko zaufane pliki: w Finderze kliknij prawym przyciskiem i wybierz `Otwórz`, albo usuń atrybut kwarantanny poleceniem `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Instalacja
 
 Wymagane są Python 3.12 lub nowszy oraz [`uv`](https://docs.astral.sh/uv/).
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Kompilacje wydaniowe są wykonywane automatycznie przez GitHub Actions zgodnie z przepływem pracy zdefiniowanym w `.github/workflows/i18n-release.yml`. Kod źródłowy Zed jest przypięty do tagu `zed_version` i skrótu SHA `zed_commit` w pliku `config/project.toml`.
 
-Przepływ pracy wydania stosuje `config/distribution.toml`, aby zaktualizować identyfikator `zed-i18n`, informacje w sekcji About oraz ścieżkę manifestu aktualizatora. W tym procesie ścieżka automatycznych aktualizacji zmienia się na `zed-i18n`.
+Przepływ pracy wydania stosuje `config/distribution.toml`, aby zaktualizować identyfikator `zed-i18n`, informacje w sekcji About oraz ścieżkę automatycznych aktualizacji. W tym procesie ścieżka automatycznych aktualizacji zmienia się na `zed-i18n`.
 
 ## Znane ograniczenia
 
-Większość ciągów interfejsu użytkownika — menu, przyciski, podpowiedzi, ustawienia, opisy akcji — jest obsługiwana przez bezpośrednie podstawianie. Jednak niektóre nazwy akcji generowane dynamicznie w czasie działania programu w Palecie poleceń lub Edytorze skrótów klawiszowych wymagają oddzielnej poprawki i nie są jeszcze obsługiwane.
+Większość ciągów interfejsu użytkownika — menu, przyciski, podpowiedzi, ustawienia, opisy akcji — jest obsługiwana przez bezpośrednie podstawianie. Jednak niektóre nazwy akcji generowane dynamicznie w czasie działania programu w Palecie poleceń lub Edytorze mapy klawiszy wymagają oddzielnej poprawki i nie są jeszcze obsługiwane.
 
 Jeśli znasz sposób na niezawodne stosowanie poprawek w różnych wersjach Zed, będziemy wdzięczni za wkład.
 

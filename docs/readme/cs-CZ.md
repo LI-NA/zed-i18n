@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Nejnovější binární soubory jsou k dispozici v sekci [Releases](https://github.com/LI-NA/zed-i18n/releases). Pokud dáváte přednost vlastnímu sestavení projektu, postupujte podle níže uvedených kroků.
 
+Distribuované soubory zatím nejsou podepsané kódem. Pokud macOS aplikaci zablokuje, u souborů, kterým důvěřujete, ji otevřete ve Finderu přes pravé kliknutí a `Otevřít`, případně odstraňte karanténní atribut příkazem `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Instalace
 
 Vyžaduje Python 3.12 nebo novější a [`uv`](https://docs.astral.sh/uv/).
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Release buildy se vytvářejí automaticky přes GitHub Actions podle definice v `.github/workflows/i18n-release.yml`. Zdrojový kód Zed je připnutý na tag `zed_version` a SHA `zed_commit` v `config/project.toml`.
 
-Workflow pro vydání aplikuje `config/distribution.toml`, aby upravil identifikátor zed-i18n, informace v dialogu About a cestu k manifestu updateru. Tím se cesta automatických aktualizací přepíše na `zed-i18n`.
+Workflow pro vydání aplikuje `config/distribution.toml`, aby upravil identifikátor zed-i18n, informace v dialogu About a cestu automatických aktualizací. Tím se cesta automatických aktualizací přepíše na `zed-i18n`.
 
 ## Známá omezení
 
-Většina UI řetězců — nabídky, tlačítka, tooltipy, nastavení, popisky akcí — je zpracována přímým nahrazením. Některé názvy akcí generované dynamicky za běhu v Command Palette nebo Keymap Editoru však vyžadují samostatný patch, a proto zatím nejsou pokryty.
+Většina UI řetězců — nabídky, tlačítka, tooltipy, nastavení, popisky akcí — je zpracována přímým nahrazením. Některé názvy akcí generované dynamicky za běhu v Paletě příkazů nebo Editoru mapy kláves však vyžadují samostatný patch, a proto zatím nejsou pokryty.
 
 Pokud znáte způsob, jak spolehlivě aplikovat patche napříč verzemi Zed, příspěvky jsou velmi vítány.
 

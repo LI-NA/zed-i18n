@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Die aktuellen Binärdateien sind unter [Releases](https://github.com/LI-NA/zed-i18n/releases) verfügbar. Wer das Projekt lieber selbst bauen möchte, folgt den nachstehenden Schritten.
 
+Die Release-Dateien sind derzeit nicht codesigniert. Falls macOS die App blockiert, öffnen Sie nur vertrauenswürdige Dateien im Finder per Rechtsklick und `Öffnen`, oder entfernen Sie das Quarantäne-Attribut mit `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Installation
 
 Voraussetzungen: Python 3.12 oder neuer sowie [`uv`](https://docs.astral.sh/uv/).
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Release-Builds laufen automatisch über GitHub Actions, definiert in `.github/workflows/i18n-release.yml`. Die Zed-Quellen sind auf den `zed_version`-Tag und den `zed_commit`-SHA in `config/project.toml` festgeschrieben.
 
-Der Release-Workflow wendet `config/distribution.toml` an, um die zed-i18n-Kennung, die About-Informationen und die Updater-Manifest-Pfade anzupassen. Dadurch wird der automatische Update-Pfad auf `zed-i18n` umgeschrieben.
+Der Release-Workflow wendet `config/distribution.toml` an, um die zed-i18n-Kennung, die About-Informationen und den automatischen Update-Pfad anzupassen. Dadurch wird der automatische Update-Pfad auf `zed-i18n` umgeschrieben.
 
 ## Bekannte Einschränkungen
 
-Die meisten UI-Strings — Menüs, Schaltflächen, Tooltips, Einstellungen, Aktionsbeschreibungen — werden durch direkte Substitution behandelt. Einige Aktionsnamen, die zur Laufzeit dynamisch in der Command Palette oder im Keymap Editor erzeugt werden, erfordern jedoch einen gesonderten Patch und sind noch nicht abgedeckt.
+Die meisten UI-Strings — Menüs, Schaltflächen, Tooltips, Einstellungen, Aktionsbeschreibungen — werden durch direkte Substitution behandelt. Einige Aktionsnamen, die zur Laufzeit dynamisch in der Befehlspalette oder im Tastenzuordnungs-Editor erzeugt werden, erfordern jedoch einen gesonderten Patch und sind noch nicht abgedeckt.
 
 Wer einen Weg kennt, Patches zuverlässig über Zed-Versionen hinweg einzuspielen, ist herzlich eingeladen, einen Beitrag zu leisten.
 

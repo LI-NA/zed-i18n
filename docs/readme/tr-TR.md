@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 En güncel ikili dosyaları [Releases](https://github.com/LI-NA/zed-i18n/releases) sayfasından indirebilirsiniz. Projeyi kendiniz derlemek isterseniz aşağıdaki adımları izleyin.
 
+Dağıtım dosyaları şu anda kod imzalı değildir. macOS uygulamayı engellerse bunu yalnızca güvendiğiniz dosyalar için yapın: Finder'da sağ tıklayıp `Aç` seçeneğini kullanın veya karantina özniteliğini `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` komutuyla kaldırın.
+
 ## Kurulum
 
 Python 3.12 veya üzeri ile [`uv`](https://docs.astral.sh/uv/) gereklidir.
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Yayın derlemeleri, `.github/workflows/i18n-release.yml` içinde tanımlanan GitHub Actions aracılığıyla otomatik olarak çalışır. Zed kaynak kodu, `config/project.toml` dosyasındaki `zed_version` etiketine ve `zed_commit` SHA değerine sabitlenmiştir.
 
-Yayın iş akışı, zed-i18n tanımlayıcısını, About bilgilerini ve updater manifest yolunu düzenlemek için `config/distribution.toml` dosyasını uygular. Bu işlem, otomatik güncelleme yolunu `zed-i18n` olarak yeniden yazar.
+Yayın iş akışı, zed-i18n tanımlayıcısını, About bilgilerini ve otomatik güncelleme yolunu düzenlemek için `config/distribution.toml` dosyasını uygular. Bu işlem, otomatik güncelleme yolunu `zed-i18n` olarak yeniden yazar.
 
 ## Bilinen Kısıtlamalar
 
-Menüler, düğmeler, araç ipuçları, ayarlar ve eylem açıklamaları gibi arayüz dizelerinin büyük çoğunluğu doğrudan değiştirme yöntemiyle işlenir. Ancak Command Palette veya Keymap Editor'da çalışma zamanında dinamik olarak oluşturulan bazı eylem adları ayrı bir yama gerektirmekte olup henüz kapsama alınmamıştır.
+Menüler, düğmeler, araç ipuçları, ayarlar ve eylem açıklamaları gibi arayüz dizelerinin büyük çoğunluğu doğrudan değiştirme yöntemiyle işlenir. Ancak Komut Paleti veya Tuş Haritası Düzenleyicisi'nde çalışma zamanında dinamik olarak oluşturulan bazı eylem adları ayrı bir yama gerektirmekte olup henüz kapsama alınmamıştır.
 
 Zed sürümü değişse bile yamaları güvenilir biçimde uygulamanın bir yolunu biliyorsanız katkılarınızı bekliyoruz.
 

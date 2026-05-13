@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 最新ビルドは [Releases](https://github.com/LI-NA/zed-i18n/releases) から入手できます。自分でビルドする場合は、以下の手順に従ってください。
 
+現在の配布ファイルにはコード署名が適用されていません。macOS で開けない場合は、信頼できるファイルに限り Finder で右クリックして `開く` を選ぶか、ターミナルで `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` を実行して隔離属性を削除してください。
+
 ## インストール
 
 Python 3.12 以降と [`uv`](https://docs.astral.sh/uv/) が必要です。
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 リリースビルドは `.github/workflows/i18n-release.yml` で定義された GitHub Actions を通じて自動的に実行されます。Zed のソースは `config/project.toml` 内の `zed_version` タグと `zed_commit` SHA に固定されています。
 
-リリースワークフローは `config/distribution.toml` を適用して、zed-i18n の識別子、About 情報、および updater manifest のパスにパッチを当てます。これにより、自動更新パスが `zed-i18n` に書き換えられます。
+リリースワークフローは `config/distribution.toml` を適用して、zed-i18n の識別子、About 情報、および自動更新パスにパッチを当てます。これにより、自動更新パスが `zed-i18n` に書き換えられます。
 
 ## 既知の制限事項
 
-メニュー、ボタン、ツールチップ、設定、アクション説明など、ほとんどの UI 文字列は直接置換で対応しています。ただし、Command Palette や Keymap Editor でランタイムに動的生成されるアクション名の一部は、別途パッチが必要なため現時点では対応していません。
+メニュー、ボタン、ツールチップ、設定、アクション説明など、ほとんどの UI 文字列は直接置換で対応しています。ただし、コマンドパレットやキーマップエディターでランタイムに動的生成されるアクション名の一部は、別途パッチが必要なため現時点では対応していません。
 
 Zed のバージョン間でパッチを安定して適用する方法をご存知の方は、ぜひ貢献をお待ちしています。
 

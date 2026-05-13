@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 You can download the latest builds from [Releases](https://github.com/LI-NA/zed-i18n/releases). If you would rather build them manually, follow the steps below.
 
+Release files are not code-signed yet. On macOS, if the app is blocked, only open files you trust: right-click it in Finder and choose `Open`, or remove the quarantine attribute with `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Installation
 
 Requires Python 3.12 or later and [`uv`](https://docs.astral.sh/uv/).
@@ -104,7 +106,7 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Release builds run automatically through GitHub Actions, defined in `.github/workflows/i18n-release.yml`. The Zed source is pinned to the `zed_version` tag and `zed_commit` SHA in `config/project.toml`.
 
-The release workflow applies `config/distribution.toml` to patch the zed-i18n identifier, About information, and updater manifest paths. This changes the automatic update path to `zed-i18n`.
+The release workflow applies `config/distribution.toml` to patch the zed-i18n identifier, About information, and automatic updates. This redirects update checks to `zed-i18n`.
 
 ## Known Limitations
 

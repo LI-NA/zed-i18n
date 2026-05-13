@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 [Releases](https://github.com/LI-NA/zed-i18n/releases)에서 최신 빌드를 다운로드받을 수 있습니다. 수동으로 빌드를 하고 싶으시다면, 아래 절차로 직접 빌드할 수 있습니다.
 
+현재 배포 파일은 코드 서명이 적용되어 있지 않습니다. macOS에서 열리지 않으면 신뢰하는 파일에 한해 Finder에서 우클릭 후 `열기`를 선택하거나, 터미널에서 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`를 실행해 격리 속성을 제거해야 할 수 있습니다.
+
 ## 설치
 
 Python 3.12 이상, [`uv`](https://docs.astral.sh/uv/) 필요.
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 릴리즈 빌드는 GitHub Actions를 통해 자동으로 이루어지며, `.github/workflows/i18n-release.yml`에 정의되어 있습니다. Zed 원본은 `config/project.toml`의 `zed_version` 태그와 `zed_commit` SHA로 고정한 버전을 사용합니다.
 
-릴리즈 workflow는 `config/distribution.toml`을 적용해 zed-i18n 식별자, About 정보, updater manifest 경로를 패치합니다. 이 과정에서 자동 업데이트 경로가 `zed-i18n`으로 변경됩니다.
+릴리즈 workflow는 `config/distribution.toml`을 적용해 zed-i18n 식별자, About 정보, 자동 업데이트 경로를 패치합니다. 이 과정에서 자동 업데이트 경로가 `zed-i18n`으로 변경됩니다.
 
 ## 알려진 한계
 
-메뉴, 버튼, 툴팁, 설정, 액션 설명 등 대부분의 UI 문자열은 직접 치환으로 처리됩니다. 다만 Command Palette나 Keymap Editor에서 런타임에 동적 생성되는 일부 action 이름은 별도 패치가 필요하므로 현재 다루고 있지 않습니다.
+메뉴, 버튼, 툴팁, 설정, 액션 설명 등 대부분의 UI 문자열은 직접 치환으로 처리됩니다. 다만 명령 팔레트나 키맵 편집기에서 런타임에 동적 생성되는 일부 action 이름은 별도 패치가 필요하므로 현재 다루고 있지 않습니다.
 
 Zed 버전이 달라져도 안정적으로 패치를 할 수 있는 방법이 있다면 기여해주시면 고맙겠습니다.
 

@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Puedes obtener las compilaciones más recientes en [Releases](https://github.com/LI-NA/zed-i18n/releases). Si prefieres compilar el proyecto tú mismo, sigue los pasos que se indican a continuación.
 
+Los archivos distribuidos todavía no tienen firma de código. Si macOS bloquea la app, hazlo solo con archivos de confianza: ábrela desde Finder con clic derecho y `Abrir`, o elimina el atributo de cuarentena con `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+
 ## Instalación
 
 Requiere Python 3.12 o posterior y [`uv`](https://docs.astral.sh/uv/).
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Las compilaciones de lanzamiento se ejecutan automáticamente a través de GitHub Actions y están definidas en `.github/workflows/i18n-release.yml`. El código fuente de Zed queda fijado por la etiqueta `zed_version` y el SHA `zed_commit` en `config/project.toml`.
 
-El flujo de lanzamiento aplica `config/distribution.toml` para parchear el identificador de zed-i18n, la información de About y la ruta del manifiesto del actualizador. Esto redirige la ruta de actualización automática a `zed-i18n`.
+El flujo de lanzamiento aplica `config/distribution.toml` para parchear el identificador de zed-i18n, la información de About y la ruta de actualización automática. Esto redirige la ruta de actualización automática a `zed-i18n`.
 
 ## Limitaciones conocidas
 
-La mayoría de las cadenas de la interfaz de usuario —menús, botones, información sobre herramientas, configuración, descripciones de acciones— se gestionan mediante sustitución directa. Sin embargo, algunos nombres de acción que se generan dinámicamente en tiempo de ejecución en la Command Palette o el Keymap Editor requieren un parche adicional y aún no están cubiertos.
+La mayoría de las cadenas de la interfaz de usuario —menús, botones, información sobre herramientas, configuración, descripciones de acciones— se gestionan mediante sustitución directa. Sin embargo, algunos nombres de acción que se generan dinámicamente en tiempo de ejecución en la paleta de comandos o el Editor de mapa de teclas requieren un parche adicional y aún no están cubiertos.
 
 Si conoces alguna forma de aplicar parches de manera fiable entre versiones de Zed, las contribuciones son muy bienvenidas.
 

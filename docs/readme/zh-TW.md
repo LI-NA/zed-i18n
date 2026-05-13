@@ -39,6 +39,8 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 你可以從 [Releases](https://github.com/LI-NA/zed-i18n/releases) 下載最新建置。若想自行建置，請依照下列步驟進行。
 
+目前發布檔案尚未套用程式碼簽署。如果 macOS 阻擋開啟，請僅對你信任的檔案在 Finder 中按右鍵選擇 `打開`，或在終端機執行 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` 移除隔離屬性。
+
 ## 安裝
 
 需要 Python 3.12 以上版本及 [`uv`](https://docs.astral.sh/uv/)。
@@ -104,11 +106,11 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 正式版建置會透過 GitHub Actions 自動執行，定義於 `.github/workflows/i18n-release.yml`。Zed 原始碼固定於 `config/project.toml` 中的 `zed_version` 標籤與 `zed_commit` SHA。
 
-發布工作流程會套用 `config/distribution.toml`，以修補 zed-i18n 識別碼、About 資訊及 updater manifest 路徑，將自動更新路徑改寫為 `zed-i18n`。
+發布工作流程會套用 `config/distribution.toml`，以修補 zed-i18n 識別碼、About 資訊及自動更新路徑，將自動更新路徑改寫為 `zed-i18n`。
 
 ## 已知限制
 
-大多數 UI 字串——選單、按鈕、工具提示、設定、動作說明——均透過直接替換來處理。然而，部分在執行時由 Command Palette 或 Keymap Editor 動態產生的動作名稱，需要另行修補，目前尚未涵蓋。
+大多數 UI 字串——選單、按鈕、工具提示、設定、動作說明——均透過直接替換來處理。然而，部分在執行時由命令選擇區或鍵盤對應編輯器動態產生的動作名稱，需要另行修補，目前尚未涵蓋。
 
 若你知道如何可靠地跨 Zed 版本套用修補，非常歡迎貢獻。
 
