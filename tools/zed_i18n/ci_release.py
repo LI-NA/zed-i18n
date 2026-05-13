@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tomllib
 from typing import Iterable
+import zipfile
 
 from .apply import apply_translations
 from .config import load_project_config, zed_checkout_path
@@ -473,6 +474,15 @@ def app_source_path(
     raise ValueError(f"unsupported platform: {platform}")
 
 
+def windows_portable_source_path(
+    zed_root: Path,
+    arch: str,
+    distribution: DistributionConfig | None = None,
+) -> Path:
+    setup_name = distribution.windows_setup_name if distribution is not None else "Zed"
+    return zed_root / "target" / f"{setup_name}-{arch}.zip"
+
+
 def app_asset_name(language: str, platform: str, arch: str) -> str:
     if platform == "linux":
         return f"zed-{language}-linux-{arch}.tar.gz"
@@ -483,15 +493,94 @@ def app_asset_name(language: str, platform: str, arch: str) -> str:
     raise ValueError(f"unsupported platform: {platform}")
 
 
+def windows_portable_asset_name(language: str, arch: str) -> str:
+    return f"Zed-{language}-windows-{arch}.zip"
+
+
+def app_asset_names(language: str, platform: str, arch: str) -> list[str]:
+    names = [app_asset_name(language, platform, arch)]
+    if platform == "windows":
+        names.append(windows_portable_asset_name(language, arch))
+    return names
+
+
 def expected_app_asset_names(
     languages: Iterable[str],
     platforms: Iterable[BuildPlatform],
 ) -> list[str]:
     return sorted(
-        app_asset_name(language, platform.platform, platform.arch)
+        name
         for platform in platforms
         for language in languages
+        for name in app_asset_names(language, platform.platform, platform.arch)
     )
+
+
+WINDOWS_PORTABLE_ENTRIES = (
+    "Zed.exe",
+    "bin",
+    "tools",
+    "appx",
+    "x64",
+    "arm64",
+    "conpty.dll",
+    "amd_ags_x64.dll",
+)
+WINDOWS_PORTABLE_COMMON_REQUIRED_ENTRIES = (
+    "Zed.exe",
+    "bin/zed.exe",
+    "bin/zed",
+    "tools/auto_update_helper.exe",
+    "appx/zed_explorer_command_injector.appx",
+    "appx/zed_explorer_command_injector.dll",
+    "conpty.dll",
+)
+WINDOWS_PORTABLE_ARCH_REQUIRED_ENTRIES = {
+    "x86_64": ("x64/OpenConsole.exe", "arm64/OpenConsole.exe", "amd_ags_x64.dll"),
+    "aarch64": ("arm64/OpenConsole.exe",),
+}
+
+
+def windows_portable_required_entries(arch: str) -> tuple[str, ...]:
+    if arch not in WINDOWS_PORTABLE_ARCH_REQUIRED_ENTRIES:
+        raise ValueError(f"unsupported Windows architecture: {arch}")
+    return (
+        *WINDOWS_PORTABLE_COMMON_REQUIRED_ENTRIES,
+        *WINDOWS_PORTABLE_ARCH_REQUIRED_ENTRIES[arch],
+    )
+
+
+def create_windows_portable_zip(zed_root: Path, arch: str, destination: Path) -> None:
+    source_dir = zed_root / "inno" / arch
+    if not source_dir.exists():
+        raise FileNotFoundError(f"expected Windows bundle payload does not exist: {source_dir}")
+
+    missing = [
+        entry
+        for entry in windows_portable_required_entries(arch)
+        if not (source_dir / entry).exists()
+    ]
+    if missing:
+        raise FileNotFoundError(
+            f"expected Windows bundle payload entries are missing: {', '.join(missing)}"
+        )
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        destination.unlink()
+
+    with zipfile.ZipFile(destination, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for entry in WINDOWS_PORTABLE_ENTRIES:
+            source = source_dir / entry
+            if not source.exists():
+                continue
+            if source.is_dir():
+                for path in sorted(item for item in source.rglob("*") if item.is_file()):
+                    archive.write(path, (Path(entry) / path.relative_to(source)).as_posix())
+            else:
+                archive.write(source, entry)
+
+    print(f"Created Windows portable zip {destination}")
 
 
 def cargo_target_dir(zed_root: Path) -> Path:
@@ -550,19 +639,48 @@ def build_shard(
             env=env,
             check=True,
         )
+        if platform == "windows":
+            create_windows_portable_zip(
+                zed_root,
+                arch,
+                windows_portable_source_path(zed_root, arch, distribution),
+            )
         copy_asset(
             app_source_path(zed_root, platform, arch, distribution),
             dist_dir,
             app_asset_name(language, platform, arch),
         )
+        if platform == "windows":
+            copy_asset(
+                windows_portable_source_path(zed_root, arch, distribution),
+                dist_dir,
+                windows_portable_asset_name(language, arch),
+            )
 
     reset_zed_checkout(zed_root)
 
 
 APP_PATTERNS = (
-    (re.compile(r"^zed-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"), "linux"),
-    (re.compile(r"^Zed-(?P<locale>.+)-macos-(?P<arch>x86_64|aarch64)\.dmg$"), "macos"),
-    (re.compile(r"^Zed-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.exe$"), "windows"),
+    (
+        re.compile(r"^zed-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
+        "linux",
+        "app",
+    ),
+    (
+        re.compile(r"^Zed-(?P<locale>.+)-macos-(?P<arch>x86_64|aarch64)\.dmg$"),
+        "macos",
+        "app",
+    ),
+    (
+        re.compile(r"^Zed-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.exe$"),
+        "windows",
+        "app",
+    ),
+    (
+        re.compile(r"^Zed-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.zip$"),
+        "windows",
+        "portable_app",
+    ),
 )
 REMOTE_PATTERN = re.compile(
     r"^zed-remote-server-(?:linux|macos|windows)-(?:x86_64|aarch64)\.(?:gz|zip)$"
@@ -579,12 +697,12 @@ def sha256_file(path: Path) -> str:
 
 def classify_asset(path: Path) -> dict[str, object]:
     name = path.name
-    for pattern, platform in APP_PATTERNS:
+    for pattern, platform, kind in APP_PATTERNS:
         match = pattern.match(name)
         if match:
             return {
                 "name": name,
-                "kind": "app",
+                "kind": kind,
                 "locale": match.group("locale"),
                 "platform": platform,
                 "arch": match.group("arch"),

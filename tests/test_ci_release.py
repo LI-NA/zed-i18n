@@ -3,12 +3,14 @@ from unittest.mock import patch
 import shutil
 import unittest
 from pathlib import Path
+import zipfile
 
 from tools.zed_i18n.ci_release import (
     app_source_path,
     build_matrix,
     bundle_env,
     classify_asset,
+    create_windows_portable_zip,
     expected_app_asset_names,
     generate_release_metadata,
     list_translation_languages,
@@ -121,6 +123,17 @@ class CiReleaseTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             classify_asset(Path("zed-remote-server-windows-aarch64.zip"))
 
+        self.assertEqual(
+            classify_asset(Path("Zed-ko-KR-windows-x86_64.zip")),
+            {
+                "name": "Zed-ko-KR-windows-x86_64.zip",
+                "kind": "portable_app",
+                "locale": "ko-KR",
+                "platform": "windows",
+                "arch": "x86_64",
+            },
+        )
+
     def test_generates_manifest_and_checksums(self) -> None:
         dist_dir = self.temp_root / "dist"
         dist_dir.mkdir()
@@ -154,7 +167,9 @@ class CiReleaseTests(unittest.TestCase):
             expected_app_asset_names(["ko-KR", "ja-JP"], platforms),
             [
                 "Zed-ja-JP-windows-aarch64.exe",
+                "Zed-ja-JP-windows-aarch64.zip",
                 "Zed-ko-KR-windows-aarch64.exe",
+                "Zed-ko-KR-windows-aarch64.zip",
                 "zed-ja-JP-linux-x86_64.tar.gz",
                 "zed-ko-KR-linux-x86_64.tar.gz",
             ],
@@ -184,6 +199,7 @@ class CiReleaseTests(unittest.TestCase):
         dist_dir = self.temp_root / "dist"
         dist_dir.mkdir()
         (dist_dir / "Zed-ko-KR-windows-x86_64.exe").write_text("app", encoding="utf-8")
+        (dist_dir / "Zed-ko-KR-windows-x86_64.zip").write_text("portable", encoding="utf-8")
 
         generate_release_metadata(
             root=self.temp_root,
@@ -206,6 +222,11 @@ class CiReleaseTests(unittest.TestCase):
             manifest["assets"][0]["download_url"],
             "https://github.com/owner/repo/releases/download/v1.2.3-i18n.5/Zed-ko-KR-windows-x86_64.exe",
         )
+        self.assertEqual(manifest["assets"][1]["kind"], "portable_app")
+        self.assertEqual(
+            manifest["assets"][1]["download_url"],
+            "https://github.com/owner/repo/releases/download/v1.2.3-i18n.5/Zed-ko-KR-windows-x86_64.zip",
+        )
 
     def test_windows_app_source_path_uses_distribution_setup_name(self) -> None:
         config = DistributionConfig(windows_setup_name="Zed-i18n")
@@ -214,6 +235,67 @@ class CiReleaseTests(unittest.TestCase):
             app_source_path(self.temp_root, "windows", "x86_64", config),
             self.temp_root / "target" / "Zed-i18n-x86_64.exe",
         )
+
+    def test_creates_windows_portable_zip_from_installer_payload(self) -> None:
+        payload = self.temp_root / "inno" / "x86_64"
+        for path in [
+            payload / "Zed.exe",
+            payload / "bin" / "zed.exe",
+            payload / "bin" / "zed",
+            payload / "tools" / "auto_update_helper.exe",
+            payload / "appx" / "zed_explorer_command_injector.appx",
+            payload / "appx" / "zed_explorer_command_injector.dll",
+            payload / "x64" / "OpenConsole.exe",
+            payload / "arm64" / "OpenConsole.exe",
+            payload / "conpty.dll",
+            payload / "amd_ags_x64.dll",
+            payload / "zed.iss",
+        ]:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(path.name, encoding="utf-8")
+
+        destination = self.temp_root / "target" / "Zed-x86_64.zip"
+        create_windows_portable_zip(self.temp_root, "x86_64", destination)
+
+        with zipfile.ZipFile(destination) as archive:
+            names = sorted(archive.namelist())
+
+        self.assertEqual(
+            names,
+            [
+                "Zed.exe",
+                "amd_ags_x64.dll",
+                "appx/zed_explorer_command_injector.appx",
+                "appx/zed_explorer_command_injector.dll",
+                "arm64/OpenConsole.exe",
+                "bin/zed",
+                "bin/zed.exe",
+                "conpty.dll",
+                "tools/auto_update_helper.exe",
+                "x64/OpenConsole.exe",
+            ],
+        )
+
+    def test_windows_portable_zip_rejects_incomplete_payload(self) -> None:
+        payload = self.temp_root / "inno" / "aarch64"
+        for path in [
+            payload / "Zed.exe",
+            payload / "bin" / "zed.exe",
+            payload / "bin" / "zed",
+            payload / "tools" / "auto_update_helper.exe",
+            payload / "appx" / "zed_explorer_command_injector.appx",
+            payload / "appx" / "zed_explorer_command_injector.dll",
+            payload / "arm64" / "OpenConsole.exe",
+        ]:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(path.name, encoding="utf-8")
+
+        with self.assertRaisesRegex(FileNotFoundError, "conpty.dll"):
+            create_windows_portable_zip(
+                self.temp_root,
+                "aarch64",
+                self.temp_root / "target" / "Zed-aarch64.zip",
+            )
 
     def test_windows_bundle_env_disables_ci_signing_when_values_are_empty(self) -> None:
         self.write_zed_cargo_toml()
@@ -265,9 +347,9 @@ class CiReleaseTests(unittest.TestCase):
         )
 
         self.assertNotRegex(workflow, r"uses:\s+[^#\n]+@v\d")
-        self.assertIn("actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5", workflow)
-        self.assertIn("astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081", workflow)
-        self.assertIn("actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02", workflow)
+        self.assertIn("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd", workflow)
+        self.assertIn("astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b", workflow)
+        self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
 
     def test_patches_bundle_scripts_to_skip_remote_server_build(self) -> None:
         script_dir = self.temp_root / "script"
