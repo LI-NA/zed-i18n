@@ -56,10 +56,10 @@ jobs:
       build-count: ${{ steps.matrix.outputs.build-count }}
     steps:
       - name: Checkout zed-i18n
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
 
@@ -96,10 +96,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout zed-i18n
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
 
@@ -148,15 +148,31 @@ jobs:
       DISTRIBUTION_PATCHES_ENABLED: ${{ github.event_name != 'workflow_dispatch' || inputs.distribution_patches }}
     steps:
       - name: Checkout zed-i18n
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
 
       - name: Install Python
         run: uv python install 3.12
+
+      - name: Configure Windows Cargo paths
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          git config --global core.longpaths true
+
+          $workspaceRoot = [System.IO.Path]::GetPathRoot($env:GITHUB_WORKSPACE)
+          $cargoHome = Join-Path $workspaceRoot "c"
+
+          New-Item -ItemType Directory -Force -Path $cargoHome | Out-Null
+
+          "CARGO_HOME=$cargoHome" >> $env:GITHUB_ENV
+          "CARGO_NET_GIT_FETCH_WITH_CLI=true" >> $env:GITHUB_ENV
+
+          Write-Host "Using CARGO_HOME=$cargoHome"
 
       - name: Fetch Zed source
         run: uv run zed-i18n fetch-zed
@@ -170,9 +186,9 @@ jobs:
 
       - name: Setup macOS Node
         if: matrix.platform == 'macos'
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Limit Cargo jobs on macOS arm64
         if: matrix.platform == 'macos' && matrix.arch == 'aarch64'
@@ -198,7 +214,7 @@ jobs:
             "${distribution_args[@]}"
 
       - name: Upload shard artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.artifact }}
           path: dist/*
@@ -219,10 +235,10 @@ jobs:
       artifact-metadata: write
     steps:
       - name: Checkout zed-i18n
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Setup uv
-        uses: astral-sh/setup-uv@e58605a9b6da7c637471fab8847a5e5a6b8df081 # v5
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           enable-cache: true
 
@@ -230,7 +246,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Download shard artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           path: release-artifacts
           pattern: zed-i18n-*
@@ -257,7 +273,7 @@ jobs:
           subject-path: release-artifacts/*
 
       - name: Upload combined artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: zed-i18n-release-assets
           path: release-artifacts/*
@@ -278,7 +294,7 @@ jobs:
       name: release
     steps:
       - name: Download combined artifact
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
           name: zed-i18n-release-assets
           path: release-artifacts
