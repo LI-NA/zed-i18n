@@ -166,15 +166,15 @@ jobs:
         run: uv run zed-i18n fetch-zed
 
       - name: Cache Rust dependencies
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ${{ steps.rust-cache.outputs.cargo-home }}/registry/index
             ${{ steps.rust-cache.outputs.cargo-home }}/registry/cache
             ${{ steps.rust-cache.outputs.cargo-home }}/git/db
-          key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}-${{ hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml', 'config/project.toml') }}
+          key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml') }}
           restore-keys: |
-            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}-
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-
             zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-
 
       - name: Setup Linux dependencies

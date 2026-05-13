@@ -374,8 +374,10 @@ class CiReleaseTests(unittest.TestCase):
         )
 
         self.assertIn("Configure Rust cache environment", workflow)
-        self.assertIn("rust-cache-env --platform", workflow)
+        self.assertIn('rust-cache-env --platform "${{ matrix.platform }}"', workflow)
+        self.assertNotIn('rust-cache-env --platform "${{ matrix.platform }}" --arch', workflow)
         self.assertIn("Cache Rust dependencies", workflow)
+        self.assertIn("uses: actions/cache@", workflow)
         self.assertIn("registry/cache", workflow)
         self.assertIn("git/db", workflow)
         self.assertNotIn("steps.rust-cache.outputs.cargo-home }}/bin", workflow)
@@ -388,14 +390,27 @@ class CiReleaseTests(unittest.TestCase):
         self.assertNotIn("cargo-paths-posix", workflow)
         self.assertNotIn("cargo-paths-windows", workflow)
         self.assertIn(
-            "hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml', 'config/project.toml')",
+            "hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml')",
             workflow,
         )
         self.assertIn(
-            "key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}-",
+            "key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml') }}",
             workflow,
         )
-        self.assertNotIn("key: zed-rust-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}", workflow)
+        self.assertIn(
+            "zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-",
+            workflow,
+        )
+        self.assertIn("zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-", workflow)
+        self.assertNotIn(
+            "zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}",
+            workflow,
+        )
+        self.assertNotIn(
+            "hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml', 'config/project.toml')",
+            workflow,
+        )
+        self.assertNotIn("steps.rust-cache.outputs.cache-scope", workflow)
         self.assertNotIn("install-sccache", workflow)
         self.assertNotIn("github-script", workflow)
         self.assertNotIn("configure-sccache-gha", workflow)
@@ -412,7 +427,7 @@ class CiReleaseTests(unittest.TestCase):
         self.assertNotRegex(workflow, r"uses:\s+[^#\n]+@v\d")
         self.assertIn("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd", workflow)
         self.assertIn("astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b", workflow)
-        self.assertIn("actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57", workflow)
+        self.assertIn("actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae", workflow)
         self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
 
     def test_patches_bundle_scripts_to_skip_remote_server_build(self) -> None:
