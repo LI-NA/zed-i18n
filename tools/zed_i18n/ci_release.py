@@ -783,6 +783,49 @@ def resolve_workspace_path(root: Path, value: str) -> Path:
     return ensure_inside_workspace(root, path.resolve())
 
 
+def append_github_file(env_name: str, lines: Iterable[str]) -> None:
+    path = os.environ.get(env_name)
+    if not path:
+        return
+    with Path(path).open("a", encoding="utf-8", newline="\n") as file:
+        for line in lines:
+            file.write(f"{line}\n")
+
+
+def github_actions_cargo_home(root: Path, platform: str) -> Path:
+    if platform == "windows":
+        workspace = Path(os.environ.get("GITHUB_WORKSPACE", root))
+        anchor = workspace.anchor or workspace.drive
+        if not anchor:
+            return root / ".cargo-home"
+        return Path(anchor) / "c"
+
+    runner_temp = Path(os.environ.get("RUNNER_TEMP", root / ".tmp"))
+    return runner_temp / "cargo-home"
+
+
+def configure_github_rust_cache_env(root: Path, platform: str) -> None:
+    cargo_home = github_actions_cargo_home(root, platform)
+    cargo_bin = cargo_home / "bin"
+    cargo_bin.mkdir(parents=True, exist_ok=True)
+
+    if platform == "windows":
+        subprocess.run(["git", "config", "--global", "core.longpaths", "true"], check=False)
+
+    append_github_file(
+        "GITHUB_ENV",
+        [
+            f"CARGO_HOME={cargo_home}",
+            "CARGO_NET_GIT_FETCH_WITH_CLI=true",
+        ],
+    )
+    append_github_file("GITHUB_PATH", [str(cargo_bin)])
+    cargo_home_for_actions = str(cargo_home).replace("\\", "/")
+    append_github_file("GITHUB_OUTPUT", [f"cargo-home={cargo_home_for_actions}"])
+
+    print(f"Using CARGO_HOME={cargo_home}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m tools.zed_i18n.ci_release")
     parser.add_argument("--root", default=".", help="zed-i18n repository root")
@@ -813,6 +856,9 @@ def build_parser() -> argparse.ArgumentParser:
     metadata_parser.add_argument("--run-id")
     metadata_parser.add_argument("--languages")
     metadata_parser.add_argument("--platforms")
+
+    rust_cache_parser = subparsers.add_parser("rust-cache-env")
+    rust_cache_parser.add_argument("--platform", required=True, choices=["linux", "macos", "windows"])
 
     return parser
 
@@ -859,6 +905,9 @@ def main(argv: list[str] | None = None) -> int:
                 run_id=args.run_id,
                 expected_assets=expected_assets,
             )
+            return 0
+        if args.command == "rust-cache-env":
+            configure_github_rust_cache_env(root, args.platform)
             return 0
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)

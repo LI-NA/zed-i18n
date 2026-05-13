@@ -158,24 +158,24 @@ jobs:
       - name: Install Python
         run: uv python install 3.12
 
-      - name: Configure Windows Cargo paths
-        if: matrix.platform == 'windows'
-        shell: pwsh
-        run: |
-          git config --global core.longpaths true
-
-          $workspaceRoot = [System.IO.Path]::GetPathRoot($env:GITHUB_WORKSPACE)
-          $cargoHome = Join-Path $workspaceRoot "c"
-
-          New-Item -ItemType Directory -Force -Path $cargoHome | Out-Null
-
-          "CARGO_HOME=$cargoHome" >> $env:GITHUB_ENV
-          "CARGO_NET_GIT_FETCH_WITH_CLI=true" >> $env:GITHUB_ENV
-
-          Write-Host "Using CARGO_HOME=$cargoHome"
+      - name: Configure Rust cache environment
+        id: rust-cache
+        run: uv run python -m tools.zed_i18n.ci_release rust-cache-env --platform "${{ matrix.platform }}"
 
       - name: Fetch Zed source
         run: uv run zed-i18n fetch-zed
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: |
+            ${{ steps.rust-cache.outputs.cargo-home }}/registry/index
+            ${{ steps.rust-cache.outputs.cargo-home }}/registry/cache
+            ${{ steps.rust-cache.outputs.cargo-home }}/git/db
+          key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}-${{ hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml', 'config/project.toml') }}
+          restore-keys: |
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}-
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-
 
       - name: Setup Linux dependencies
         if: matrix.platform == 'linux'

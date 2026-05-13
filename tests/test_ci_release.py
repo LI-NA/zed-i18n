@@ -10,6 +10,7 @@ from tools.zed_i18n.ci_release import (
     build_matrix,
     bundle_env,
     classify_asset,
+    configure_github_rust_cache_env,
     create_windows_portable_zip,
     expected_app_asset_names,
     generate_release_metadata,
@@ -341,6 +342,68 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("actions/attest@281a49d4cbb0a72c9575a50d18f6deb515a11deb", workflow)
         self.assertIn("subject-path: release-artifacts/*", workflow)
 
+    def test_github_rust_cache_env_writes_linux_paths(self) -> None:
+        github_env = self.temp_root / "github-env.txt"
+        github_path = self.temp_root / "github-path.txt"
+        github_output = self.temp_root / "github-output.txt"
+        runner_temp = self.temp_root / "runner-temp"
+        cargo_home = runner_temp / "cargo-home"
+        cargo_home_output = str(cargo_home).replace("\\", "/")
+
+        with patch.dict(
+            "os.environ",
+            {
+                "GITHUB_ENV": str(github_env),
+                "GITHUB_PATH": str(github_path),
+                "GITHUB_OUTPUT": str(github_output),
+                "GITHUB_WORKSPACE": str(self.temp_root),
+                "RUNNER_TEMP": str(runner_temp),
+            },
+            clear=True,
+        ):
+            configure_github_rust_cache_env(self.temp_root, "linux")
+
+        self.assertIn(f"CARGO_HOME={cargo_home}", github_env.read_text(encoding="utf-8"))
+        self.assertIn("CARGO_NET_GIT_FETCH_WITH_CLI=true", github_env.read_text(encoding="utf-8"))
+        self.assertEqual(f"{cargo_home / 'bin'}\n", github_path.read_text(encoding="utf-8"))
+        self.assertEqual(f"cargo-home={cargo_home_output}\n", github_output.read_text(encoding="utf-8"))
+
+    def test_release_workflow_configures_github_actions_rust_cache(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Configure Rust cache environment", workflow)
+        self.assertIn("rust-cache-env --platform", workflow)
+        self.assertIn("Cache Rust dependencies", workflow)
+        self.assertIn("registry/cache", workflow)
+        self.assertIn("git/db", workflow)
+        self.assertNotIn("steps.rust-cache.outputs.cargo-home }}/bin", workflow)
+        self.assertNotIn(".crates.toml", workflow)
+        self.assertNotIn(".crates2.json", workflow)
+        self.assertNotIn("registry/src", workflow)
+        self.assertNotIn("git/checkouts", workflow)
+        self.assertNotIn("target/sccache", workflow)
+        self.assertNotIn("Configure Windows Cargo paths", workflow)
+        self.assertNotIn("cargo-paths-posix", workflow)
+        self.assertNotIn("cargo-paths-windows", workflow)
+        self.assertIn(
+            "hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml', 'config/project.toml')",
+            workflow,
+        )
+        self.assertIn(
+            "key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ needs.prepare.outputs.zed-version }}-",
+            workflow,
+        )
+        self.assertNotIn("key: zed-rust-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}", workflow)
+        self.assertNotIn("install-sccache", workflow)
+        self.assertNotIn("github-script", workflow)
+        self.assertNotIn("configure-sccache-gha", workflow)
+        self.assertNotIn("SCCACHE_", workflow)
+        self.assertNotIn("RUSTC_WRAPPER", workflow)
+        self.assertNotIn("R2_ACCOUNT_ID", workflow)
+        self.assertNotIn("R2_ACCESS_KEY_ID", workflow)
+
     def test_release_workflow_pins_actions_to_full_commit_shas(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
@@ -349,6 +412,7 @@ class CiReleaseTests(unittest.TestCase):
         self.assertNotRegex(workflow, r"uses:\s+[^#\n]+@v\d")
         self.assertIn("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd", workflow)
         self.assertIn("astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b", workflow)
+        self.assertIn("actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57", workflow)
         self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
 
     def test_patches_bundle_scripts_to_skip_remote_server_build(self) -> None:
