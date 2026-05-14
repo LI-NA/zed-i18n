@@ -217,13 +217,17 @@ def patch_windows_bundle_metadata(zed_root: Path, config: DistributionConfig) ->
 
 
 def patch_windows_resources(zed_root: Path, config: DistributionConfig) -> None:
-    build_rs = zed_root / "crates" / "zed" / "build.rs"
-    text = _read(build_rs)
+    windows_resources = (
+        zed_root / "crates" / "windows_resources" / "src" / "windows_resources.rs"
+    )
+    text = _read(windows_resources)
     replacements = [
-        ('res.set("FileDescription", "Zed")', f'res.set("FileDescription", "{config.product_name}")'),
-        ('res.set("ProductName", "Zed")', f'res.set("ProductName", "{config.product_name}")'),
+        (
+            '"stable" => ("app-icon.ico", "Zed")',
+            f'"stable" => ("app-icon.ico", "{config.product_name}")',
+        ),
     ]
-    _write(build_rs, _replace_many(text, replacements, build_rs))
+    _write(windows_resources, _replace_many(text, replacements, windows_resources))
 
     appx = zed_root / "crates" / "explorer_command_injector" / "AppxManifest.xml"
     text = _read(appx)

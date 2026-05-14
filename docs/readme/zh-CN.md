@@ -2,7 +2,7 @@
   <h1>zed-i18n</h1>
   <p><strong>轻松将 Zed 编辑器翻译成你的语言。</strong></p>
 
-  [![Zed v1.1.8](https://img.shields.io/badge/Zed-v1.1.8-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.1.8)
+  [![Zed v1.2.3](https://img.shields.io/badge/Zed-v1.2.3-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.3)
   [![Python ≥3.12](https://img.shields.io/badge/Python-≥3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
   [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue)](../../LICENSE)
   [![MIT components](https://img.shields.io/badge/MIT-components-yellow)](../../LICENSE-MIT)
@@ -57,9 +57,9 @@ uv sync
 
 ```powershell
 uv run zed-i18n fetch-zed
-uv run zed-i18n extract --zed-root .cache/zed/v1.1.8-clean-extract
-uv run zed-i18n audit-candidates --zed-root .cache/zed/v1.1.8-clean-extract
-uv run zed-i18n prepare-translation --language ko-KR --zed-root .cache/zed/v1.1.8-clean-extract
+uv run zed-i18n extract --zed-root .cache/zed/v1.2.3-clean-extract
+uv run zed-i18n audit-candidates --zed-root .cache/zed/v1.2.3-clean-extract
+uv run zed-i18n prepare-translation --language ko-KR --zed-root .cache/zed/v1.2.3-clean-extract
 uv run zed-i18n merge-translation --language ko-KR
 uv run zed-i18n validate --language ko-KR
 uv run zed-i18n apply --language ko-KR
@@ -98,7 +98,7 @@ git clone https://github.com/microsoft/vscode .cache/vscode-upstream
 ```powershell
 $env:CARGO_TARGET_DIR = (Resolve-Path .cache\zed\target).Path
 $env:CARGO_INCREMENTAL = "1"
-cd .cache\zed\v1.1.8
+cd .cache\zed\v1.2.3
 cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 ```
 

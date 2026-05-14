@@ -40,7 +40,6 @@ class LinePattern:
 
 CALL_RULES: dict[str, tuple[int, str, str]] = {
     "MenuItem::action": (0, "menu_item", "MenuItem::action"),
-    "MenuItem::os_action": (0, "menu_item", "MenuItem::os_action"),
     "Menu::new": (0, "menu", "Menu::new"),
     "ContextMenuEntry::new": (0, "context_menu_entry", "ContextMenuEntry::new"),
     "ConfiguredApiCard::new": (0, "configured_api_card_label", "ConfiguredApiCard::new"),
@@ -49,7 +48,6 @@ CALL_RULES: dict[str, tuple[int, str, str]] = {
     "Headline::new": (0, "headline", "Headline::new"),
     "Button::new": (1, "button", "Button::new"),
     "ButtonLink::new": (0, "button_link", "ButtonLink::new"),
-    "CopyButton::new": (1, "button", "CopyButton::new"),
     "InputField::new": (2, "placeholder", "InputField::new"),
     "Tooltip::text": (0, "tooltip", "Tooltip::text"),
     "Tooltip::simple": (0, "tooltip", "Tooltip::simple"),
@@ -90,7 +88,6 @@ STRUCT_FIELD_RULES: dict[tuple[str, str], tuple[str, str]] = {
     ),
     ("PathPromptOptions", "prompt"): ("path_prompt", "PathPromptOptions.prompt"),
     ("Content", "message"): ("content_message", "Content.message"),
-    ("Content", "tooltip_message"): ("content_tooltip_message", "Content.tooltip_message"),
 }
 
 UI_RETURN_METHODS: dict[str, tuple[str, str]] = {
@@ -288,8 +285,6 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
             (1, "switch_label", "SwitchField::new"),
             (2, "switch_description", "SwitchField::new"),
         )
-    if canonical == "KeybindingHint::with_suffix" or canonical.endswith("::KeybindingHint::with_suffix"):
-        return ((1, "keybinding_hint_suffix", "KeybindingHint::with_suffix"),)
     if canonical.endswith(".suffix") and "KeybindingHint::" in canonical:
         return ((0, "keybinding_hint_suffix", "KeybindingHint.suffix"),)
     if canonical in {"panel_button", "panel_filled_button"}:
@@ -324,8 +319,6 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
         return ((0, "context_menu_action", "action"),)
     if canonical.endswith(".action_disabled_when"):
         return ((1, "context_menu_action", "action_disabled_when"),)
-    if canonical.endswith(".heading") or canonical == "heading":
-        return ((0, "announcement_heading", "heading"),)
     return ()
 
 
@@ -1113,12 +1106,6 @@ LINE_PATTERNS: tuple[LinePattern, ...] = (
         1,
     ),
     LinePattern(
-        re.compile(r'\bCopyButton::new\s*\(\s*[^,\n]+,\s*("(?:\\.|[^"\\])*")'),
-        "CopyButton::new",
-        "button",
-        1,
-    ),
-    LinePattern(
         re.compile(r'\bButtonLink::new\s*\(\s*("(?:\\.|[^"\\])*")'),
         "ButtonLink::new",
         "button_link",
@@ -1269,18 +1256,6 @@ LINE_PATTERNS: tuple[LinePattern, ...] = (
         1,
     ),
     LinePattern(
-        re.compile(r'\.link\s*\(\s*("(?:\\.|[^"\\])*")'),
-        "link",
-        "link",
-        1,
-    ),
-    LinePattern(
-        re.compile(r'\.link_with_handler\s*\(\s*("(?:\\.|[^"\\])*")'),
-        "link_with_handler",
-        "link",
-        1,
-    ),
-    LinePattern(
         re.compile(r'\.label\s*\(\s*("(?:\\.|[^"\\])*")'),
         "label",
         "label",
@@ -1349,12 +1324,6 @@ SETTINGS_UI_LINE_PATTERNS: tuple[LinePattern, ...] = (
         1,
     ),
     LinePattern(
-        re.compile(r'\bbutton_text:\s*("(?:\\.|[^"\\])*")(?:\.into\(\))?'),
-        "settings_action_button",
-        "setting_action_button",
-        1,
-    ),
-    LinePattern(
         re.compile(r'\bplaceholder:\s*(?:Some\()?("(?:\\.|[^"\\])*")'),
         "settings_field_placeholder",
         "setting_placeholder",
@@ -1398,12 +1367,6 @@ ANNOUNCEMENT_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'\bprimary_action_label:\s*("(?:\\.|[^"\\])*")(?:\.into\(\))?'),
         "announcement_primary_action",
         "announcement_primary_action",
-        1,
-    ),
-    LinePattern(
-        re.compile(r'\bbullet_items:\s*vec!\[\s*("(?:\\.|[^"\\])*")(?:\.into\(\))?'),
-        "announcement_bullet",
-        "announcement_bullet",
         1,
     ),
 )
@@ -1467,12 +1430,6 @@ WORKSPACE_PANE_LINE_PATTERNS: tuple[LinePattern, ...] = (
 
 
 GIT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
-    LinePattern(
-        re.compile(r'^\s*("(?:\\.|[^"\\])*")\.into_any_element\(\),?\s*$'),
-        "into_any_element",
-        "child_text",
-        1,
-    ),
     LinePattern(
         re.compile(r'\bpanel_button\s*\(\s*("(?:\\.|[^"\\])*")'),
         "panel_button",
@@ -1765,12 +1722,6 @@ KEYMAP_EDITOR_MULTILINE_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
 
 
 RUST_LANGUAGE_LINE_PATTERNS: tuple[LinePattern, ...] = (
-    LinePattern(
-        re.compile(r'\blabel:\s*format!\(\s*("(?:\\.|[^"\\])*")'),
-        "TaskTemplate.label",
-        "task_template_label",
-        1,
-    ),
     LinePattern(
         re.compile(r'\blabel:\s*("(?:\\.|[^"\\])*")\.into\(\)'),
         "TaskTemplate.label",

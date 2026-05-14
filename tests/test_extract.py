@@ -423,7 +423,7 @@ class ExtractTests(unittest.TestCase):
                 '    MessageNotification::new(format!("Updated to {app_name} {}", version), cx);',
                 '    ModalHeader::new().headline("Import External Agent Threads");',
                 '    SectionHeader::new("Recent Projects");',
-                '    CopyButton::new("copy", "Copy").tooltip_label("Copy Error Message");',
+                '    CopyButton::new("copy-error-message", message).tooltip_label("Copy Error Message");',
                 "}",
             ]
         )
@@ -723,8 +723,15 @@ class ExtractTests(unittest.TestCase):
             [
                 "fn render(menu: ContextMenu, cx: &mut App) {",
                 '    div().child("Could not open file");',
-                '    menu.link("Go to Copilot Settings", url);',
-                '    menu.link_with_handler("Learn More", |_, _| {});',
+                "    menu.link(",
+                '        "Go to Copilot Settings",',
+                "        OpenBrowser { url }.boxed_clone(),",
+                "    );",
+                "    menu.link_with_handler(",
+                '        "Learn More",',
+                "        OpenBrowser { url }.boxed_clone(),",
+                "        |_, _| {},",
+                "    );",
                 '    ContextMenuEntry::new("Training Data Collection")',
                 "        .documentation_aside(DocumentationSide::Left, move |cx| {",
                 "            let (msg, color) = match enabled {",
@@ -826,7 +833,6 @@ class ExtractTests(unittest.TestCase):
                 "fn content() -> Content {",
                 "    Content {",
                 '        message: format!("Downloading {}...", name),',
-                '        tooltip_message: Some(format!("{health_str}{message}")),',
                 "    }",
                 "}",
             ]
@@ -838,9 +844,8 @@ class ExtractTests(unittest.TestCase):
         )
 
         by_source = {occurrence.source: occurrence for occurrence in occurrences}
-        self.assertEqual(set(by_source), {"Downloading {}...", "{health_str}{message}"})
+        self.assertEqual(set(by_source), {"Downloading {}..."})
         self.assertEqual(by_source["Downloading {}..."].call, "Content.message")
-        self.assertEqual(by_source["{health_str}{message}"].kind, "content_tooltip_message")
 
     def test_extracts_activity_indicator_dynamic_status_messages(self) -> None:
         source = "\n".join(
@@ -1483,7 +1488,11 @@ class ExtractTests(unittest.TestCase):
                 "impl GitPanel {",
                 "    fn render_uninitialized_ui(&self) -> Vec<AnyElement> {",
                 "        vec![",
-                '            "No Git Repositories".into_any_element(),',
+                "            div()",
+                "                .self_stretch()",
+                "                .text_center()",
+                '                .child("No Git Repositories")',
+                "                .into_any_element(),",
                 '            panel_filled_button("Initialize Repository")',
                 "                .tooltip(Tooltip::for_action_title_in(",
                 '                    "git init",',
@@ -1581,7 +1590,9 @@ class ExtractTests(unittest.TestCase):
                 "    Some(AnnouncementContent {",
                 '        heading: "Introducing Parallel Agents".into(),',
                 '        description: "Run multiple threads of your favorite agents simultaneously across projects.".into(),',
-                '        bullet_items: vec!["Use your favorite agents in parallel".into()],',
+                "        bullet_items: vec![",
+                '            "Use your favorite agents in parallel".into(),',
+                "        ],",
                 '        primary_action_label: "Try Agentic Layout".into(),',
                 "    });",
                 '    Self::new(IconName::Download, "Restart to Update");',

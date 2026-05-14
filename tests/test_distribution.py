@@ -89,10 +89,16 @@ identifier = "dev.zed.Zed"
 name = "Zed"
 osx_url_schemes = ["zed"]
 """,
-            "crates/zed/build.rs": """
-fn main() {
-    res.set("FileDescription", "Zed");
-    res.set("ProductName", "Zed");
+            "crates/windows_resources/src/windows_resources.rs": """
+pub fn compile(manifest: bool) -> Result<(), Box<dyn std::error::Error>> {
+    let channel = option_env!("RELEASE_CHANNEL").unwrap_or("dev");
+    let (icon_filename, product_name) = match channel {
+        "stable" => ("app-icon.ico", "Zed"),
+        "preview" => ("app-icon-preview.ico", "Zed Preview"),
+        "nightly" => ("app-icon-nightly.ico", "Zed Nightly"),
+        _ => ("app-icon-dev.ico", "Zed Dev"),
+    };
+    Ok(())
 }
 """,
             "script/bundle-linux": """
@@ -247,6 +253,9 @@ fn app_menus() -> Vec<Menu> {
         bundle_windows = (self.zed_root / "script/bundle-windows.ps1").read_text(
             encoding="utf-8"
         )
+        windows_resources = (
+            self.zed_root / "crates/windows_resources/src/windows_resources.rs"
+        ).read_text(encoding="utf-8")
         auto_update = (self.zed_root / "crates/auto_update/src/auto_update.rs").read_text(
             encoding="utf-8"
         )
@@ -266,6 +275,8 @@ fn app_menus() -> Vec<Menu> {
         self.assertNotIn('$appId = "{{48948123-2766-49EA-9C78-31B8096DE3D6}}"', bundle_windows)
         self.assertIn('$appName = "Zed i18n"', bundle_windows)
         self.assertIn('$appExeName = "Zed"', bundle_windows)
+        self.assertIn('"stable" => ("app-icon.ico", "Zed i18n")', windows_resources)
+        self.assertIn('"preview" => ("app-icon-preview.ico", "Zed Preview")', windows_resources)
         self.assertIn("ZED_I18N_UPDATE_MANIFEST_URL", auto_update)
         self.assertIn("get_i18n_release_asset", auto_update)
         self.assertIn('"zed-remote-server" => return Ok(None)', auto_update)
