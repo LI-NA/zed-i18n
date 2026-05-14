@@ -1,5 +1,5 @@
-name: localized Zed release
-run-name: localized Zed release ${{ inputs.release_tag || github.ref_name }}
+name: Release
+run-name: Release ${{ inputs.release_tag || github.ref_name }}
 
 on:
   push:
