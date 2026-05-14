@@ -12,8 +12,10 @@ from tools.zed_i18n.ci_release import (
     classify_asset,
     configure_github_rust_cache_env,
     create_windows_portable_zip,
+    disk_summary_entries,
     expected_app_asset_names,
     generate_release_metadata,
+    github_matrix_outputs,
     list_translation_languages,
     patch_remote_server_build,
     runner_override_env_name,
@@ -116,6 +118,37 @@ class CiReleaseTests(unittest.TestCase):
         )
 
         self.assertEqual([row["id"] for row in rows], ["linux-x86_64-de-DE", "linux-x86_64-ko-KR"])
+
+    def test_github_matrix_outputs_split_rows_by_platform(self) -> None:
+        for language in ["de-DE", "ko-KR"]:
+            self.write_translation(language)
+
+        outputs = github_matrix_outputs(
+            self.temp_root,
+            language_spec="all",
+            platform_spec="linux-x86_64,macos-aarch64,windows-x86_64",
+            shard_size=1,
+        )
+
+        self.assertEqual(outputs["build-count"], "6")
+        self.assertEqual(outputs["linux-build-count"], "2")
+        self.assertEqual(outputs["macos-build-count"], "2")
+        self.assertEqual(outputs["windows-build-count"], "2")
+        linux_matrix = json.loads(outputs["linux-matrix"])
+        macos_matrix = json.loads(outputs["macos-matrix"])
+        windows_matrix = json.loads(outputs["windows-matrix"])
+        self.assertEqual(
+            [row["id"] for row in linux_matrix["include"]],
+            ["linux-x86_64-de-DE", "linux-x86_64-ko-KR"],
+        )
+        self.assertEqual(
+            [row["id"] for row in macos_matrix["include"]],
+            ["macos-aarch64-de-DE", "macos-aarch64-ko-KR"],
+        )
+        self.assertEqual(
+            [row["id"] for row in windows_matrix["include"]],
+            ["windows-x86_64-de-DE", "windows-x86_64-ko-KR"],
+        )
 
     def test_select_platform_family_expands_to_architectures(self) -> None:
         platforms = select_platforms("linux,windows-x86_64")
@@ -409,6 +442,21 @@ class CiReleaseTests(unittest.TestCase):
         self.assertEqual(f"{cargo_home / 'bin'}\n", github_path.read_text(encoding="utf-8"))
         self.assertEqual(f"cargo-home={cargo_home_output}\n", github_output.read_text(encoding="utf-8"))
 
+    def test_disk_summary_entries_use_nearest_existing_path(self) -> None:
+        missing_target = self.temp_root / "missing" / "target"
+
+        entries = disk_summary_entries(
+            [
+                ("workspace", self.temp_root),
+                ("target", missing_target),
+            ]
+        )
+
+        self.assertEqual([entry.label for entry in entries], ["workspace", "target"])
+        self.assertEqual(entries[1].path, self.temp_root.resolve())
+        self.assertGreater(entries[0].total_bytes, 0)
+        self.assertGreater(entries[0].free_bytes, 0)
+
     def test_release_workflow_configures_github_actions_rust_cache(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
@@ -460,14 +508,70 @@ class CiReleaseTests(unittest.TestCase):
         self.assertNotIn("R2_ACCOUNT_ID", workflow)
         self.assertNotIn("R2_ACCESS_KEY_ID", workflow)
 
+    def test_release_workflow_records_disk_space_and_cleans_linux_runners(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Record initial disk space", workflow)
+        self.assertIn("disk-summary --label \"initial\"", workflow)
+        self.assertIn("build-linux:", workflow)
+        self.assertIn("Clean Linux runner disk", workflow)
+        self.assertIn("sudo rm -rf /usr/local/lib/android", workflow)
+        self.assertIn("sudo rm -rf /usr/share/dotnet", workflow)
+        self.assertIn("Record disk space after Linux cleanup", workflow)
+        self.assertIn("disk-summary --label \"after-linux-cleanup\"", workflow)
+
+    def test_release_workflow_cleans_only_macos_core_simulator(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Clean macOS CoreSimulator", workflow)
+        self.assertIn("build-macos:", workflow)
+        self.assertIn("sudo rm -rf /Library/Developer/CoreSimulator", workflow)
+        self.assertNotIn("sudo rm -rf /opt/homebrew", workflow)
+        self.assertNotIn("sudo rm -rf /Users/runner/hostedtoolcache", workflow)
+
     def test_release_workflow_defaults_tag_pushes_to_single_language_shards(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
         )
 
         self.assertIn("SHARD_SIZE: ${{ inputs.shard_size || '1' }}", workflow)
-        self.assertIn("name: Build ${{ matrix.id }}", workflow)
+        self.assertIn("name: Build Linux ${{ matrix.id }}", workflow)
+        self.assertIn("name: Build macOS ${{ matrix.id }}", workflow)
+        self.assertIn("name: Build Windows ${{ matrix.id }}", workflow)
         self.assertNotIn("SHARD_SIZE: ${{ inputs.shard_size || '4' }}", workflow)
+
+    def test_release_workflow_splits_build_jobs_by_platform(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+        workflow = workflow.replace("\r\n", "\n")
+
+        self.assertIn("linux-matrix: ${{ steps.matrix.outputs.linux-matrix }}", workflow)
+        self.assertIn("macos-matrix: ${{ steps.matrix.outputs.macos-matrix }}", workflow)
+        self.assertIn("windows-matrix: ${{ steps.matrix.outputs.windows-matrix }}", workflow)
+        self.assertIn("build-linux:", workflow)
+        self.assertIn("build-macos:", workflow)
+        self.assertIn("build-windows:", workflow)
+        self.assertIn("matrix: ${{ fromJson(needs.prepare.outputs['linux-matrix']) }}", workflow)
+        self.assertIn("matrix: ${{ fromJson(needs.prepare.outputs['macos-matrix']) }}", workflow)
+        self.assertIn("matrix: ${{ fromJson(needs.prepare.outputs['windows-matrix']) }}", workflow)
+        linux_job = workflow.split("\n  build-linux:\n", 1)[1].split("\n  build-macos:\n", 1)[0]
+        macos_job = workflow.split("\n  build-macos:\n", 1)[1].split("\n  build-windows:\n", 1)[0]
+        windows_job = workflow.split("\n  build-windows:\n", 1)[1].split("\n  package:\n", 1)[0]
+        self.assertIn("max-parallel: 5", linux_job)
+        self.assertIn("max-parallel: 5", macos_job)
+        self.assertIn("max-parallel: 10", windows_job)
+        package_job = workflow.split("\n  package:\n", 1)[1].split("\n  publish:\n", 1)[0]
+        self.assertIn("- validate", package_job)
+        self.assertIn("needs.validate.result == 'success'", package_job)
+        self.assertIn("needs['build-linux'].result != 'failure'", workflow)
+        self.assertIn("needs['build-macos'].result != 'failure'", workflow)
+        self.assertIn("needs['build-windows'].result != 'failure'", workflow)
+        self.assertNotIn("\n  build:\n", workflow)
 
     def test_release_workflow_pins_actions_to_full_commit_shas(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(

@@ -52,9 +52,15 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      linux-matrix: ${{ steps.matrix.outputs.linux-matrix }}
+      macos-matrix: ${{ steps.matrix.outputs.macos-matrix }}
+      windows-matrix: ${{ steps.matrix.outputs.windows-matrix }}
       languages: ${{ steps.matrix.outputs.languages }}
       zed-version: ${{ steps.matrix.outputs.zed-version }}
       build-count: ${{ steps.matrix.outputs.build-count }}
+      linux-build-count: ${{ steps.matrix.outputs.linux-build-count }}
+      macos-build-count: ${{ steps.matrix.outputs.macos-build-count }}
+      windows-build-count: ${{ steps.matrix.outputs.windows-build-count }}
     steps:
       - name: Checkout zed-i18n
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -90,6 +96,9 @@ jobs:
           echo "Zed version: ${{ steps.matrix.outputs.zed-version }}"
           echo "Languages: ${{ steps.matrix.outputs.languages }}"
           echo "Build jobs: ${{ steps.matrix.outputs.build-count }}"
+          echo "Linux build jobs: ${{ steps.matrix.outputs.linux-build-count }}"
+          echo "macOS build jobs: ${{ steps.matrix.outputs.macos-build-count }}"
+          echo "Windows build jobs: ${{ steps.matrix.outputs.windows-build-count }}"
 
   validate:
     name: Validate translations
@@ -116,34 +125,19 @@ jobs:
             uv run zed-i18n validate --language "$locale"
           done
 
-  build:
-    name: Build ${{ matrix.id }}
+  build-linux:
+    name: Build Linux ${{ matrix.id }}
     needs:
       - prepare
       - validate
+    if: ${{ needs.prepare.outputs['linux-build-count'] != '0' }}
     strategy:
       fail-fast: false
-      max-parallel: 20
-      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+      max-parallel: 5
+      matrix: ${{ fromJson(needs.prepare.outputs['linux-matrix']) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
     env:
-      ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
-      ZED_MINIDUMP_ENDPOINT: ${{ secrets.ZED_SENTRY_MINIDUMP_ENDPOINT }}
-      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
-      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-      APPLE_NOTARIZATION_KEY: ${{ secrets.APPLE_NOTARIZATION_KEY }}
-      APPLE_NOTARIZATION_KEY_ID: ${{ secrets.APPLE_NOTARIZATION_KEY_ID }}
-      APPLE_NOTARIZATION_ISSUER_ID: ${{ secrets.APPLE_NOTARIZATION_ISSUER_ID }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_SIGNING_TENANT_ID }}
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_SIGNING_CLIENT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}
-      ACCOUNT_NAME: ${{ vars.AZURE_SIGNING_ACCOUNT_NAME }}
-      CERT_PROFILE_NAME: ${{ vars.AZURE_SIGNING_CERT_PROFILE_NAME }}
-      ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
-      FILE_DIGEST: SHA256
-      TIMESTAMP_DIGEST: SHA256
-      TIMESTAMP_SERVER: http://timestamp.acs.microsoft.com
       ZED_I18N_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name || '' }}
       ZED_I18N_REPOSITORY: ${{ github.repository }}
       DISTRIBUTION_PATCHES_ENABLED: ${{ github.event_name != 'workflow_dispatch' || inputs.distribution_patches }}
@@ -163,6 +157,27 @@ jobs:
         id: rust-cache
         run: uv run python -m tools.zed_i18n.ci_release rust-cache-env --platform "${{ matrix.platform }}"
 
+      - name: Record initial disk space
+        run: uv run python -m tools.zed_i18n.ci_release disk-summary --label "initial"
+
+      - name: Clean Linux runner disk
+        shell: bash
+        run: |
+          df -h "$GITHUB_WORKSPACE"
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/az
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/local/share/chromium
+          docker system prune --all --force || true
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile /swapfile || true
+          df -h "$GITHUB_WORKSPACE"
+
+      - name: Record disk space after Linux cleanup
+        run: uv run python -m tools.zed_i18n.ci_release disk-summary --label "after-linux-cleanup"
+
       - name: Fetch Zed source
         run: uv run zed-i18n fetch-zed
 
@@ -179,20 +194,103 @@ jobs:
             zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-
 
       - name: Setup Linux dependencies
-        if: matrix.platform == 'linux'
         working-directory: .cache/zed/${{ needs.prepare.outputs.zed-version }}
         run: |
           ./script/linux
           ./script/download-wasi-sdk
 
+      - name: Build localized artifacts
+        shell: bash
+        run: |
+          distribution_args=()
+          if [[ "$DISTRIBUTION_PATCHES_ENABLED" == "true" ]]; then
+            distribution_args=(--distribution-config config/distribution.toml)
+          fi
+
+          uv run python -m tools.zed_i18n.ci_release build-shard \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --bundle-target "${{ matrix.bundle_target }}" \
+            --languages "${{ matrix.languages }}" \
+            --dist-dir dist \
+            "${distribution_args[@]}"
+
+      - name: Upload shard artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 3
+
+  build-macos:
+    name: Build macOS ${{ matrix.id }}
+    needs:
+      - prepare
+      - validate
+    if: ${{ needs.prepare.outputs['macos-build-count'] != '0' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix: ${{ fromJson(needs.prepare.outputs['macos-matrix']) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 360
+    env:
+      ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
+      ZED_MINIDUMP_ENDPOINT: ${{ secrets.ZED_SENTRY_MINIDUMP_ENDPOINT }}
+      MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      APPLE_NOTARIZATION_KEY: ${{ secrets.APPLE_NOTARIZATION_KEY }}
+      APPLE_NOTARIZATION_KEY_ID: ${{ secrets.APPLE_NOTARIZATION_KEY_ID }}
+      APPLE_NOTARIZATION_ISSUER_ID: ${{ secrets.APPLE_NOTARIZATION_ISSUER_ID }}
+      ZED_I18N_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name || '' }}
+      ZED_I18N_REPOSITORY: ${{ github.repository }}
+      DISTRIBUTION_PATCHES_ENABLED: ${{ github.event_name != 'workflow_dispatch' || inputs.distribution_patches }}
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Configure Rust cache environment
+        id: rust-cache
+        run: uv run python -m tools.zed_i18n.ci_release rust-cache-env --platform "${{ matrix.platform }}"
+
+      - name: Record initial disk space
+        run: uv run python -m tools.zed_i18n.ci_release disk-summary --label "initial"
+
+      - name: Clean macOS CoreSimulator
+        shell: bash
+        run: sudo rm -rf /Library/Developer/CoreSimulator
+
+      - name: Fetch Zed source
+        run: uv run zed-i18n fetch-zed
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ${{ steps.rust-cache.outputs.cargo-home }}/registry/index
+            ${{ steps.rust-cache.outputs.cargo-home }}/registry/cache
+            ${{ steps.rust-cache.outputs.cargo-home }}/git/db
+          key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml') }}
+          restore-keys: |
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-
+
       - name: Setup macOS Node
-        if: matrix.platform == 'macos'
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: "24"
 
       - name: Limit Cargo jobs on macOS arm64
-        if: matrix.platform == 'macos' && matrix.arch == 'aarch64'
+        if: matrix.arch == 'aarch64'
         shell: bash
         run: |
           echo "CARGO_BUILD_JOBS=2" >> "$GITHUB_ENV"
@@ -222,11 +320,111 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
+  build-windows:
+    name: Build Windows ${{ matrix.id }}
+    needs:
+      - prepare
+      - validate
+    if: ${{ needs.prepare.outputs['windows-build-count'] != '0' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix: ${{ fromJson(needs.prepare.outputs['windows-matrix']) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 360
+    env:
+      ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
+      ZED_MINIDUMP_ENDPOINT: ${{ secrets.ZED_SENTRY_MINIDUMP_ENDPOINT }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_SIGNING_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_SIGNING_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_SIGNING_CLIENT_SECRET }}
+      ACCOUNT_NAME: ${{ vars.AZURE_SIGNING_ACCOUNT_NAME }}
+      CERT_PROFILE_NAME: ${{ vars.AZURE_SIGNING_CERT_PROFILE_NAME }}
+      ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+      FILE_DIGEST: SHA256
+      TIMESTAMP_DIGEST: SHA256
+      TIMESTAMP_SERVER: http://timestamp.acs.microsoft.com
+      ZED_I18N_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name || '' }}
+      ZED_I18N_REPOSITORY: ${{ github.repository }}
+      DISTRIBUTION_PATCHES_ENABLED: ${{ github.event_name != 'workflow_dispatch' || inputs.distribution_patches }}
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Configure Rust cache environment
+        id: rust-cache
+        run: uv run python -m tools.zed_i18n.ci_release rust-cache-env --platform "${{ matrix.platform }}"
+
+      - name: Record initial disk space
+        run: uv run python -m tools.zed_i18n.ci_release disk-summary --label "initial"
+
+      - name: Fetch Zed source
+        run: uv run zed-i18n fetch-zed
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: |
+            ${{ steps.rust-cache.outputs.cargo-home }}/registry/index
+            ${{ steps.rust-cache.outputs.cargo-home }}/registry/cache
+            ${{ steps.rust-cache.outputs.cargo-home }}/git/db
+          key: zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('.cache/zed/**/Cargo.lock', '.cache/zed/**/rust-toolchain.toml') }}
+          restore-keys: |
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-
+            zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-
+
+      - name: Build localized artifacts
+        shell: bash
+        run: |
+          distribution_args=()
+          if [[ "$DISTRIBUTION_PATCHES_ENABLED" == "true" ]]; then
+            distribution_args=(--distribution-config config/distribution.toml)
+          fi
+
+          uv run python -m tools.zed_i18n.ci_release build-shard \
+            --platform "${{ matrix.platform }}" \
+            --arch "${{ matrix.arch }}" \
+            --bundle-target "${{ matrix.bundle_target }}" \
+            --languages "${{ matrix.languages }}" \
+            --dist-dir dist \
+            "${distribution_args[@]}"
+
+      - name: Upload shard artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 3
+
   package:
     name: Package release assets
     needs:
       - prepare
-      - build
+      - validate
+      - build-linux
+      - build-macos
+      - build-windows
+    if: >-
+      ${{
+        always() &&
+        needs.prepare.result == 'success' &&
+        needs.validate.result == 'success' &&
+        needs['build-linux'].result != 'failure' &&
+        needs['build-linux'].result != 'cancelled' &&
+        needs['build-macos'].result != 'failure' &&
+        needs['build-macos'].result != 'cancelled' &&
+        needs['build-windows'].result != 'failure' &&
+        needs['build-windows'].result != 'cancelled'
+      }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read

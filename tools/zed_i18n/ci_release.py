@@ -42,6 +42,15 @@ class BuildPlatform:
     bundle_target: str
 
 
+@dataclass(frozen=True)
+class DiskSummaryEntry:
+    label: str
+    path: Path
+    total_bytes: int
+    used_bytes: int
+    free_bytes: int
+
+
 BUILD_PLATFORMS: tuple[BuildPlatform, ...] = (
     BuildPlatform("linux-x86_64", "linux", "x86_64", "ubuntu-24.04", ""),
     BuildPlatform("linux-aarch64", "linux", "aarch64", "ubuntu-24.04-arm", ""),
@@ -186,13 +195,37 @@ def write_github_matrix_outputs(
     platform_spec: str | None,
     shard_size: int,
 ) -> None:
+    for name, value in github_matrix_outputs(root, language_spec, platform_spec, shard_size).items():
+        print(f"{name}={value}")
+
+
+def github_matrix_outputs(
+    root: Path,
+    language_spec: str | None,
+    platform_spec: str | None,
+    shard_size: int,
+) -> dict[str, str]:
     config = load_project_config(root)
     languages, rows = build_matrix(root, language_spec, platform_spec, shard_size)
-    matrix = json.dumps({"include": rows}, separators=(",", ":"))
-    print(f"matrix={matrix}")
-    print(f"languages={','.join(languages)}")
-    print(f"zed-version={config.zed_version}")
-    print(f"build-count={len(rows)}")
+    rows_by_platform = {
+        platform: [row for row in rows if row["platform"] == platform]
+        for platform in ("linux", "macos", "windows")
+    }
+
+    outputs = {
+        "matrix": github_matrix_json(rows),
+        "languages": ",".join(languages),
+        "zed-version": config.zed_version,
+        "build-count": str(len(rows)),
+    }
+    for platform, platform_rows in rows_by_platform.items():
+        outputs[f"{platform}-matrix"] = github_matrix_json(platform_rows)
+        outputs[f"{platform}-build-count"] = str(len(platform_rows))
+    return outputs
+
+
+def github_matrix_json(rows: list[dict[str, object]]) -> str:
+    return json.dumps({"include": rows}, separators=(",", ":"))
 
 
 def read_json(path: Path) -> dict:
@@ -591,6 +624,54 @@ def cargo_target_dir(zed_root: Path) -> Path:
     return target_dir
 
 
+def nearest_existing_path(path: Path) -> Path:
+    resolved = path.resolve()
+    while not resolved.exists():
+        parent = resolved.parent
+        if parent == resolved:
+            break
+        resolved = parent
+    return resolved
+
+
+def format_gib(byte_count: int) -> str:
+    return f"{byte_count / (1024**3):.1f} GiB"
+
+
+def disk_summary_entries(paths: Iterable[tuple[str, Path]]) -> list[DiskSummaryEntry]:
+    entries: list[DiskSummaryEntry] = []
+    for label, path in paths:
+        probe = nearest_existing_path(path)
+        usage = shutil.disk_usage(probe)
+        entries.append(
+            DiskSummaryEntry(
+                label=label,
+                path=probe,
+                total_bytes=usage.total,
+                used_bytes=usage.used,
+                free_bytes=usage.free,
+            )
+        )
+    return entries
+
+
+def print_disk_summary(root: Path, label: str) -> None:
+    paths = [("workspace", Path(os.environ.get("GITHUB_WORKSPACE") or root))]
+    for env_name in ("RUNNER_TEMP", "CARGO_HOME", "CARGO_TARGET_DIR"):
+        value = os.environ.get(env_name)
+        if value:
+            paths.append((env_name.lower(), Path(value)))
+
+    print(f"Disk summary: {label}")
+    print("| Label | Path | Total | Used | Free |")
+    print("|---|---|---:|---:|---:|")
+    for entry in disk_summary_entries(paths):
+        print(
+            f"| {entry.label} | `{entry.path}` | {format_gib(entry.total_bytes)} | "
+            f"{format_gib(entry.used_bytes)} | {format_gib(entry.free_bytes)} |"
+        )
+
+
 def copy_asset(source: Path, destination_dir: Path, name: str) -> None:
     if not source.exists():
         raise FileNotFoundError(f"expected build output does not exist: {source}")
@@ -861,6 +942,9 @@ def build_parser() -> argparse.ArgumentParser:
     rust_cache_parser = subparsers.add_parser("rust-cache-env")
     rust_cache_parser.add_argument("--platform", required=True, choices=["linux", "macos", "windows"])
 
+    disk_parser = subparsers.add_parser("disk-summary")
+    disk_parser.add_argument("--label", default="snapshot")
+
     return parser
 
 
@@ -872,6 +956,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "matrix":
             write_github_matrix_outputs(root, args.languages, args.platforms, args.shard_size)
+            return 0
+        if args.command == "disk-summary":
+            print_disk_summary(root, args.label)
             return 0
         if args.command == "build-shard":
             dist_dir = ensure_inside_workspace(root, Path(args.dist_dir).resolve())
