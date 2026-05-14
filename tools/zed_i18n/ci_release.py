@@ -156,7 +156,7 @@ def build_matrix(
     root: Path,
     language_spec: str | None = None,
     platform_spec: str | None = None,
-    shard_size: int = 4,
+    shard_size: int = 1,
 ) -> tuple[list[str], list[dict[str, object]]]:
     languages = select_languages(root, language_spec)
     platforms = select_platforms(platform_spec)
@@ -165,15 +165,16 @@ def build_matrix(
     rows: list[dict[str, object]] = []
     for platform in platforms:
         for shard_index, shard in enumerate(language_shards, start=1):
+            shard_name = shard[0] if shard_size == 1 else f"shard-{shard_index}"
             rows.append(
                 {
-                    "id": f"{platform.id}-shard-{shard_index}",
+                    "id": f"{platform.id}-{shard_name}",
                     "platform": platform.platform,
                     "arch": platform.arch,
                     "runner": runner_label(platform),
                     "bundle_target": platform.bundle_target,
                     "languages": ",".join(shard),
-                    "artifact": f"zed-i18n-{platform.id}-shard-{shard_index}",
+                    "artifact": f"zed-i18n-{platform.id}-{shard_name}",
                 }
             )
     return languages, rows
@@ -834,7 +835,7 @@ def build_parser() -> argparse.ArgumentParser:
     matrix_parser = subparsers.add_parser("matrix")
     matrix_parser.add_argument("--languages", default="all")
     matrix_parser.add_argument("--platforms", default="all")
-    matrix_parser.add_argument("--shard-size", type=int, default=4)
+    matrix_parser.add_argument("--shard-size", type=int, default=1)
 
     build_parser = subparsers.add_parser("build-shard")
     build_parser.add_argument("--platform", required=True)

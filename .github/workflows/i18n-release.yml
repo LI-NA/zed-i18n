@@ -72,7 +72,7 @@ jobs:
         env:
           LANGUAGES: ${{ inputs.languages || 'all' }}
           PLATFORMS: ${{ inputs.platforms || 'all' }}
-          SHARD_SIZE: ${{ inputs.shard_size || '4' }}
+          SHARD_SIZE: ${{ inputs.shard_size || '1' }}
           ZED_I18N_RUNNER_LINUX_X86_64: ${{ vars.ZED_I18N_RUNNER_LINUX_X86_64 || '' }}
           ZED_I18N_RUNNER_LINUX_AARCH64: ${{ vars.ZED_I18N_RUNNER_LINUX_AARCH64 || '' }}
           ZED_I18N_RUNNER_MACOS_X86_64: ${{ vars.ZED_I18N_RUNNER_MACOS_X86_64 || '' }}

@@ -71,10 +71,51 @@ class CiReleaseTests(unittest.TestCase):
 
         self.assertEqual(languages, ["cs-CZ", "de-DE", "es-ES", "fr-FR", "ko-KR"])
         self.assertEqual(len(rows), 6)
+        self.assertEqual(
+            [row["id"] for row in rows],
+            [
+                "linux-x86_64-shard-1",
+                "linux-x86_64-shard-2",
+                "linux-x86_64-shard-3",
+                "macos-aarch64-shard-1",
+                "macos-aarch64-shard-2",
+                "macos-aarch64-shard-3",
+            ],
+        )
         self.assertEqual(rows[0]["languages"], "cs-CZ,de-DE")
         self.assertNotIn("include_remote", rows[0])
         self.assertEqual(rows[3]["platform"], "macos")
         self.assertEqual(rows[3]["runner"], "macos-15")
+
+    def test_build_matrix_uses_locale_names_for_single_language_shards(self) -> None:
+        for language in ["de-DE", "ko-KR"]:
+            self.write_translation(language)
+
+        _, rows = build_matrix(
+            self.temp_root,
+            language_spec="all",
+            platform_spec="linux-x86_64",
+            shard_size=1,
+        )
+
+        self.assertEqual([row["id"] for row in rows], ["linux-x86_64-de-DE", "linux-x86_64-ko-KR"])
+        self.assertEqual(
+            [row["artifact"] for row in rows],
+            ["zed-i18n-linux-x86_64-de-DE", "zed-i18n-linux-x86_64-ko-KR"],
+        )
+        self.assertEqual([row["languages"] for row in rows], ["de-DE", "ko-KR"])
+
+    def test_build_matrix_defaults_to_single_language_shards(self) -> None:
+        for language in ["de-DE", "ko-KR"]:
+            self.write_translation(language)
+
+        _, rows = build_matrix(
+            self.temp_root,
+            language_spec="all",
+            platform_spec="linux-x86_64",
+        )
+
+        self.assertEqual([row["id"] for row in rows], ["linux-x86_64-de-DE", "linux-x86_64-ko-KR"])
 
     def test_select_platform_family_expands_to_architectures(self) -> None:
         platforms = select_platforms("linux,windows-x86_64")
@@ -418,6 +459,15 @@ class CiReleaseTests(unittest.TestCase):
         self.assertNotIn("RUSTC_WRAPPER", workflow)
         self.assertNotIn("R2_ACCOUNT_ID", workflow)
         self.assertNotIn("R2_ACCESS_KEY_ID", workflow)
+
+    def test_release_workflow_defaults_tag_pushes_to_single_language_shards(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("SHARD_SIZE: ${{ inputs.shard_size || '1' }}", workflow)
+        self.assertIn("name: Build ${{ matrix.id }}", workflow)
+        self.assertNotIn("SHARD_SIZE: ${{ inputs.shard_size || '4' }}", workflow)
 
     def test_release_workflow_pins_actions_to_full_commit_shas(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
