@@ -305,7 +305,7 @@ fn app_menus() -> Vec<Menu> {
             config,
             base_env={"ZED_UPDATE_EXPLANATION": "disabled"},
             locale="ko-KR",
-            release_tag="v1.2.3-i18n.4",
+            release_tag="v1.2.5-i18n.4",
             repository="owner/repo",
         )
 
@@ -319,7 +319,7 @@ fn app_menus() -> Vec<Menu> {
         )
 
     def test_parse_i18n_revision_from_release_tag(self) -> None:
-        self.assertEqual(parse_i18n_revision("v1.2.3-i18n.7"), "7")
+        self.assertEqual(parse_i18n_revision("v1.2.5-i18n.7"), "7")
         self.assertEqual(parse_i18n_revision("nightly"), "0")
 
 

@@ -35,7 +35,7 @@ class CiReleaseTests(unittest.TestCase):
         (self.temp_root / "translations").mkdir(parents=True)
         (self.temp_root / "config").mkdir()
         (self.temp_root / "config" / "project.toml").write_text(
-            'zed_version = "v1.2.3"\n'
+            'zed_version = "v1.2.5"\n'
             'zed_repository = "https://github.com/zed-industries/zed"\n'
             'cache_dir = ".cache/zed"\n',
             encoding="utf-8",
@@ -53,7 +53,7 @@ class CiReleaseTests(unittest.TestCase):
     def write_zed_cargo_toml(self) -> None:
         cargo_toml = self.temp_root / "crates" / "zed" / "Cargo.toml"
         cargo_toml.parent.mkdir(parents=True)
-        cargo_toml.write_text('[package]\nname = "zed"\nversion = "1.2.3"\n', encoding="utf-8")
+        cargo_toml.write_text('[package]\nname = "zed"\nversion = "1.2.5"\n', encoding="utf-8")
 
     def test_lists_translation_languages_from_json_files(self) -> None:
         self.write_translation("ko-KR")
@@ -222,7 +222,7 @@ class CiReleaseTests(unittest.TestCase):
             dist_dir=dist_dir,
             manifest_path=dist_dir / "manifest.json",
             checksums_path=dist_dir / "SHA256SUMS.txt",
-            release_tag="v1.2.3-i18n.1",
+            release_tag="v1.2.5-i18n.1",
             repository="owner/repo",
             run_id="123",
         )
@@ -230,8 +230,8 @@ class CiReleaseTests(unittest.TestCase):
         manifest = json.loads((dist_dir / "manifest.json").read_text(encoding="utf-8"))
         checksums = (dist_dir / "SHA256SUMS.txt").read_text(encoding="utf-8")
 
-        self.assertEqual(manifest["zed_version"], "v1.2.3")
-        self.assertEqual(manifest["release_tag"], "v1.2.3-i18n.1")
+        self.assertEqual(manifest["zed_version"], "v1.2.5")
+        self.assertEqual(manifest["release_tag"], "v1.2.5-i18n.1")
         self.assertEqual(manifest["asset_count"], 1)
         self.assertEqual([asset["kind"] for asset in manifest["assets"]], ["app"])
         self.assertIn("zed-ko-KR-linux-x86_64.tar.gz", checksums)
@@ -263,7 +263,7 @@ class CiReleaseTests(unittest.TestCase):
                 dist_dir=dist_dir,
                 manifest_path=dist_dir / "manifest.json",
                 checksums_path=dist_dir / "SHA256SUMS.txt",
-                release_tag="v1.2.3-i18n.1",
+                release_tag="v1.2.5-i18n.1",
                 repository="owner/repo",
                 run_id="123",
                 expected_assets=[
@@ -283,7 +283,7 @@ class CiReleaseTests(unittest.TestCase):
             dist_dir=dist_dir,
             manifest_path=dist_dir / "manifest.json",
             checksums_path=dist_dir / "SHA256SUMS.txt",
-            release_tag="v1.2.3-i18n.5",
+            release_tag="v1.2.5-i18n.5",
             repository="owner/repo",
             run_id="123",
         )
@@ -297,12 +297,12 @@ class CiReleaseTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["assets"][0]["download_url"],
-            "https://github.com/owner/repo/releases/download/v1.2.3-i18n.5/Zed-ko-KR-windows-x86_64.exe",
+            "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-ko-KR-windows-x86_64.exe",
         )
         self.assertEqual(manifest["assets"][1]["kind"], "portable_app")
         self.assertEqual(
             manifest["assets"][1]["download_url"],
-            "https://github.com/owner/repo/releases/download/v1.2.3-i18n.5/Zed-ko-KR-windows-x86_64.zip",
+            "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-ko-KR-windows-x86_64.zip",
         )
 
     def test_windows_app_source_path_uses_distribution_setup_name(self) -> None:

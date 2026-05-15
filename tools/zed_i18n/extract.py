@@ -906,6 +906,8 @@ def _line_patterns_for_path(
         patterns.extend(KEYMAP_EDITOR_LINE_PATTERNS)
     if _is_rust_language_path(relative_path):
         patterns.extend(RUST_LANGUAGE_LINE_PATTERNS)
+    if _is_language_model_provider_path(relative_path):
+        patterns.extend(LANGUAGE_MODEL_PROVIDER_LINE_PATTERNS)
     if _is_workspace_pane_path(relative_path):
         patterns.extend(WORKSPACE_PANE_LINE_PATTERNS)
     if _is_agent_entry_view_state_path(relative_path):
@@ -1050,6 +1052,10 @@ def _is_rust_language_path(relative_path: str) -> bool:
     return relative_path == "crates/languages/src/rust.rs"
 
 
+def _is_language_model_provider_path(relative_path: str) -> bool:
+    return relative_path.startswith("crates/language_models/src/provider/")
+
+
 ACTION_DOC_COMMENT_PATTERN = re.compile(r"^\s*///\s+(.+\S)\s*$")
 ACTIONS_MACRO_START_PATTERN = re.compile(r"\bactions!\s*\(")
 DERIVE_ACTION_PATTERN = re.compile(r"\bderive\s*\([^)]*\bAction\b")
@@ -1057,6 +1063,14 @@ ACTION_NO_REGISTER_PATTERN = re.compile(r"\bno_register\b")
 ACTION_ITEM_PATTERN = re.compile(r"^\s*(?:pub(?:\([^)]*\))?\s+)?(?:struct|enum)\s+\w+\b")
 
 LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(
+            r'ReasoningEffort::(?!None\b)\w+\s*=>\s*\(\s*("(?:\\.|[^"\\])*")\s*,\s*"(?:\\.|[^"\\])*"\s*\)'
+        ),
+        "reasoning_effort_display",
+        "language_model_effort_label",
+        1,
+    ),
     LinePattern(
         re.compile(r'\bMenuItem::action\s*\(\s*("(?:\\.|[^"\\])*")'),
         "MenuItem::action",
@@ -1736,6 +1750,16 @@ RUST_LANGUAGE_MULTILINE_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
         re.compile(r'^\s*label:\s*format!\(\s*$'),
         "TaskTemplate.label",
         "task_template_label",
+    ),
+)
+
+
+LANGUAGE_MODEL_PROVIDER_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'^\s*name:\s*("(?:Low|Medium|High|Max|Minimal|Extra High)")\.into\(\),'),
+        "LanguageModelEffortLevel.name",
+        "language_model_effort_label",
+        1,
     ),
 )
 

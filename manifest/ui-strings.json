@@ -123,11 +123,11 @@
       },
       {
         "call": "ListBulletItem::new",
-        "end_byte": 16920,
+        "end_byte": 20504,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "list_bullet_item",
-        "line": 523,
-        "start_byte": 16918
+        "line": 630,
+        "start_byte": 20502
       },
       {
         "call": "ListBulletItem::new",
@@ -139,11 +139,11 @@
       },
       {
         "call": "ListBulletItem::new",
-        "end_byte": 28817,
+        "end_byte": 29124,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "list_bullet_item",
-        "line": 839,
-        "start_byte": 28815
+        "line": 843,
+        "start_byte": 29122
       },
       {
         "call": "ListBulletItem::new",
@@ -1237,11 +1237,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 246576,
+        "end_byte": 246653,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 6046,
-        "start_byte": 246570
+        "line": 6047,
+        "start_byte": 246647
       },
       {
         "call": "Label::new",
@@ -2026,27 +2026,27 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 172452,
+        "end_byte": 172529,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4300,
-        "start_byte": 172449
+        "line": 4301,
+        "start_byte": 172526
       },
       {
         "call": "Label::new",
-        "end_byte": 173091,
+        "end_byte": 173168,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4313,
-        "start_byte": 173088
+        "line": 4314,
+        "start_byte": 173165
       },
       {
         "call": "Label::new",
-        "end_byte": 173580,
+        "end_byte": 173657,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4321,
-        "start_byte": 173577
+        "line": 4322,
+        "start_byte": 173654
       },
       {
         "call": "Label::new",
@@ -2178,11 +2178,11 @@
     "occurrences": [
       {
         "call": "InputField::new",
-        "end_byte": 13396,
+        "end_byte": 13606,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "placeholder",
-        "line": 424,
-        "start_byte": 13343
+        "line": 428,
+        "start_byte": 13553
       }
     ],
     "status": "ignored"
@@ -3261,11 +3261,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 345133,
+        "end_byte": 345210,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8351,
-        "start_byte": 345122
+        "line": 8352,
+        "start_byte": 345199
       }
     ],
     "status": "accepted"
@@ -3308,11 +3308,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 342458,
+        "end_byte": 342535,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8282,
-        "start_byte": 342441
+        "line": 8283,
+        "start_byte": 342518
       }
     ],
     "status": "accepted"
@@ -3408,11 +3408,11 @@
       },
       {
         "call": "label",
-        "end_byte": 25056,
+        "end_byte": 25363,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 727,
-        "start_byte": 25047
+        "line": 731,
+        "start_byte": 25354
       },
       {
         "call": "label",
@@ -3450,11 +3450,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 17544,
+        "end_byte": 17754,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "label",
-        "line": 538,
-        "start_byte": 17517
+        "line": 542,
+        "start_byte": 17727
       }
     ],
     "status": "accepted"
@@ -3508,11 +3508,11 @@
       },
       {
         "call": "ConfiguredApiCard::new",
-        "end_byte": 16229,
+        "end_byte": 19813,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "configured_api_card_label",
-        "line": 506,
-        "start_byte": 16169
+        "line": 613,
+        "start_byte": 19753
       },
       {
         "call": "ConfiguredApiCard::new",
@@ -3524,11 +3524,11 @@
       },
       {
         "call": "ConfiguredApiCard::new",
-        "end_byte": 28112,
+        "end_byte": 28419,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "configured_api_card_label",
-        "line": 820,
-        "start_byte": 28052
+        "line": 824,
+        "start_byte": 28359
       },
       {
         "call": "ConfiguredApiCard::new",
@@ -3574,11 +3574,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 17422,
+        "end_byte": 17632,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "label",
-        "line": 536,
-        "start_byte": 17370
+        "line": 540,
+        "start_byte": 17580
       }
     ],
     "status": "accepted"
@@ -4390,11 +4390,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 161839,
+        "end_byte": 161916,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4046,
-        "start_byte": 161826
+        "line": 4047,
+        "start_byte": 161903
       },
       {
         "call": "Tooltip::with_meta",
@@ -4479,11 +4479,11 @@
     "occurrences": [
       {
         "call": "action",
-        "end_byte": 106185,
+        "end_byte": 106733,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2866,
-        "start_byte": 106163
+        "line": 2874,
+        "start_byte": 106711
       }
     ],
     "status": "accepted"
@@ -4617,11 +4617,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 117902,
+        "end_byte": 118450,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_entry",
-        "line": 3092,
-        "start_byte": 117885
+        "line": 3100,
+        "start_byte": 118433
       }
     ],
     "status": "accepted"
@@ -5297,11 +5297,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 101977,
+        "end_byte": 102525,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "label",
-        "line": 2761,
-        "start_byte": 101970
+        "line": 2769,
+        "start_byte": 102518
       }
     ],
     "status": "accepted"
@@ -5349,11 +5349,11 @@
     "occurrences": [
       {
         "call": "icon_tooltip",
-        "end_byte": 92503,
+        "end_byte": 93051,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "panel_tooltip",
-        "line": 2526,
-        "start_byte": 92490
+        "line": 2534,
+        "start_byte": 93038
       },
       {
         "call": "SettingsPageItem::SectionHeader",
@@ -5500,11 +5500,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 359847,
+        "end_byte": 359924,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 8732,
-        "start_byte": 359823
+        "line": 8733,
+        "start_byte": 359900
       }
     ],
     "status": "accepted"
@@ -5659,11 +5659,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 282710,
+        "end_byte": 282787,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 6819,
-        "start_byte": 282703
+        "line": 6820,
+        "start_byte": 282780
       },
       {
         "call": "entry",
@@ -5808,11 +5808,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 247945,
+        "end_byte": 248022,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip_meta",
-        "line": 6073,
-        "start_byte": 247850
+        "line": 6074,
+        "start_byte": 247927
       }
     ],
     "status": "accepted"
@@ -5938,11 +5938,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 289589,
+        "end_byte": 289666,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 6981,
-        "start_byte": 289563
+        "line": 6982,
+        "start_byte": 289640
       }
     ],
     "status": "accepted"
@@ -6291,11 +6291,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 353339,
+        "end_byte": 353416,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8570,
-        "start_byte": 353320
+        "line": 8571,
+        "start_byte": 353397
       },
       {
         "call": "Headline::new",
@@ -6625,11 +6625,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 296778,
+        "end_byte": 296855,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 7122,
-        "start_byte": 296771
+        "line": 7123,
+        "start_byte": 296848
       },
       {
         "call": "Button::new",
@@ -7016,11 +7016,11 @@
       },
       {
         "call": "Button::new",
-        "end_byte": 350540,
+        "end_byte": 350617,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8500,
-        "start_byte": 350526
+        "line": 8501,
+        "start_byte": 350603
       }
     ],
     "status": "accepted"
@@ -7110,11 +7110,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 346512,
+        "end_byte": 346589,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8391,
-        "start_byte": 346487
+        "line": 8392,
+        "start_byte": 346564
       }
     ],
     "status": "accepted"
@@ -7592,11 +7592,11 @@
     "occurrences": [
       {
         "call": "LoadingLabel::new",
-        "end_byte": 220001,
+        "end_byte": 220078,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "loading_label",
-        "line": 5389,
-        "start_byte": 219978
+        "line": 5390,
+        "start_byte": 220055
       }
     ],
     "status": "accepted"
@@ -8581,11 +8581,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 168297,
+        "end_byte": 168374,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4193,
-        "start_byte": 168284
+        "line": 4194,
+        "start_byte": 168361
       },
       {
         "call": "Tooltip::with_meta",
@@ -9823,19 +9823,19 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 151924,
+        "end_byte": 152001,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 3843,
-        "start_byte": 151900
+        "line": 3844,
+        "start_byte": 151977
       },
       {
         "call": "header",
-        "end_byte": 153555,
+        "end_byte": 153632,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_header",
-        "line": 3882,
-        "start_byte": 153531
+        "line": 3883,
+        "start_byte": 153608
       }
     ],
     "status": "accepted"
@@ -10659,11 +10659,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 326203,
+        "end_byte": 326280,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip_meta",
-        "line": 7907,
-        "start_byte": 326184
+        "line": 7908,
+        "start_byte": 326261
       }
     ],
     "status": "accepted"
@@ -10693,11 +10693,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 326251,
+        "end_byte": 326328,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip_meta",
-        "line": 7909,
-        "start_byte": 326233
+        "line": 7910,
+        "start_byte": 326310
       }
     ],
     "status": "accepted"
@@ -10784,11 +10784,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 63128,
+        "end_byte": 63676,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1669,
-        "start_byte": 63095
+        "line": 1677,
+        "start_byte": 63643
       }
     ],
     "status": "accepted"
@@ -11593,11 +11593,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 355790,
+        "end_byte": 355867,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8631,
-        "start_byte": 355772
+        "line": 8632,
+        "start_byte": 355849
       }
     ],
     "status": "accepted"
@@ -13279,11 +13279,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 342868,
+        "end_byte": 342945,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8293,
-        "start_byte": 342844
+        "line": 8294,
+        "start_byte": 342921
       }
     ],
     "status": "accepted"
@@ -13425,19 +13425,19 @@
     "occurrences": [
       {
         "call": "header",
-        "end_byte": 163822,
+        "end_byte": 163899,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_header",
-        "line": 4100,
-        "start_byte": 163813
+        "line": 4101,
+        "start_byte": 163890
       },
       {
         "call": "Label::new",
-        "end_byte": 171924,
+        "end_byte": 172001,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4289,
-        "start_byte": 171915
+        "line": 4290,
+        "start_byte": 171992
       },
       {
         "call": "Table.header",
@@ -13480,11 +13480,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 348919,
+        "end_byte": 348996,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8457,
-        "start_byte": 348900
+        "line": 8458,
+        "start_byte": 348977
       }
     ],
     "status": "accepted"
@@ -14893,11 +14893,11 @@
     "occurrences": [
       {
         "call": "tooltip_label",
-        "end_byte": 241827,
+        "end_byte": 241904,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5913,
-        "start_byte": 241813
+        "line": 5914,
+        "start_byte": 241890
       }
     ],
     "status": "accepted"
@@ -14995,11 +14995,11 @@
     "occurrences": [
       {
         "call": "tooltip_label",
-        "end_byte": 354655,
+        "end_byte": 354732,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8600,
-        "start_byte": 354635
+        "line": 8601,
+        "start_byte": 354712
       },
       {
         "call": "tooltip_label",
@@ -15050,11 +15050,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 236055,
+        "end_byte": 236132,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 5764,
-        "start_byte": 236044
+        "line": 5765,
+        "start_byte": 236121
       },
       {
         "call": "Button::new",
@@ -15263,11 +15263,11 @@
     "occurrences": [
       {
         "call": "action_disabled_when",
-        "end_byte": 236411,
+        "end_byte": 236488,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_action",
-        "line": 5771,
-        "start_byte": 236395
+        "line": 5772,
+        "start_byte": 236472
       }
     ],
     "status": "accepted"
@@ -15289,11 +15289,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 233512,
+        "end_byte": 233589,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 5713,
-        "start_byte": 233486
+        "line": 5714,
+        "start_byte": 233563
       }
     ],
     "status": "accepted"
@@ -15370,11 +15370,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 174211,
+        "end_byte": 174288,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4335,
-        "start_byte": 174205
+        "line": 4336,
+        "start_byte": 174282
       }
     ],
     "status": "accepted"
@@ -15856,11 +15856,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 16996,
+        "end_byte": 20580,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "label",
-        "line": 524,
-        "start_byte": 16972
+        "line": 631,
+        "start_byte": 20556
       },
       {
         "call": "Label::new",
@@ -16205,11 +16205,11 @@
     "occurrences": [
       {
         "call": "header",
-        "end_byte": 104768,
+        "end_byte": 105316,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_header",
-        "line": 2838,
-        "start_byte": 104752
+        "line": 2846,
+        "start_byte": 105300
       }
     ],
     "status": "accepted"
@@ -16952,11 +16952,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 152586,
+        "end_byte": 152663,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 3859,
-        "start_byte": 152563
+        "line": 3860,
+        "start_byte": 152640
       }
     ],
     "status": "accepted"
@@ -23043,11 +23043,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 284335,
+        "end_byte": 284412,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 6851,
-        "start_byte": 284329
+        "line": 6852,
+        "start_byte": 284406
       },
       {
         "call": "entry",
@@ -23868,11 +23868,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 146408,
+        "end_byte": 146485,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3695,
-        "start_byte": 146389
+        "line": 3696,
+        "start_byte": 146466
       }
     ],
     "status": "accepted"
@@ -23881,11 +23881,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 120655,
+        "end_byte": 121203,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 3161,
-        "start_byte": 120634
+        "line": 3169,
+        "start_byte": 121182
       }
     ],
     "status": "accepted"
@@ -23907,11 +23907,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 147679,
+        "end_byte": 147756,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3733,
-        "start_byte": 147656
+        "line": 3734,
+        "start_byte": 147733
       }
     ],
     "status": "accepted"
@@ -24144,11 +24144,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 275056,
+        "end_byte": 275133,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 6648,
-        "start_byte": 275030
+        "line": 6649,
+        "start_byte": 275107
       }
     ],
     "status": "accepted"
@@ -24270,19 +24270,19 @@
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 354881,
+        "end_byte": 354958,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8606,
-        "start_byte": 354872
+        "line": 8607,
+        "start_byte": 354949
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 359280,
+        "end_byte": 359357,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8717,
-        "start_byte": 359271
+        "line": 8718,
+        "start_byte": 359348
       },
       {
         "call": "Button::new",
@@ -24421,19 +24421,19 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 356621,
+        "end_byte": 356698,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8649,
-        "start_byte": 356604
+        "line": 8650,
+        "start_byte": 356681
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 357520,
+        "end_byte": 357597,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8669,
-        "start_byte": 357503
+        "line": 8670,
+        "start_byte": 357580
       }
     ],
     "status": "accepted"
@@ -25787,19 +25787,19 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 134866,
+        "end_byte": 134943,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3428,
-        "start_byte": 134860
+        "line": 3429,
+        "start_byte": 134937
       },
       {
         "call": "Tooltip::simple",
-        "end_byte": 135289,
+        "end_byte": 135366,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3434,
-        "start_byte": 135283
+        "line": 3435,
+        "start_byte": 135360
       },
       {
         "call": "action_disabled_when",
@@ -26059,11 +26059,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 130254,
+        "end_byte": 130331,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3358,
-        "start_byte": 130233
+        "line": 3359,
+        "start_byte": 130310
       }
     ],
     "status": "accepted"
@@ -26347,11 +26347,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 191193,
+        "end_byte": 191270,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4641,
-        "start_byte": 191137
+        "line": 4642,
+        "start_byte": 191214
       }
     ],
     "status": "accepted"
@@ -26360,11 +26360,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 188959,
+        "end_byte": 189036,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4611,
-        "start_byte": 188909
+        "line": 4612,
+        "start_byte": 188986
       }
     ],
     "status": "accepted"
@@ -26636,11 +26636,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 146512,
+        "end_byte": 146589,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3698,
-        "start_byte": 146494
+        "line": 3699,
+        "start_byte": 146571
       }
     ],
     "status": "accepted"
@@ -26662,11 +26662,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 121034,
+        "end_byte": 121582,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 3168,
-        "start_byte": 121014
+        "line": 3176,
+        "start_byte": 121562
       }
     ],
     "status": "accepted"
@@ -26805,11 +26805,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 147834,
+        "end_byte": 147911,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3739,
-        "start_byte": 147812
+        "line": 3740,
+        "start_byte": 147889
       }
     ],
     "status": "accepted"
@@ -27137,11 +27137,11 @@
     "occurrences": [
       {
         "call": "ListBulletItem::new",
-        "end_byte": 17261,
+        "end_byte": 20845,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "list_bullet_item",
-        "line": 528,
-        "start_byte": 17221
+        "line": 635,
+        "start_byte": 20805
       }
     ],
     "status": "accepted"
@@ -27525,11 +27525,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 197607,
+        "end_byte": 197684,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4783,
-        "start_byte": 197522
+        "line": 4784,
+        "start_byte": 197599
       }
     ],
     "status": "accepted"
@@ -27832,11 +27832,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 250955,
+        "end_byte": 251032,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 6135,
-        "start_byte": 250934
+        "line": 6136,
+        "start_byte": 251011
       }
     ],
     "status": "accepted"
@@ -28457,11 +28457,11 @@
       },
       {
         "call": "header",
-        "end_byte": 114206,
+        "end_byte": 114754,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_header",
-        "line": 3027,
-        "start_byte": 114189
+        "line": 3035,
+        "start_byte": 114737
       }
     ],
     "status": "accepted"
@@ -28470,11 +28470,24 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 358951,
+        "end_byte": 359028,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8711,
-        "start_byte": 358888
+        "line": 8712,
+        "start_byte": 358965
+      }
+    ],
+    "status": "accepted"
+  },
+  "Extra High": {
+    "occurrences": [
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 9089,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "language_model_effort_label",
+        "line": 264,
+        "start_byte": 9077
       }
     ],
     "status": "accepted"
@@ -28674,11 +28687,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 63485,
+        "end_byte": 64033,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1679,
-        "start_byte": 63431
+        "line": 1687,
+        "start_byte": 63979
       }
     ],
     "status": "accepted"
@@ -28864,11 +28877,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 63857,
+        "end_byte": 64405,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1691,
-        "start_byte": 63813
+        "line": 1699,
+        "start_byte": 64361
       }
     ],
     "status": "accepted"
@@ -29591,11 +29604,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 163910,
+        "end_byte": 163987,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4102,
-        "start_byte": 163889
+        "line": 4103,
+        "start_byte": 163966
       }
     ],
     "status": "accepted"
@@ -31480,11 +31493,11 @@
     "occurrences": [
       {
         "call": "description",
-        "end_byte": 355888,
+        "end_byte": 355965,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "description",
-        "line": 8632,
-        "start_byte": 355817
+        "line": 8633,
+        "start_byte": 355894
       }
     ],
     "status": "accepted"
@@ -32058,11 +32071,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 347215,
+        "end_byte": 347292,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8410,
-        "start_byte": 347194
+        "line": 8411,
+        "start_byte": 347271
       }
     ],
     "status": "accepted"
@@ -32776,11 +32789,11 @@
       },
       {
         "call": "Tooltip::for_action",
-        "end_byte": 107380,
+        "end_byte": 107928,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 2894,
-        "start_byte": 107371
+        "line": 2902,
+        "start_byte": 107919
       },
       {
         "call": "Label::new",
@@ -32970,19 +32983,19 @@
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 308148,
+        "end_byte": 308225,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 7401,
-        "start_byte": 308136
+        "line": 7402,
+        "start_byte": 308213
       },
       {
         "call": "Button::new",
-        "end_byte": 320306,
+        "end_byte": 320383,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 7742,
-        "start_byte": 320294
+        "line": 7743,
+        "start_byte": 320371
       }
     ],
     "status": "accepted"
@@ -34064,11 +34077,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 207098,
+        "end_byte": 207175,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5032,
-        "start_byte": 207080
+        "line": 5033,
+        "start_byte": 207157
       }
     ],
     "status": "accepted"
@@ -34332,6 +34345,51 @@
         "kind": "setting_title",
         "line": 1859,
         "start_byte": 88110
+      }
+    ],
+    "status": "accepted"
+  },
+  "High": {
+    "occurrences": [
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 11293,
+        "file": "crates/language_models/src/provider/anthropic.rs",
+        "kind": "language_model_effort_label",
+        "line": 344,
+        "start_byte": 11287
+      },
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 24716,
+        "file": "crates/language_models/src/provider/bedrock.rs",
+        "kind": "language_model_effort_label",
+        "line": 661,
+        "start_byte": 24710
+      },
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 9151,
+        "file": "crates/language_models/src/provider/deepseek.rs",
+        "kind": "language_model_effort_label",
+        "line": 291,
+        "start_byte": 9145
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 9014,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "language_model_effort_label",
+        "line": 263,
+        "start_byte": 9008
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 2246,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "language_model_effort_label",
+        "line": 51,
+        "start_byte": 2240
       }
     ],
     "status": "accepted"
@@ -35472,11 +35530,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 166846,
+        "end_byte": 166923,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4162,
-        "start_byte": 166839
+        "line": 4163,
+        "start_byte": 166916
       }
     ],
     "status": "accepted"
@@ -35688,11 +35746,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 128329,
+        "end_byte": 128406,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3321,
-        "start_byte": 128319
+        "line": 3322,
+        "start_byte": 128396
       }
     ],
     "status": "accepted"
@@ -36428,11 +36486,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 172933,
+        "end_byte": 173010,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4311,
-        "start_byte": 172925
+        "line": 4312,
+        "start_byte": 173002
       },
       {
         "call": "Label::new",
@@ -37153,19 +37211,19 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 272561,
+        "end_byte": 272638,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 6615,
-        "start_byte": 272543
+        "line": 6616,
+        "start_byte": 272620
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 303850,
+        "end_byte": 303927,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 7297,
-        "start_byte": 303832
+        "line": 7298,
+        "start_byte": 303909
       }
     ],
     "status": "accepted"
@@ -37247,11 +37305,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 343314,
+        "end_byte": 343391,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8304,
-        "start_byte": 343297
+        "line": 8305,
+        "start_byte": 343374
       }
     ],
     "status": "accepted"
@@ -38587,11 +38645,11 @@
       },
       {
         "call": "Button::new",
-        "end_byte": 19355,
+        "end_byte": 22939,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "button",
-        "line": 579,
-        "start_byte": 19343
+        "line": 686,
+        "start_byte": 22927
       },
       {
         "call": "Button::new",
@@ -39098,19 +39156,19 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 158066,
+        "end_byte": 158143,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3964,
-        "start_byte": 158040
+        "line": 3965,
+        "start_byte": 158117
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 188259,
+        "end_byte": 188336,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4603,
-        "start_byte": 188233
+        "line": 4604,
+        "start_byte": 188310
       }
     ],
     "status": "accepted"
@@ -39167,11 +39225,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 30320,
+        "end_byte": 30627,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 872,
-        "start_byte": 30296
+        "line": 876,
+        "start_byte": 30603
       },
       {
         "call": "Label::new",
@@ -39188,19 +39246,19 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 19871,
+        "end_byte": 23455,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "label",
-        "line": 591,
-        "start_byte": 19847
+        "line": 698,
+        "start_byte": 23431
       },
       {
         "call": "Label::new",
-        "end_byte": 18658,
+        "end_byte": 18868,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "label",
-        "line": 561,
-        "start_byte": 18634
+        "line": 565,
+        "start_byte": 18844
       },
       {
         "call": "Label::new",
@@ -39437,6 +39495,43 @@
     ],
     "status": "ignored"
   },
+  "Low": {
+    "occurrences": [
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 10890,
+        "file": "crates/language_models/src/provider/anthropic.rs",
+        "kind": "language_model_effort_label",
+        "line": 334,
+        "start_byte": 10885
+      },
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 24313,
+        "file": "crates/language_models/src/provider/bedrock.rs",
+        "kind": "language_model_effort_label",
+        "line": 651,
+        "start_byte": 24308
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 8873,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "language_model_effort_label",
+        "line": 261,
+        "start_byte": 8868
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 2139,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "language_model_effort_label",
+        "line": 49,
+        "start_byte": 2134
+      }
+    ],
+    "status": "accepted"
+  },
   "Lowercase names are grouped before uppercase names, with case-insensitive": {
     "occurrences": [
       {
@@ -39467,11 +39562,11 @@
     "occurrences": [
       {
         "call": "header",
-        "end_byte": 105659,
+        "end_byte": 106207,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_header",
-        "line": 2856,
-        "start_byte": 105646
+        "line": 2864,
+        "start_byte": 106194
       }
     ],
     "status": "accepted"
@@ -39571,11 +39666,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 334350,
+        "end_byte": 334427,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8064,
-        "start_byte": 334323
+        "line": 8065,
+        "start_byte": 334400
       }
     ],
     "status": "accepted"
@@ -39740,6 +39835,43 @@
         "kind": "rust_doc_comment",
         "line": 853,
         "start_byte": 30054
+      }
+    ],
+    "status": "accepted"
+  },
+  "Max": {
+    "occurrences": [
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 11491,
+        "file": "crates/language_models/src/provider/anthropic.rs",
+        "kind": "language_model_effort_label",
+        "line": 349,
+        "start_byte": 11486
+      },
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 24914,
+        "file": "crates/language_models/src/provider/bedrock.rs",
+        "kind": "language_model_effort_label",
+        "line": 666,
+        "start_byte": 24909
+      },
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 9313,
+        "file": "crates/language_models/src/provider/deepseek.rs",
+        "kind": "language_model_effort_label",
+        "line": 296,
+        "start_byte": 9308
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 2297,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "language_model_effort_label",
+        "line": 52,
+        "start_byte": 2292
       }
     ],
     "status": "accepted"
@@ -40106,6 +40238,43 @@
     ],
     "status": "accepted"
   },
+  "Medium": {
+    "occurrences": [
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 11091,
+        "file": "crates/language_models/src/provider/anthropic.rs",
+        "kind": "language_model_effort_label",
+        "line": 339,
+        "start_byte": 11083
+      },
+      {
+        "call": "LanguageModelEffortLevel.name",
+        "end_byte": 24514,
+        "file": "crates/language_models/src/provider/bedrock.rs",
+        "kind": "language_model_effort_label",
+        "line": 656,
+        "start_byte": 24506
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 8944,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "language_model_effort_label",
+        "line": 262,
+        "start_byte": 8936
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 2193,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "language_model_effort_label",
+        "line": 50,
+        "start_byte": 2185
+      }
+    ],
+    "status": "accepted"
+  },
   "Medium Headline": {
     "occurrences": [
       {
@@ -40370,6 +40539,27 @@
         "kind": "setting_title",
         "line": 2056,
         "start_byte": 96690
+      }
+    ],
+    "status": "accepted"
+  },
+  "Minimal": {
+    "occurrences": [
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 8804,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "language_model_effort_label",
+        "line": 260,
+        "start_byte": 8795
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 2087,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "language_model_effort_label",
+        "line": 48,
+        "start_byte": 2078
       }
     ],
     "status": "accepted"
@@ -43203,11 +43393,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 109707,
+        "end_byte": 110255,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_entry",
-        "line": 2950,
-        "start_byte": 109689
+        "line": 2958,
+        "start_byte": 110237
       }
     ],
     "status": "accepted"
@@ -43305,11 +43495,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 349671,
+        "end_byte": 349748,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8478,
-        "start_byte": 349659
+        "line": 8479,
+        "start_byte": 349736
       }
     ],
     "status": "accepted"
@@ -43318,11 +43508,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 124839,
+        "end_byte": 125387,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 3262,
-        "start_byte": 124819
+        "line": 3270,
+        "start_byte": 125367
       }
     ],
     "status": "accepted"
@@ -43331,11 +43521,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 123109,
+        "end_byte": 123657,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 3217,
-        "start_byte": 123094
+        "line": 3225,
+        "start_byte": 123642
       }
     ],
     "status": "accepted"
@@ -43410,11 +43600,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 359793,
+        "end_byte": 359870,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 8730,
-        "start_byte": 359770
+        "line": 8731,
+        "start_byte": 359847
       }
     ],
     "status": "accepted"
@@ -43538,11 +43728,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 128241,
+        "end_byte": 128318,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3319,
-        "start_byte": 128226
+        "line": 3320,
+        "start_byte": 128303
       }
     ],
     "status": "accepted"
@@ -43577,11 +43767,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 342624,
+        "end_byte": 342701,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8284,
-        "start_byte": 342505
+        "line": 8285,
+        "start_byte": 342582
       }
     ],
     "status": "accepted"
@@ -43694,11 +43884,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 344861,
+        "end_byte": 344938,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8344,
-        "start_byte": 344842
+        "line": 8345,
+        "start_byte": 344919
       }
     ],
     "status": "accepted"
@@ -43806,11 +43996,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 60643,
+        "end_byte": 61191,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1604,
-        "start_byte": 60610
+        "line": 1612,
+        "start_byte": 61158
       }
     ],
     "status": "accepted"
@@ -43819,11 +44009,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 65692,
+        "end_byte": 66240,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1743,
-        "start_byte": 65674
+        "line": 1751,
+        "start_byte": 66222
       }
     ],
     "status": "accepted"
@@ -43879,11 +44069,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 62949,
+        "end_byte": 63497,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1664,
-        "start_byte": 62917
+        "line": 1672,
+        "start_byte": 63465
       }
     ],
     "status": "accepted"
@@ -44171,11 +44361,11 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 66100,
+        "end_byte": 66648,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1753,
-        "start_byte": 66063
+        "line": 1761,
+        "start_byte": 66611
       }
     ],
     "status": "accepted"
@@ -44405,11 +44595,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 32898,
+        "end_byte": 33205,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 924,
-        "start_byte": 32821
+        "line": 928,
+        "start_byte": 33128
       }
     ],
     "status": "accepted"
@@ -44637,11 +44827,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 208416,
+        "end_byte": 208493,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5055,
-        "start_byte": 208394
+        "line": 5056,
+        "start_byte": 208471
       }
     ],
     "status": "accepted"
@@ -44744,11 +44934,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 17997,
+        "end_byte": 21581,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "label",
-        "line": 544,
-        "start_byte": 17912
+        "line": 651,
+        "start_byte": 21496
       }
     ],
     "status": "accepted"
@@ -45571,11 +45761,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 278152,
+        "end_byte": 278229,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 6687,
-        "start_byte": 278141
+        "line": 6688,
+        "start_byte": 278218
       },
       {
         "call": "Tooltip::text",
@@ -46113,19 +46303,19 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 202437,
+        "end_byte": 202514,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4920,
-        "start_byte": 202412
+        "line": 4921,
+        "start_byte": 202489
       },
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 235171,
+        "end_byte": 235248,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 5747,
-        "start_byte": 235146
+        "line": 5748,
+        "start_byte": 235223
       }
     ],
     "status": "accepted"
@@ -46385,11 +46575,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 355976,
+        "end_byte": 356053,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8634,
-        "start_byte": 355963
+        "line": 8635,
+        "start_byte": 356040
       },
       {
         "call": "primary_message",
@@ -46484,11 +46674,11 @@
     "occurrences": [
       {
         "call": "ButtonLink::new",
-        "end_byte": 17072,
+        "end_byte": 20656,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "button_link",
-        "line": 525,
-        "start_byte": 17054
+        "line": 632,
+        "start_byte": 20638
       }
     ],
     "status": "accepted"
@@ -46497,11 +46687,11 @@
     "occurrences": [
       {
         "call": "ButtonLink::new",
-        "end_byte": 29011,
+        "end_byte": 29318,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "button_link",
-        "line": 842,
-        "start_byte": 28993
+        "line": 846,
+        "start_byte": 29300
       }
     ],
     "status": "accepted"
@@ -48508,11 +48698,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 344497,
+        "end_byte": 344574,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8335,
-        "start_byte": 344475
+        "line": 8336,
+        "start_byte": 344552
       }
     ],
     "status": "accepted"
@@ -48521,11 +48711,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 249576,
+        "end_byte": 249653,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 6104,
-        "start_byte": 249554
+        "line": 6105,
+        "start_byte": 249631
       }
     ],
     "status": "accepted"
@@ -48534,19 +48724,19 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 173421,
+        "end_byte": 173498,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4319,
-        "start_byte": 173412
+        "line": 4320,
+        "start_byte": 173489
       },
       {
         "call": "input_output_header",
-        "end_byte": 265552,
+        "end_byte": 265629,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 6476,
-        "start_byte": 265543
+        "line": 6477,
+        "start_byte": 265620
       }
     ],
     "status": "accepted"
@@ -48915,11 +49105,11 @@
     "occurrences": [
       {
         "call": "ListBulletItem::new",
-        "end_byte": 29283,
+        "end_byte": 29590,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "list_bullet_item",
-        "line": 847,
-        "start_byte": 29219
+        "line": 851,
+        "start_byte": 29526
       }
     ],
     "status": "accepted"
@@ -48944,11 +49134,11 @@
       },
       {
         "call": "ListBulletItem::new",
-        "end_byte": 17434,
+        "end_byte": 21018,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "list_bullet_item",
-        "line": 531,
-        "start_byte": 17369
+        "line": 638,
+        "start_byte": 20953
       },
       {
         "call": "ListBulletItem::new",
@@ -49260,11 +49450,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 343741,
+        "end_byte": 343818,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8315,
-        "start_byte": 343722
+        "line": 8316,
+        "start_byte": 343799
       }
     ],
     "status": "accepted"
@@ -50037,11 +50227,11 @@
     "occurrences": [
       {
         "call": "action",
-        "end_byte": 106386,
+        "end_byte": 106934,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2869,
-        "start_byte": 106376
+        "line": 2877,
+        "start_byte": 106924
       }
     ],
     "status": "accepted"
@@ -50382,11 +50572,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 341933,
+        "end_byte": 342010,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8270,
-        "start_byte": 341911
+        "line": 8271,
+        "start_byte": 341988
       }
     ],
     "status": "accepted"
@@ -50752,11 +50942,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 159921,
+        "end_byte": 159998,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4004,
-        "start_byte": 159905
+        "line": 4005,
+        "start_byte": 159982
       }
     ],
     "status": "accepted"
@@ -50908,11 +51098,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 341508,
+        "end_byte": 341585,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8259,
-        "start_byte": 341488
+        "line": 8260,
+        "start_byte": 341565
       }
     ],
     "status": "accepted"
@@ -50986,11 +51176,11 @@
     "occurrences": [
       {
         "call": "SharedString::new",
-        "end_byte": 206199,
+        "end_byte": 206276,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 5014,
-        "start_byte": 206124
+        "line": 5015,
+        "start_byte": 206201
       }
     ],
     "status": "accepted"
@@ -50999,19 +51189,19 @@
     "occurrences": [
       {
         "call": "input_output_header",
-        "end_byte": 260231,
+        "end_byte": 260308,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 6377,
-        "start_byte": 260219
+        "line": 6378,
+        "start_byte": 260296
       },
       {
         "call": "input_output_header",
-        "end_byte": 264955,
+        "end_byte": 265032,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 6467,
-        "start_byte": 264943
+        "line": 6468,
+        "start_byte": 265020
       }
     ],
     "status": "accepted"
@@ -51145,11 +51335,11 @@
     "occurrences": [
       {
         "call": "action",
-        "end_byte": 106745,
+        "end_byte": 107293,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2875,
-        "start_byte": 106729
+        "line": 2883,
+        "start_byte": 107277
       }
     ],
     "status": "accepted"
@@ -51247,11 +51437,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 359989,
+        "end_byte": 360066,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8737,
-        "start_byte": 359978
+        "line": 8738,
+        "start_byte": 360055
       },
       {
         "call": "Button::new",
@@ -51466,11 +51656,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 104974,
+        "end_byte": 105522,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_entry",
-        "line": 2842,
-        "start_byte": 104949
+        "line": 2850,
+        "start_byte": 105497
       }
     ],
     "status": "accepted"
@@ -52026,19 +52216,19 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 133132,
+        "end_byte": 133209,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3402,
-        "start_byte": 133105
+        "line": 3403,
+        "start_byte": 133182
       },
       {
         "call": "Tooltip::simple",
-        "end_byte": 133639,
+        "end_byte": 133716,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3409,
-        "start_byte": 133612
+        "line": 3410,
+        "start_byte": 133689
       }
     ],
     "status": "accepted"
@@ -53024,11 +53214,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 344158,
+        "end_byte": 344235,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8326,
-        "start_byte": 344142
+        "line": 8327,
+        "start_byte": 344219
       }
     ],
     "status": "accepted"
@@ -53050,11 +53240,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 346042,
+        "end_byte": 346119,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8377,
-        "start_byte": 346025
+        "line": 8378,
+        "start_byte": 346102
       }
     ],
     "status": "accepted"
@@ -53248,11 +53438,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 17887,
+        "end_byte": 18097,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "button",
-        "line": 547,
-        "start_byte": 17872
+        "line": 551,
+        "start_byte": 18082
       }
     ],
     "status": "accepted"
@@ -53865,11 +54055,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 183855,
+        "end_byte": 183932,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 4530,
-        "start_byte": 183835
+        "line": 4531,
+        "start_byte": 183912
       }
     ],
     "status": "accepted"
@@ -54060,11 +54250,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 184268,
+        "end_byte": 184345,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4534,
-        "start_byte": 184174
+        "line": 4535,
+        "start_byte": 184251
       }
     ],
     "status": "accepted"
@@ -54224,11 +54414,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 355493,
+        "end_byte": 355570,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8622,
-        "start_byte": 355476
+        "line": 8623,
+        "start_byte": 355553
       }
     ],
     "status": "accepted"
@@ -54237,11 +54427,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 349344,
+        "end_byte": 349421,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8469,
-        "start_byte": 349337
+        "line": 8470,
+        "start_byte": 349414
       },
       {
         "call": "prompt",
@@ -54282,11 +54472,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 353756,
+        "end_byte": 353833,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8579,
-        "start_byte": 353738
+        "line": 8580,
+        "start_byte": 353815
       }
     ],
     "status": "accepted"
@@ -54647,11 +54837,11 @@
     "occurrences": [
       {
         "call": "title",
-        "end_byte": 357130,
+        "end_byte": 357207,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_title",
-        "line": 8663,
-        "start_byte": 357107
+        "line": 8664,
+        "start_byte": 357184
       }
     ],
     "status": "accepted"
@@ -54871,27 +55061,27 @@
     "occurrences": [
       {
         "call": "action",
-        "end_byte": 106299,
+        "end_byte": 106847,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2868,
-        "start_byte": 106292
+        "line": 2876,
+        "start_byte": 106840
       },
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 166113,
+        "end_byte": 166190,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4147,
-        "start_byte": 166106
+        "line": 4148,
+        "start_byte": 166183
       },
       {
         "call": "Label::new",
-        "end_byte": 175052,
+        "end_byte": 175129,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4354,
-        "start_byte": 175045
+        "line": 4355,
+        "start_byte": 175122
       }
     ],
     "status": "accepted"
@@ -54950,11 +55140,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 240998,
+        "end_byte": 241075,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 5894,
-        "start_byte": 240985
+        "line": 5895,
+        "start_byte": 241062
       }
     ],
     "status": "accepted"
@@ -55677,11 +55867,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 203069,
+        "end_byte": 203146,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4933,
-        "start_byte": 203034
+        "line": 4934,
+        "start_byte": 203111
       }
     ],
     "status": "accepted"
@@ -55690,11 +55880,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 203478,
+        "end_byte": 203555,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4942,
-        "start_byte": 203463
+        "line": 4943,
+        "start_byte": 203540
       }
     ],
     "status": "accepted"
@@ -55914,11 +56104,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 234304,
+        "end_byte": 234381,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 5728,
-        "start_byte": 234286
+        "line": 5729,
+        "start_byte": 234363
       }
     ],
     "status": "accepted"
@@ -55940,11 +56130,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 234722,
+        "end_byte": 234799,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 5737,
-        "start_byte": 234707
+        "line": 5738,
+        "start_byte": 234784
       }
     ],
     "status": "accepted"
@@ -57490,11 +57680,11 @@
     "occurrences": [
       {
         "call": "header",
-        "end_byte": 293558,
+        "end_byte": 293635,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_header",
-        "line": 7065,
-        "start_byte": 293539
+        "line": 7066,
+        "start_byte": 293616
       }
     ],
     "status": "accepted"
@@ -57665,11 +57855,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 344939,
+        "end_byte": 345016,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8345,
-        "start_byte": 344879
+        "line": 8346,
+        "start_byte": 344956
       }
     ],
     "status": "accepted"
@@ -58011,11 +58201,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 119665,
+        "end_byte": 120213,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip_meta",
-        "line": 3134,
-        "start_byte": 119649
+        "line": 3142,
+        "start_byte": 120197
       }
     ],
     "status": "accepted"
@@ -58097,11 +58287,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 167629,
+        "end_byte": 167706,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4178,
-        "start_byte": 167618
+        "line": 4179,
+        "start_byte": 167695
       },
       {
         "call": "Menu.name",
@@ -59235,11 +59425,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 160520,
+        "end_byte": 160597,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4014,
-        "start_byte": 160502
+        "line": 4015,
+        "start_byte": 160579
       }
     ],
     "status": "accepted"
@@ -59248,11 +59438,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 161023,
+        "end_byte": 161100,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 4024,
-        "start_byte": 161009
+        "line": 4025,
+        "start_byte": 161086
       }
     ],
     "status": "accepted"
@@ -59261,19 +59451,19 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 131084,
+        "end_byte": 131161,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 3371,
-        "start_byte": 131074
+        "line": 3372,
+        "start_byte": 131151
       },
       {
         "call": "Button::new",
-        "end_byte": 135978,
+        "end_byte": 136055,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 3445,
-        "start_byte": 135968
+        "line": 3446,
+        "start_byte": 136045
       }
     ],
     "status": "accepted"
@@ -59949,19 +60139,19 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 101868,
+        "end_byte": 102416,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "label",
-        "line": 2759,
-        "start_byte": 101858
+        "line": 2767,
+        "start_byte": 102406
       },
       {
         "call": "action",
-        "end_byte": 106471,
+        "end_byte": 107019,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2870,
-        "start_byte": 106461
+        "line": 2878,
+        "start_byte": 107009
       },
       {
         "call": "action",
@@ -60363,11 +60553,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 210011,
+        "end_byte": 210088,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5087,
-        "start_byte": 209997
+        "line": 5088,
+        "start_byte": 210074
       }
     ],
     "status": "accepted"
@@ -60863,11 +61053,11 @@
     "occurrences": [
       {
         "call": "label",
-        "end_byte": 32147,
+        "end_byte": 32454,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 910,
-        "start_byte": 32129
+        "line": 914,
+        "start_byte": 32436
       }
     ],
     "status": "accepted"
@@ -60928,11 +61118,11 @@
     "occurrences": [
       {
         "call": "label",
-        "end_byte": 31510,
+        "end_byte": 31817,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 897,
-        "start_byte": 31494
+        "line": 901,
+        "start_byte": 31801
       }
     ],
     "status": "accepted"
@@ -61342,11 +61532,11 @@
     "occurrences": [
       {
         "call": "label",
-        "end_byte": 30878,
+        "end_byte": 31185,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 884,
-        "start_byte": 30861
+        "line": 888,
+        "start_byte": 31168
       }
     ],
     "status": "accepted"
@@ -63058,6 +63248,14 @@
         "start_byte": 46547
       },
       {
+        "call": "button_label",
+        "end_byte": 33895,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "button_label",
+        "line": 992,
+        "start_byte": 33885
+      },
+      {
         "call": "action",
         "end_byte": 56536,
         "file": "crates/title_bar/src/title_bar.rs",
@@ -63072,11 +63270,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 28898,
+        "end_byte": 29205,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 840,
-        "start_byte": 28869
+        "line": 844,
+        "start_byte": 29176
       }
     ],
     "status": "accepted"
@@ -63146,6 +63344,32 @@
     ],
     "status": "accepted"
   },
+  "Sign in with ChatGPT": {
+    "occurrences": [
+      {
+        "call": "Button::new",
+        "end_byte": 34905,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "button",
+        "line": 1019,
+        "start_byte": 34883
+      }
+    ],
+    "status": "accepted"
+  },
+  "Sign in with your ChatGPT Plus or Pro subscription to use OpenAI models in Zed's agent.": {
+    "occurrences": [
+      {
+        "call": "Label::new",
+        "end_byte": 34807,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "label",
+        "line": 1016,
+        "start_byte": 34718
+      }
+    ],
+    "status": "accepted"
+  },
   "Signature Help": {
     "occurrences": [
       {
@@ -63207,6 +63431,14 @@
         "kind": "button",
         "line": 2656,
         "start_byte": 99445
+      },
+      {
+        "call": "Label::new",
+        "end_byte": 34262,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "label",
+        "line": 1002,
+        "start_byte": 34247
       },
       {
         "call": "Label::new",
@@ -63903,11 +64135,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 324562,
+        "end_byte": 324639,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 7862,
-        "start_byte": 324543
+        "line": 7863,
+        "start_byte": 324620
       }
     ],
     "status": "accepted"
@@ -64670,11 +64902,11 @@
       },
       {
         "call": "Button::new",
-        "end_byte": 362492,
+        "end_byte": 362569,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8805,
-        "start_byte": 362474
+        "line": 8806,
+        "start_byte": 362551
       }
     ],
     "status": "accepted"
@@ -65391,11 +65623,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 158498,
+        "end_byte": 158575,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3972,
-        "start_byte": 158481
+        "line": 3973,
+        "start_byte": 158558
       },
       {
         "call": "Tooltip::text",
@@ -65472,11 +65704,11 @@
       },
       {
         "call": "Tooltip::text",
-        "end_byte": 332250,
+        "end_byte": 332327,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 8020,
-        "start_byte": 332235
+        "line": 8021,
+        "start_byte": 332312
       }
     ],
     "status": "accepted"
@@ -65498,11 +65730,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 247778,
+        "end_byte": 247855,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 6071,
-        "start_byte": 247759
+        "line": 6072,
+        "start_byte": 247836
       }
     ],
     "status": "accepted"
@@ -65706,11 +65938,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 324439,
+        "end_byte": 324516,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 7858,
-        "start_byte": 324420
+        "line": 7859,
+        "start_byte": 324497
       }
     ],
     "status": "accepted"
@@ -65719,11 +65951,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 325393,
+        "end_byte": 325470,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 7883,
-        "start_byte": 325373
+        "line": 7884,
+        "start_byte": 325450
       }
     ],
     "status": "accepted"
@@ -65732,19 +65964,19 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 325751,
+        "end_byte": 325828,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 7893,
-        "start_byte": 325734
+        "line": 7894,
+        "start_byte": 325811
       },
       {
         "call": "Label::new",
-        "end_byte": 324506,
+        "end_byte": 324583,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 7860,
-        "start_byte": 324489
+        "line": 7861,
+        "start_byte": 324566
       }
     ],
     "status": "accepted"
@@ -65753,11 +65985,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 197203,
+        "end_byte": 197280,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4777,
-        "start_byte": 197186
+        "line": 4778,
+        "start_byte": 197263
       }
     ],
     "status": "accepted"
@@ -65857,11 +66089,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 30706,
+        "end_byte": 31013,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 881,
-        "start_byte": 30690
+        "line": 885,
+        "start_byte": 30997
       }
     ],
     "status": "accepted"
@@ -66456,11 +66688,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 164643,
+        "end_byte": 164720,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4117,
-        "start_byte": 164634
+        "line": 4118,
+        "start_byte": 164711
       }
     ],
     "status": "accepted"
@@ -66469,11 +66701,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 209519,
+        "end_byte": 209596,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5078,
-        "start_byte": 209494
+        "line": 5079,
+        "start_byte": 209571
       }
     ],
     "status": "accepted"
@@ -67282,11 +67514,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 206938,
+        "end_byte": 207015,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5029,
-        "start_byte": 206911
+        "line": 5030,
+        "start_byte": 206988
       }
     ],
     "status": "accepted"
@@ -67308,11 +67540,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 343496,
+        "end_byte": 343573,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8306,
-        "start_byte": 343361
+        "line": 8307,
+        "start_byte": 343438
       }
     ],
     "status": "accepted"
@@ -67894,11 +68126,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 343076,
+        "end_byte": 343153,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8295,
-        "start_byte": 342915
+        "line": 8296,
+        "start_byte": 342992
       }
     ],
     "status": "accepted"
@@ -69051,11 +69283,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 352276,
+        "end_byte": 352353,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 8538,
-        "start_byte": 352265
+        "line": 8539,
+        "start_byte": 352342
       },
       {
         "call": "SharedString::from",
@@ -69085,11 +69317,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 344644,
+        "end_byte": 344721,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8336,
-        "start_byte": 344515
+        "line": 8337,
+        "start_byte": 344592
       }
     ],
     "status": "accepted"
@@ -69661,11 +69893,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 344278,
+        "end_byte": 344355,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8327,
-        "start_byte": 344176
+        "line": 8328,
+        "start_byte": 344253
       }
     ],
     "status": "accepted"
@@ -70393,11 +70625,11 @@
     "occurrences": [
       {
         "call": "child",
-        "end_byte": 228413,
+        "end_byte": 228490,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "child_text",
-        "line": 5604,
-        "start_byte": 228403
+        "line": 5605,
+        "start_byte": 228480
       }
     ],
     "status": "accepted"
@@ -70544,11 +70776,11 @@
     "occurrences": [
       {
         "call": "description",
-        "end_byte": 355302,
+        "end_byte": 355379,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "description",
-        "line": 8616,
-        "start_byte": 355174
+        "line": 8617,
+        "start_byte": 355251
       }
     ],
     "status": "accepted"
@@ -70557,11 +70789,11 @@
     "occurrences": [
       {
         "call": "description",
-        "end_byte": 358701,
+        "end_byte": 358778,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "description",
-        "line": 8703,
-        "start_byte": 358606
+        "line": 8704,
+        "start_byte": 358683
       }
     ],
     "status": "accepted"
@@ -71133,11 +71365,11 @@
     "occurrences": [
       {
         "call": "description",
-        "end_byte": 357244,
+        "end_byte": 357321,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "description",
-        "line": 8664,
-        "start_byte": 357157
+        "line": 8665,
+        "start_byte": 357234
       }
     ],
     "status": "accepted"
@@ -71344,11 +71576,11 @@
     "occurrences": [
       {
         "call": "Toast::new",
-        "end_byte": 61675,
+        "end_byte": 62223,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1625,
-        "start_byte": 61630
+        "line": 1633,
+        "start_byte": 62178
       }
     ],
     "status": "accepted"
@@ -71370,11 +71602,11 @@
     "occurrences": [
       {
         "call": "Toast::new",
-        "end_byte": 65137,
+        "end_byte": 65685,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1722,
-        "start_byte": 65107
+        "line": 1730,
+        "start_byte": 65655
       }
     ],
     "status": "accepted"
@@ -71383,19 +71615,19 @@
     "occurrences": [
       {
         "call": "show_deferred_toast",
-        "end_byte": 65892,
+        "end_byte": 66440,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1748,
-        "start_byte": 65855
+        "line": 1756,
+        "start_byte": 66403
       },
       {
         "call": "show_deferred_toast",
-        "end_byte": 66750,
+        "end_byte": 67298,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "toast",
-        "line": 1771,
-        "start_byte": 66713
+        "line": 1779,
+        "start_byte": 67261
       }
     ],
     "status": "accepted"
@@ -71456,11 +71688,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 165378,
+        "end_byte": 165455,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "context_menu_entry",
-        "line": 4132,
-        "start_byte": 165369
+        "line": 4133,
+        "start_byte": 165446
       }
     ],
     "status": "accepted"
@@ -71698,11 +71930,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 100707,
+        "end_byte": 101255,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 2735,
-        "start_byte": 100675
+        "line": 2743,
+        "start_byte": 101223
       }
     ],
     "status": "accepted"
@@ -71711,11 +71943,11 @@
     "occurrences": [
       {
         "call": "description",
-        "end_byte": 362161,
+        "end_byte": 362238,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "description",
-        "line": 8795,
-        "start_byte": 362112
+        "line": 8796,
+        "start_byte": 362189
       }
     ],
     "status": "accepted"
@@ -71800,11 +72032,11 @@
       },
       {
         "call": "tooltip_label",
-        "end_byte": 18517,
+        "end_byte": 22101,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "tooltip",
-        "line": 554,
-        "start_byte": 18438
+        "line": 661,
+        "start_byte": 22022
       },
       {
         "call": "tooltip_label",
@@ -71816,11 +72048,11 @@
       },
       {
         "call": "tooltip_label",
-        "end_byte": 30027,
+        "end_byte": 30334,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "tooltip",
-        "line": 864,
-        "start_byte": 29948
+        "line": 868,
+        "start_byte": 30255
       },
       {
         "call": "tooltip_label",
@@ -71845,11 +72077,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 18315,
+        "end_byte": 18525,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "tooltip",
-        "line": 552,
-        "start_byte": 18244
+        "line": 556,
+        "start_byte": 18454
       }
     ],
     "status": "accepted"
@@ -71923,11 +72155,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 28658,
+        "end_byte": 28965,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 834,
-        "start_byte": 28605
+        "line": 838,
+        "start_byte": 28912
       }
     ],
     "status": "accepted"
@@ -71975,11 +72207,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 16779,
+        "end_byte": 20363,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "label",
-        "line": 519,
-        "start_byte": 16698
+        "line": 626,
+        "start_byte": 20282
       }
     ],
     "status": "accepted"
@@ -72014,11 +72246,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 15993,
+        "end_byte": 16203,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "label",
-        "line": 501,
-        "start_byte": 15909
+        "line": 505,
+        "start_byte": 16119
       }
     ],
     "status": "accepted"
@@ -72074,11 +72306,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 104136,
+        "end_byte": 104684,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "tooltip",
-        "line": 2822,
-        "start_byte": 104117
+        "line": 2830,
+        "start_byte": 104665
       }
     ],
     "status": "accepted"
@@ -72392,11 +72624,11 @@
     "occurrences": [
       {
         "call": "action",
-        "end_byte": 106598,
+        "end_byte": 107146,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2872,
-        "start_byte": 106574
+        "line": 2880,
+        "start_byte": 107122
       }
     ],
     "status": "accepted"
@@ -74356,11 +74588,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 170178,
+        "end_byte": 170255,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip_meta",
-        "line": 4238,
-        "start_byte": 170121
+        "line": 4239,
+        "start_byte": 170198
       }
     ],
     "status": "accepted"
@@ -74648,11 +74880,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 250092,
+        "end_byte": 250169,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 6117,
-        "start_byte": 250081
+        "line": 6118,
+        "start_byte": 250158
       }
     ],
     "status": "accepted"
@@ -74820,11 +75052,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 130389,
+        "end_byte": 130466,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip_meta",
-        "line": 3360,
-        "start_byte": 130366
+        "line": 3361,
+        "start_byte": 130443
       }
     ],
     "status": "accepted"
@@ -74846,11 +75078,11 @@
     "occurrences": [
       {
         "call": "Tooltip::for_action",
-        "end_byte": 159389,
+        "end_byte": 159466,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 3993,
-        "start_byte": 159375
+        "line": 3994,
+        "start_byte": 159452
       }
     ],
     "status": "accepted"
@@ -75002,11 +75234,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 190818,
+        "end_byte": 190895,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4637,
-        "start_byte": 190797
+        "line": 4638,
+        "start_byte": 190874
       }
     ],
     "status": "accepted"
@@ -75978,11 +76210,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 359938,
+        "end_byte": 360015,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8735,
-        "start_byte": 359923
+        "line": 8736,
+        "start_byte": 360000
       }
     ],
     "status": "accepted"
@@ -76043,11 +76275,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 350065,
+        "end_byte": 350142,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 8488,
-        "start_byte": 350056
+        "line": 8489,
+        "start_byte": 350133
       },
       {
         "call": "Button::new",
@@ -77708,11 +77940,11 @@
     "occurrences": [
       {
         "call": "input_output_header",
-        "end_byte": 260309,
+        "end_byte": 260386,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 6379,
-        "start_byte": 260293
+        "line": 6380,
+        "start_byte": 260370
       }
     ],
     "status": "accepted"
@@ -77760,11 +77992,11 @@
     "occurrences": [
       {
         "call": "action",
-        "end_byte": 105754,
+        "end_byte": 106302,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_action",
-        "line": 2858,
-        "start_byte": 105730
+        "line": 2866,
+        "start_byte": 106278
       }
     ],
     "status": "accepted"
@@ -78229,11 +78461,11 @@
     "occurrences": [
       {
         "call": "Tooltip::text",
-        "end_byte": 208177,
+        "end_byte": 208254,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip",
-        "line": 5050,
-        "start_byte": 208106
+        "line": 5051,
+        "start_byte": 208183
       }
     ],
     "status": "accepted"
@@ -84131,11 +84363,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 17704,
+        "end_byte": 21288,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "label",
-        "line": 537,
-        "start_byte": 17621
+        "line": 644,
+        "start_byte": 21205
       },
       {
         "call": "Label::new",
@@ -84147,11 +84379,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 29554,
+        "end_byte": 29861,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "label",
-        "line": 853,
-        "start_byte": 29471
+        "line": 857,
+        "start_byte": 29778
       },
       {
         "call": "Label::new",
@@ -84189,11 +84421,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 16348,
+        "end_byte": 16558,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "label",
-        "line": 509,
-        "start_byte": 16273
+        "line": 513,
+        "start_byte": 16483
       }
     ],
     "status": "accepted"
@@ -84215,11 +84447,11 @@
     "occurrences": [
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 275286,
+        "end_byte": 275363,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "tooltip_meta",
-        "line": 6650,
-        "start_byte": 275200
+        "line": 6651,
+        "start_byte": 275277
       }
     ],
     "status": "accepted"
@@ -84501,11 +84733,11 @@
     "occurrences": [
       {
         "call": "ContextMenuEntry::new",
-        "end_byte": 110619,
+        "end_byte": 111167,
         "file": "crates/agent_ui/src/agent_panel.rs",
         "kind": "context_menu_entry",
-        "line": 2967,
-        "start_byte": 110608
+        "line": 2975,
+        "start_byte": 111156
       }
     ],
     "status": "accepted"
@@ -84540,11 +84772,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 19269,
+        "end_byte": 22853,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "label",
-        "line": 576,
-        "start_byte": 19224
+        "line": 683,
+        "start_byte": 22808
       }
     ],
     "status": "accepted"
@@ -84960,11 +85192,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 172309,
+        "end_byte": 172386,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4298,
-        "start_byte": 172299
+        "line": 4299,
+        "start_byte": 172376
       },
       {
         "call": "Label::new",
@@ -85294,11 +85526,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 36960,
+        "end_byte": 49100,
         "file": "crates/open_ai/src/completion.rs",
         "kind": "shared_string",
-        "line": 953,
-        "start_byte": 36950
+        "line": 1321,
+        "start_byte": 49090
       }
     ],
     "status": "ignored"
@@ -86934,11 +87166,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 225954,
+        "end_byte": 226031,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 5542,
-        "start_byte": 225935
+        "line": 5543,
+        "start_byte": 226012
       }
     ],
     "status": "ignored"
@@ -86947,11 +87179,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 256596,
+        "end_byte": 256673,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 6295,
-        "start_byte": 256572
+        "line": 6296,
+        "start_byte": 256649
       }
     ],
     "status": "ignored"
@@ -87051,11 +87283,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 313872,
+        "end_byte": 313949,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 7565,
-        "start_byte": 313863
+        "line": 7566,
+        "start_byte": 313940
       }
     ],
     "status": "ignored"
@@ -88539,11 +88771,11 @@
       },
       {
         "call": "InputField::new",
-        "end_byte": 25039,
+        "end_byte": 25346,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "placeholder",
-        "line": 727,
-        "start_byte": 25002
+        "line": 731,
+        "start_byte": 25309
       }
     ],
     "status": "ignored"
@@ -88552,11 +88784,11 @@
     "occurrences": [
       {
         "call": "InputField::new",
-        "end_byte": 13848,
+        "end_byte": 17432,
         "file": "crates/language_models/src/provider/open_ai.rs",
         "kind": "placeholder",
-        "line": 434,
-        "start_byte": 13795
+        "line": 541,
+        "start_byte": 17379
       }
     ],
     "status": "ignored"
@@ -88703,11 +88935,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 247428,
+        "end_byte": 247505,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 6064,
-        "start_byte": 247410
+        "line": 6065,
+        "start_byte": 247487
       }
     ],
     "status": "ignored"
@@ -88755,11 +88987,11 @@
     "occurrences": [
       {
         "call": "child",
-        "end_byte": 182862,
+        "end_byte": 182939,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "child_text",
-        "line": 4505,
-        "start_byte": 182851
+        "line": 4506,
+        "start_byte": 182928
       }
     ],
     "status": "accepted"
@@ -88859,11 +89091,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 245680,
+        "end_byte": 245757,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 6024,
-        "start_byte": 245651
+        "line": 6025,
+        "start_byte": 245728
       }
     ],
     "status": "ignored"
@@ -88872,11 +89104,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 244075,
+        "end_byte": 244152,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 5974,
-        "start_byte": 244044
+        "line": 5975,
+        "start_byte": 244121
       }
     ],
     "status": "ignored"
@@ -88885,11 +89117,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 243951,
+        "end_byte": 244028,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 5972,
-        "start_byte": 243926
+        "line": 5973,
+        "start_byte": 244003
       }
     ],
     "status": "ignored"
@@ -89287,11 +89519,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 225873,
+        "end_byte": 225950,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 5541,
-        "start_byte": 225847
+        "line": 5542,
+        "start_byte": 225924
       }
     ],
     "status": "ignored"
@@ -89521,11 +89753,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 316591,
+        "end_byte": 316668,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "shared_string",
-        "line": 7646,
-        "start_byte": 316573
+        "line": 7647,
+        "start_byte": 316650
       }
     ],
     "status": "ignored"
@@ -90759,11 +90991,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 343932,
+        "end_byte": 344009,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8317,
-        "start_byte": 343788
+        "line": 8318,
+        "start_byte": 343865
       }
     ],
     "status": "accepted"
@@ -90772,11 +91004,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 345315,
+        "end_byte": 345392,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8353,
-        "start_byte": 345180
+        "line": 8354,
+        "start_byte": 345257
       }
     ],
     "status": "accepted"
@@ -90785,11 +91017,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 341687,
+        "end_byte": 341764,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8261,
-        "start_byte": 341555
+        "line": 8262,
+        "start_byte": 341632
       }
     ],
     "status": "accepted"
@@ -90798,11 +91030,11 @@
     "occurrences": [
       {
         "call": "render_error_callout",
-        "end_byte": 342142,
+        "end_byte": 342219,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "callout_description",
-        "line": 8272,
-        "start_byte": 341980
+        "line": 8273,
+        "start_byte": 342057
       }
     ],
     "status": "accepted"
@@ -91269,11 +91501,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 177361,
+        "end_byte": 177438,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 4389,
-        "start_byte": 177343
+        "line": 4390,
+        "start_byte": 177420
       }
     ],
     "status": "accepted"
@@ -91282,11 +91514,11 @@
     "occurrences": [
       {
         "call": "description",
-        "end_byte": 345898,
+        "end_byte": 345975,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "description",
-        "line": 8369,
-        "start_byte": 345682
+        "line": 8370,
+        "start_byte": 345759
       }
     ],
     "status": "accepted"
@@ -91360,19 +91592,19 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 204471,
+        "end_byte": 204548,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 4968,
-        "start_byte": 204460
+        "line": 4969,
+        "start_byte": 204537
       },
       {
         "call": "Label::new",
-        "end_byte": 221271,
+        "end_byte": 221348,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 5422,
-        "start_byte": 221260
+        "line": 5423,
+        "start_byte": 221337
       }
     ],
     "status": "accepted"
@@ -91394,11 +91626,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 175696,
+        "end_byte": 175773,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "button",
-        "line": 4365,
-        "start_byte": 175681
+        "line": 4366,
+        "start_byte": 175758
       }
     ],
     "status": "accepted"
@@ -91928,11 +92160,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 328214,
+        "end_byte": 328291,
         "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
         "kind": "label",
-        "line": 7955,
-        "start_byte": 328195
+        "line": 7956,
+        "start_byte": 328272
       }
     ],
     "status": "accepted"

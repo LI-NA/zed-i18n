@@ -402,6 +402,36 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(by_source["Feature Flags"].call, "SettingsPageItem::SectionHeader")
         self.assertEqual(by_source["The displayed name of this project."].kind, "setting_description")
 
+    def test_extracts_language_model_effort_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn supported_effort_levels(effort: ReasoningEffort) {",
+                "    vec![",
+                "        language_model::LanguageModelEffortLevel {",
+                '            name: "Low".into(),',
+                '            value: "low".into(),',
+                "            is_default: false,",
+                "        },",
+                "    ];",
+                "    match effort {",
+                '        ReasoningEffort::None => ("None", "none"),',
+                '        ReasoningEffort::XHigh => ("Extra High", "xhigh"),',
+                "    };",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/language_models/src/provider/open_ai.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Low", "Extra High"})
+        self.assertEqual(by_source["Low"].call, "LanguageModelEffortLevel.name")
+        self.assertEqual(by_source["Extra High"].call, "reasoning_effort_display")
+        self.assertEqual(by_source["Extra High"].kind, "language_model_effort_label")
+
     def test_extracts_visible_strings_inside_ui_expression_arguments(self) -> None:
         source = "\n".join(
             [
