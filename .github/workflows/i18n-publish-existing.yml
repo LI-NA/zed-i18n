@@ -1,4 +1,4 @@
-name: Publish Existing Release Assets
+name: Publish Existing
 run-name: Publish ${{ inputs.release_tag }} from run ${{ inputs.source_run_id }}
 
 on:
