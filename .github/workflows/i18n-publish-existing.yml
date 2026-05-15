@@ -1,0 +1,124 @@
+name: Publish Existing Release Assets
+run-name: Publish ${{ inputs.release_tag }} from run ${{ inputs.source_run_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Release workflow run id containing the combined artifact."
+        required: true
+      release_tag:
+        description: "Existing release tag to publish."
+        required: true
+      artifact_name:
+        description: "Combined artifact name from the source run."
+        required: true
+        default: zed-i18n-release-assets
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: publish-existing-release-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish existing release assets
+    runs-on: ubuntu-24.04
+    environment:
+      name: release
+    steps:
+      - name: Download combined artifact
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: release-artifacts
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Validate artifact payload
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          set -euo pipefail
+
+          test -f release-artifacts/manifest.json
+          test -f release-artifacts/SHA256SUMS.txt
+
+          cd release-artifacts
+          sha256sum --check SHA256SUMS.txt
+
+          manifest_release_tag="$(jq -r '.release_tag' manifest.json)"
+          manifest_repository="$(jq -r '.repository' manifest.json)"
+          manifest_run_id="$(jq -r '.run_id' manifest.json)"
+          manifest_asset_count="$(jq -r '.asset_count' manifest.json)"
+          actual_asset_count="$(jq '.assets | length' manifest.json)"
+
+          if [[ "$manifest_release_tag" != "$RELEASE_TAG" ]]; then
+            echo "Manifest release_tag mismatch: $manifest_release_tag != $RELEASE_TAG"
+            exit 1
+          fi
+          if [[ "$manifest_repository" != "$GITHUB_REPOSITORY" ]]; then
+            echo "Manifest repository mismatch: $manifest_repository != $GITHUB_REPOSITORY"
+            exit 1
+          fi
+          if [[ "$manifest_run_id" != "$SOURCE_RUN_ID" ]]; then
+            echo "Manifest run_id mismatch: $manifest_run_id != $SOURCE_RUN_ID"
+            exit 1
+          fi
+          if [[ "$manifest_asset_count" != "$actual_asset_count" ]]; then
+            echo "Manifest asset_count mismatch: $manifest_asset_count != $actual_asset_count"
+            exit 1
+          fi
+
+          manifest_assets="$(mktemp)"
+          jq -r '.assets[].name' manifest.json | sort > "$manifest_assets"
+          while IFS= read -r asset; do
+            if [[ ! -f "$asset" ]]; then
+              echo "Manifest asset is missing from combined artifact: $asset"
+              exit 1
+            fi
+          done < "$manifest_assets"
+
+      - name: Upload to draft GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" >/dev/null; then
+            echo "Release tag does not exist: $RELEASE_TAG"
+            exit 1
+          fi
+
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --verify-tag \
+              --draft \
+              --title "$RELEASE_TAG" \
+              --notes "Localized Zed build restored from workflow run ${{ inputs.source_run_id }}."
+          fi
+
+          gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"
+
+      - name: Validate release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          set -euo pipefail
+
+          find release-artifacts -maxdepth 1 -type f -printf '%f\n' | sort > expected-assets.txt
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' | sort > actual-assets.txt
+          missing="$(comm -23 expected-assets.txt actual-assets.txt)"
+          if [[ -n "$missing" ]]; then
+            echo "Missing release assets:"
+            echo "$missing"
+            exit 1
+          fi
+          echo "All expected release assets are present."

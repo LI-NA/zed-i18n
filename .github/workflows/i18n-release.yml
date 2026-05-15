@@ -514,15 +514,16 @@ jobs:
             exit 1
           fi
 
-          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
               --verify-tag \
               --draft \
               --title "$RELEASE_TAG" \
               --notes "Localized Zed build for ${{ needs.prepare.outputs.zed-version }}."
           fi
 
-          gh release upload "$RELEASE_TAG" release-artifacts/*
+          gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"
 
       - name: Validate release assets
         env:
@@ -531,7 +532,7 @@ jobs:
         run: |
           RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
           find release-artifacts -maxdepth 1 -type f -printf '%f\n' | sort > expected-assets.txt
-          gh release view "$RELEASE_TAG" --json assets -q '.assets[].name' | sort > actual-assets.txt
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' | sort > actual-assets.txt
           missing="$(comm -23 expected-assets.txt actual-assets.txt)"
           if [[ -n "$missing" ]]; then
             echo "Missing release assets:"

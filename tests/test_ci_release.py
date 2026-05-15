@@ -408,6 +408,42 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("--verify-tag", workflow)
         self.assertNotIn("--clobber", workflow)
 
+    def test_release_workflow_uses_explicit_repo_for_release_commands(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn('gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY"', workflow)
+        self.assertIn('gh release create "$RELEASE_TAG" \\', workflow)
+        self.assertIn('          --repo "$GITHUB_REPOSITORY" \\', workflow)
+        self.assertIn(
+            'gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"',
+            workflow,
+        )
+        self.assertIn(
+            'gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets',
+            workflow,
+        )
+
+    def test_publish_existing_release_assets_workflow_reuses_combined_artifact(self) -> None:
+        workflow = (
+            Path.cwd() / ".github" / "workflows" / "i18n-publish-existing.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("source_run_id:", workflow)
+        self.assertIn("release_tag:", workflow)
+        self.assertIn("default: zed-i18n-release-assets", workflow)
+        self.assertIn("permissions:\n  contents: write\n  actions: read", workflow)
+        self.assertIn("actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131", workflow)
+        self.assertIn("run-id: ${{ inputs.source_run_id }}", workflow)
+        self.assertIn("name: ${{ inputs.artifact_name }}", workflow)
+        self.assertIn("github-token: ${{ secrets.GITHUB_TOKEN }}", workflow)
+        self.assertIn("sha256sum --check SHA256SUMS.txt", workflow)
+        self.assertIn('gh release create "$RELEASE_TAG"', workflow)
+        self.assertIn('gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"', workflow)
+        self.assertIn('gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets', workflow)
+
     def test_release_workflow_attests_release_artifacts(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
