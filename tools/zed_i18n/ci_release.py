@@ -535,16 +535,16 @@ def windows_portable_source_path(
 
 def app_asset_name(language: str, platform: str, arch: str) -> str:
     if platform == "linux":
-        return f"zed-{language}-linux-{arch}.tar.gz"
+        return f"zed-i18n-{language}-linux-{arch}.tar.gz"
     if platform == "macos":
-        return f"Zed-{language}-macos-{arch}.dmg"
+        return f"Zed-i18n-{language}-macos-{arch}.dmg"
     if platform == "windows":
-        return f"Zed-{language}-windows-{arch}.exe"
+        return f"Zed-i18n-{language}-windows-{arch}.exe"
     raise ValueError(f"unsupported platform: {platform}")
 
 
 def windows_portable_asset_name(language: str, arch: str) -> str:
-    return f"Zed-{language}-windows-{arch}.zip"
+    return f"Zed-i18n-{language}-windows-{arch}.zip"
 
 
 def app_asset_names(language: str, platform: str, arch: str) -> list[str]:
@@ -855,22 +855,22 @@ def build_shard(
 
 APP_PATTERNS = (
     (
-        re.compile(r"^zed-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
+        re.compile(r"^zed-i18n-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
         "linux",
         "app",
     ),
     (
-        re.compile(r"^Zed-(?P<locale>.+)-macos-(?P<arch>x86_64|aarch64)\.dmg$"),
+        re.compile(r"^Zed-i18n-(?P<locale>.+)-macos-(?P<arch>x86_64|aarch64)\.dmg$"),
         "macos",
         "app",
     ),
     (
-        re.compile(r"^Zed-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.exe$"),
+        re.compile(r"^Zed-i18n-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.exe$"),
         "windows",
         "app",
     ),
     (
-        re.compile(r"^Zed-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.zip$"),
+        re.compile(r"^Zed-i18n-(?P<locale>.+)-windows-(?P<arch>x86_64|aarch64)\.zip$"),
         "windows",
         "portable_app",
     ),

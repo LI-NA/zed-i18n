@@ -188,9 +188,9 @@ class CiReleaseTests(unittest.TestCase):
 
     def test_classifies_only_app_assets(self) -> None:
         self.assertEqual(
-            classify_asset(Path("zed-ko-KR-linux-x86_64.tar.gz")),
+            classify_asset(Path("zed-i18n-ko-KR-linux-x86_64.tar.gz")),
             {
-                "name": "zed-ko-KR-linux-x86_64.tar.gz",
+                "name": "zed-i18n-ko-KR-linux-x86_64.tar.gz",
                 "kind": "app",
                 "locale": "ko-KR",
                 "platform": "linux",
@@ -201,9 +201,9 @@ class CiReleaseTests(unittest.TestCase):
             classify_asset(Path("zed-remote-server-windows-aarch64.zip"))
 
         self.assertEqual(
-            classify_asset(Path("Zed-ko-KR-windows-x86_64.zip")),
+            classify_asset(Path("Zed-i18n-ko-KR-windows-x86_64.zip")),
             {
-                "name": "Zed-ko-KR-windows-x86_64.zip",
+                "name": "Zed-i18n-ko-KR-windows-x86_64.zip",
                 "kind": "portable_app",
                 "locale": "ko-KR",
                 "platform": "windows",
@@ -214,7 +214,7 @@ class CiReleaseTests(unittest.TestCase):
     def test_generates_manifest_and_checksums(self) -> None:
         dist_dir = self.temp_root / "dist"
         dist_dir.mkdir()
-        (dist_dir / "zed-ko-KR-linux-x86_64.tar.gz").write_text("app", encoding="utf-8")
+        (dist_dir / "zed-i18n-ko-KR-linux-x86_64.tar.gz").write_text("app", encoding="utf-8")
         (dist_dir / "zed-remote-server-linux-x86_64.gz").write_text("server", encoding="utf-8")
 
         generate_release_metadata(
@@ -234,7 +234,7 @@ class CiReleaseTests(unittest.TestCase):
         self.assertEqual(manifest["release_tag"], "v1.2.5-i18n.1")
         self.assertEqual(manifest["asset_count"], 1)
         self.assertEqual([asset["kind"] for asset in manifest["assets"]], ["app"])
-        self.assertIn("zed-ko-KR-linux-x86_64.tar.gz", checksums)
+        self.assertIn("zed-i18n-ko-KR-linux-x86_64.tar.gz", checksums)
         self.assertNotIn("zed-remote-server-linux-x86_64.gz", checksums)
 
     def test_expected_app_asset_names_follow_selected_languages_and_platforms(self) -> None:
@@ -243,19 +243,19 @@ class CiReleaseTests(unittest.TestCase):
         self.assertEqual(
             expected_app_asset_names(["ko-KR", "ja-JP"], platforms),
             [
-                "Zed-ja-JP-windows-aarch64.exe",
-                "Zed-ja-JP-windows-aarch64.zip",
-                "Zed-ko-KR-windows-aarch64.exe",
-                "Zed-ko-KR-windows-aarch64.zip",
-                "zed-ja-JP-linux-x86_64.tar.gz",
-                "zed-ko-KR-linux-x86_64.tar.gz",
+                "Zed-i18n-ja-JP-windows-aarch64.exe",
+                "Zed-i18n-ja-JP-windows-aarch64.zip",
+                "Zed-i18n-ko-KR-windows-aarch64.exe",
+                "Zed-i18n-ko-KR-windows-aarch64.zip",
+                "zed-i18n-ja-JP-linux-x86_64.tar.gz",
+                "zed-i18n-ko-KR-linux-x86_64.tar.gz",
             ],
         )
 
     def test_release_metadata_rejects_missing_expected_assets(self) -> None:
         dist_dir = self.temp_root / "dist"
         dist_dir.mkdir()
-        (dist_dir / "zed-ko-KR-linux-x86_64.tar.gz").write_text("app", encoding="utf-8")
+        (dist_dir / "zed-i18n-ko-KR-linux-x86_64.tar.gz").write_text("app", encoding="utf-8")
 
         with self.assertRaisesRegex(ValueError, "missing expected release assets"):
             generate_release_metadata(
@@ -267,16 +267,16 @@ class CiReleaseTests(unittest.TestCase):
                 repository="owner/repo",
                 run_id="123",
                 expected_assets=[
-                    "zed-ko-KR-linux-x86_64.tar.gz",
-                    "Zed-ko-KR-windows-x86_64.exe",
+                    "zed-i18n-ko-KR-linux-x86_64.tar.gz",
+                    "Zed-i18n-ko-KR-windows-x86_64.exe",
                 ],
             )
 
     def test_manifest_includes_update_urls_and_i18n_revision(self) -> None:
         dist_dir = self.temp_root / "dist"
         dist_dir.mkdir()
-        (dist_dir / "Zed-ko-KR-windows-x86_64.exe").write_text("app", encoding="utf-8")
-        (dist_dir / "Zed-ko-KR-windows-x86_64.zip").write_text("portable", encoding="utf-8")
+        (dist_dir / "Zed-i18n-ko-KR-windows-x86_64.exe").write_text("app", encoding="utf-8")
+        (dist_dir / "Zed-i18n-ko-KR-windows-x86_64.zip").write_text("portable", encoding="utf-8")
 
         generate_release_metadata(
             root=self.temp_root,
@@ -297,12 +297,12 @@ class CiReleaseTests(unittest.TestCase):
         )
         self.assertEqual(
             manifest["assets"][0]["download_url"],
-            "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-ko-KR-windows-x86_64.exe",
+            "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-i18n-ko-KR-windows-x86_64.exe",
         )
         self.assertEqual(manifest["assets"][1]["kind"], "portable_app")
         self.assertEqual(
             manifest["assets"][1]["download_url"],
-            "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-ko-KR-windows-x86_64.zip",
+            "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-i18n-ko-KR-windows-x86_64.zip",
         )
 
     def test_windows_app_source_path_uses_distribution_setup_name(self) -> None:
