@@ -633,7 +633,19 @@ def create_windows_portable_zip(zed_root: Path, arch: str, destination: Path) ->
     print(f"Created Windows portable zip {destination}")
 
 
+def configure_utf8_stdio() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is None:
+            continue
+        try:
+            reconfigure(encoding="utf-8")
+        except (OSError, ValueError):
+            pass
+
+
 def run_streaming_command(command: list[str], cwd: Path, env: dict[str, str]) -> None:
+    configure_utf8_stdio()
     tail: deque[str] = deque(maxlen=STREAMED_COMMAND_TAIL_LINES)
     process = subprocess.Popen(
         command,
@@ -1060,6 +1072,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    configure_utf8_stdio()
     parser = build_parser()
     args = parser.parse_args(argv)
     root = Path(args.root).resolve()

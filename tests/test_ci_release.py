@@ -1,4 +1,5 @@
 import json
+import io
 import subprocess
 from unittest.mock import patch
 import shutil
@@ -20,6 +21,7 @@ from tools.zed_i18n.ci_release import (
     list_translation_languages,
     patch_remote_server_build,
     run_bundle_command_with_retry,
+    run_streaming_command,
     runner_override_env_name,
     SIGNING_ENV_VARS,
     select_platforms,
@@ -725,6 +727,30 @@ class CiReleaseTests(unittest.TestCase):
 
         self.assertEqual(run_command.call_count, 1)
         cleanup.assert_not_called()
+
+    def test_streaming_command_preserves_unicode_when_stdout_is_legacy_encoded(self) -> None:
+        rocket = chr(0x1F680)
+
+        class Process:
+            stdout = iter([f"{rocket} Building installer\n"])
+
+            def wait(self) -> int:
+                return 0
+
+        output = io.BytesIO()
+        legacy_stdout = io.TextIOWrapper(output, encoding="cp1252")
+
+        with (
+            patch("tools.zed_i18n.ci_release.subprocess.Popen", return_value=Process()),
+            patch("tools.zed_i18n.ci_release.sys.stdout", legacy_stdout),
+        ):
+            run_streaming_command(["bundle"], self.temp_root, {})
+
+        legacy_stdout.flush()
+        self.assertEqual(
+            output.getvalue().decode("utf-8").replace("\r\n", "\n"),
+            f"{rocket} Building installer\n",
+        )
 
     def test_patches_bundle_scripts_to_skip_remote_server_build(self) -> None:
         script_dir = self.temp_root / "script"
