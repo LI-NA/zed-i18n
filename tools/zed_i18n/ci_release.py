@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import deque
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 import hashlib
@@ -11,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import tomllib
 from typing import Iterable
 import zipfile
@@ -73,6 +75,20 @@ SIGNING_ENV_VARS = {
     "TIMESTAMP_DIGEST",
     "TIMESTAMP_SERVER",
 }
+
+MACOS_TRANSIENT_BUNDLE_ERRORS = (
+    "tar: bin/git: Not found in archive",
+    "hdiutil: create failed - Resource busy",
+)
+MACOS_BUNDLE_RETRY_STAGE_MARKERS = (
+    "Creating application bundle",
+    "Bundled ",
+    "Downloading git binary",
+    "Creating final DMG",
+    "Adding license agreement to DMG",
+    "Notarizing DMG",
+)
+STREAMED_COMMAND_TAIL_LINES = 1000
 
 
 def windows_signing_env_complete(env: dict[str, str]) -> bool:
@@ -617,6 +633,100 @@ def create_windows_portable_zip(zed_root: Path, arch: str, destination: Path) ->
     print(f"Created Windows portable zip {destination}")
 
 
+def run_streaming_command(command: list[str], cwd: Path, env: dict[str, str]) -> None:
+    tail: deque[str] = deque(maxlen=STREAMED_COMMAND_TAIL_LINES)
+    process = subprocess.Popen(
+        command,
+        cwd=cwd,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        bufsize=1,
+    )
+    if process.stdout is not None:
+        for line in process.stdout:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+            tail.append(line)
+
+    return_code = process.wait()
+    if return_code != 0:
+        raise subprocess.CalledProcessError(return_code, command, output="".join(tail))
+
+
+def called_process_output(error: subprocess.CalledProcessError) -> str:
+    output = error.output if error.output is not None else error.stderr
+    if output is None:
+        return ""
+    if isinstance(output, bytes):
+        return output.decode("utf-8", errors="replace")
+    return str(output)
+
+
+def macos_bundle_retry_reason(output: str) -> str | None:
+    for pattern in MACOS_TRANSIENT_BUNDLE_ERRORS:
+        if pattern in output:
+            return pattern
+    for marker in MACOS_BUNDLE_RETRY_STAGE_MARKERS:
+        if marker in output:
+            return f"bundle stage reached: {marker}"
+    return None
+
+
+def macos_arch_suffix(bundle_target: str) -> str:
+    if bundle_target == "aarch64-apple-darwin":
+        return "aarch64"
+    if bundle_target == "x86_64-apple-darwin":
+        return "x86_64"
+    raise ValueError(f"unsupported macOS bundle target: {bundle_target}")
+
+
+def cleanup_macos_bundle_retry_state(zed_root: Path, bundle_target: str) -> None:
+    arch_suffix = macos_arch_suffix(bundle_target)
+    dmg_target_directory = zed_root / "target" / bundle_target / "release"
+    dmg_source_directory = dmg_target_directory / "dmg"
+    dmg_file_path = dmg_target_directory / f"Zed-{arch_suffix}.dmg"
+    app_bundle_directory = dmg_target_directory / "bundle" / "osx"
+
+    print("Cleaning macOS bundle state before retry")
+    subprocess.run(["hdiutil", "info"], cwd=zed_root, check=False)
+    for volume in (Path("/Volumes/Zed"), Path("/Volumes/Zed 1")):
+        if volume.exists():
+            subprocess.run(["hdiutil", "detach", str(volume), "-force"], cwd=zed_root, check=False)
+    shutil.rmtree(dmg_source_directory, ignore_errors=True)
+    shutil.rmtree(app_bundle_directory, ignore_errors=True)
+    try:
+        dmg_file_path.unlink(missing_ok=True)
+    except OSError as error:
+        print(f"Warning: failed to remove partial DMG before retry: {error}")
+
+
+def run_bundle_command_with_retry(
+    platform: str,
+    bundle_target: str,
+    command: list[str],
+    zed_root: Path,
+    env: dict[str, str],
+) -> None:
+    try:
+        run_streaming_command(command, cwd=zed_root, env=env)
+    except subprocess.CalledProcessError as error:
+        if platform != "macos":
+            raise
+        retry_reason = macos_bundle_retry_reason(called_process_output(error))
+        if retry_reason is None:
+            raise
+
+        print(f"Detected retryable macOS bundle failure: {retry_reason}")
+        cleanup_macos_bundle_retry_state(zed_root, bundle_target)
+        print("Retrying macOS bundle command once")
+        time.sleep(10)
+        run_streaming_command(command, cwd=zed_root, env=env)
+
+
 def cargo_target_dir(zed_root: Path) -> Path:
     target_dir = Path(os.environ.get("CARGO_TARGET_DIR", "target"))
     if not target_dir.is_absolute():
@@ -715,11 +825,12 @@ def build_shard(
             release_tag=release_tag,
             repository=repository,
         )
-        subprocess.run(
+        run_bundle_command_with_retry(
+            platform,
+            bundle_target,
             bundle_command(platform, arch, bundle_target),
-            cwd=zed_root,
-            env=env,
-            check=True,
+            zed_root,
+            env,
         )
         if platform == "windows":
             create_windows_portable_zip(

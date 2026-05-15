@@ -1,4 +1,5 @@
 import json
+import subprocess
 from unittest.mock import patch
 import shutil
 import unittest
@@ -18,6 +19,7 @@ from tools.zed_i18n.ci_release import (
     github_matrix_outputs,
     list_translation_languages,
     patch_remote_server_build,
+    run_bundle_command_with_retry,
     runner_override_env_name,
     SIGNING_ENV_VARS,
     select_platforms,
@@ -583,6 +585,110 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b", workflow)
         self.assertIn("actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae", workflow)
         self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
+
+    def test_macos_bundle_retries_transient_git_archive_failure_once(self) -> None:
+        command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
+        failure = subprocess.CalledProcessError(
+            1,
+            command,
+            output="Downloading git binary\ntar: bin/git: Not found in archive\n",
+        )
+
+        with (
+            patch(
+                "tools.zed_i18n.ci_release.run_streaming_command",
+                side_effect=[failure, None],
+            ) as run_command,
+            patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state") as cleanup,
+            patch("tools.zed_i18n.ci_release.time.sleep") as sleep,
+        ):
+            run_bundle_command_with_retry(
+                "macos",
+                "aarch64-apple-darwin",
+                command,
+                self.temp_root,
+                {},
+            )
+
+        self.assertEqual(run_command.call_count, 2)
+        cleanup.assert_called_once_with(self.temp_root, "aarch64-apple-darwin")
+        sleep.assert_called_once()
+
+    def test_macos_bundle_retries_transient_hdiutil_failure_once(self) -> None:
+        command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
+        failure = subprocess.CalledProcessError(
+            1,
+            command,
+            output="Creating final DMG\nhdiutil: create failed - Resource busy\n",
+        )
+
+        with (
+            patch(
+                "tools.zed_i18n.ci_release.run_streaming_command",
+                side_effect=[failure, None],
+            ) as run_command,
+            patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state"),
+            patch("tools.zed_i18n.ci_release.time.sleep"),
+        ):
+            run_bundle_command_with_retry(
+                "macos",
+                "aarch64-apple-darwin",
+                command,
+                self.temp_root,
+                {},
+            )
+
+        self.assertEqual(run_command.call_count, 2)
+
+    def test_macos_bundle_retries_after_packaging_stage_marker_once(self) -> None:
+        command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
+        failure = subprocess.CalledProcessError(
+            1,
+            command,
+            output="Creating application bundle\nsome transient packaging failure\n",
+        )
+
+        with (
+            patch(
+                "tools.zed_i18n.ci_release.run_streaming_command",
+                side_effect=[failure, None],
+            ) as run_command,
+            patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state") as cleanup,
+            patch("tools.zed_i18n.ci_release.time.sleep"),
+        ):
+            run_bundle_command_with_retry(
+                "macos",
+                "aarch64-apple-darwin",
+                command,
+                self.temp_root,
+                {},
+            )
+
+        self.assertEqual(run_command.call_count, 2)
+        cleanup.assert_called_once_with(self.temp_root, "aarch64-apple-darwin")
+
+    def test_macos_bundle_does_not_retry_other_failures(self) -> None:
+        command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
+        failure = subprocess.CalledProcessError(1, command, output="real compile error\n")
+
+        with (
+            patch(
+                "tools.zed_i18n.ci_release.run_streaming_command",
+                side_effect=failure,
+            ) as run_command,
+            patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state") as cleanup,
+        ):
+            with self.assertRaises(subprocess.CalledProcessError):
+                run_bundle_command_with_retry(
+                    "macos",
+                    "aarch64-apple-darwin",
+                    command,
+                    self.temp_root,
+                    {},
+                )
+
+        self.assertEqual(run_command.call_count, 1)
+        cleanup.assert_not_called()
 
     def test_patches_bundle_scripts_to_skip_remote_server_build(self) -> None:
         script_dir = self.temp_root / "script"
