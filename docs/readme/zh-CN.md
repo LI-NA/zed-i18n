@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>zed-i18n</h1>
+  <h1>Zed-i18n</h1>
   <p><strong>轻松将 Zed 编辑器翻译成你的语言。</strong></p>
 
   [![Zed v1.2.6](https://img.shields.io/badge/Zed-v1.2.6-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.6)
@@ -31,7 +31,7 @@
 
 ## 简介
 
-zed-i18n 是一个工具集，用于从 [Zed](https://zed.dev) 编辑器的发布版本中提取 UI 字符串，并应用翻译以生成多语言版本。
+Zed-i18n 是一个工具集，用于从 [Zed](https://zed.dev) 编辑器的发布版本中提取 UI 字符串，并应用翻译以生成多语言版本。
 
 ## 支持的语言
 

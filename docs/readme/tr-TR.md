@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>zed-i18n</h1>
+  <h1>Zed-i18n</h1>
   <p><strong>Zed editörünü kendi dilinize kolayca çevirin.</strong></p>
 
   [![Zed v1.2.6](https://img.shields.io/badge/Zed-v1.2.6-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.6)
@@ -31,7 +31,7 @@
 
 ## Giriş
 
-zed-i18n, [Zed](https://zed.dev) editörünün yayın sürümlerinden arayüz dizelerini çıkaran ve çok dilli sürümler üretmek amacıyla çevirileri uygulayan bir araç setidir.
+Zed-i18n, [Zed](https://zed.dev) editörünün yayın sürümlerinden arayüz dizelerini çıkaran ve çok dilli sürümler üretmek amacıyla çevirileri uygulayan bir araç setidir.
 
 ## Desteklenen Diller
 

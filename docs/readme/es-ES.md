@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>zed-i18n</h1>
+  <h1>Zed-i18n</h1>
   <p><strong>Traduce el editor Zed a tu propio idioma fácilmente.</strong></p>
 
   [![Zed v1.2.6](https://img.shields.io/badge/Zed-v1.2.6-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.6)
@@ -31,7 +31,7 @@
 
 ## Introducción
 
-zed-i18n es una herramienta que extrae cadenas de la interfaz de usuario de las versiones publicadas del editor [Zed](https://zed.dev) y aplica traducciones para producir compilaciones multilingües.
+Zed-i18n es una herramienta que extrae cadenas de la interfaz de usuario de las versiones publicadas del editor [Zed](https://zed.dev) y aplica traducciones para producir compilaciones multilingües.
 
 ## Idiomas admitidos
 

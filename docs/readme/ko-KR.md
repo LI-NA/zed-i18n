@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>zed-i18n</h1>
+  <h1>Zed-i18n</h1>
   <p><strong>Zed 에디터를 손쉽게 자신의 언어로 번역해보세요.</strong></p>
 
   [![Zed v1.2.6](https://img.shields.io/badge/Zed-v1.2.6-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.6)
@@ -31,7 +31,7 @@
 
 ## 프로젝트 소개
 
-zed-i18n은 [Zed](https://zed.dev) 에디터의 릴리즈 버전에서 UI 문자열을 추출하고, 번역을 적용해 다국어 빌드를 만드는 도구입니다.
+Zed-i18n은 [Zed](https://zed.dev) 에디터의 릴리즈 버전에서 UI 문자열을 추출하고, 번역을 적용해 다국어 빌드를 만드는 도구입니다.
 
 ## 지원 언어
 

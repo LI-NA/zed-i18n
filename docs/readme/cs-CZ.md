@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>zed-i18n</h1>
+  <h1>Zed-i18n</h1>
   <p><strong>Snadno přeložte editor Zed do svého jazyka.</strong></p>
 
   [![Zed v1.2.6](https://img.shields.io/badge/Zed-v1.2.6-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.6)
@@ -31,7 +31,7 @@
 
 ## Úvod
 
-zed-i18n je sada nástrojů, která extrahuje UI řetězce z vydaných verzí editoru [Zed](https://zed.dev) a aplikuje překlady, aby bylo možné vytvářet vícejazyčné buildy.
+Zed-i18n je sada nástrojů, která extrahuje UI řetězce z vydaných verzí editoru [Zed](https://zed.dev) a aplikuje překlady, aby bylo možné vytvářet vícejazyčné buildy.
 
 ## Podporované jazyky
 
