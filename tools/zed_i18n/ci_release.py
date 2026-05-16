@@ -76,18 +76,9 @@ SIGNING_ENV_VARS = {
     "TIMESTAMP_SERVER",
 }
 
-MACOS_TRANSIENT_BUNDLE_ERRORS = (
-    "tar: bin/git: Not found in archive",
-    "hdiutil: create failed - Resource busy",
-)
-MACOS_BUNDLE_RETRY_STAGE_MARKERS = (
-    "Creating application bundle",
-    "Bundled ",
-    "Downloading git binary",
-    "Creating final DMG",
-    "Adding license agreement to DMG",
-    "Notarizing DMG",
-)
+# Intentionally empty: full bundle-mac retries can rerun license generation and Rust builds.
+# Retry known transient macOS packaging failures inside the patched Zed script instead.
+MACOS_TRANSIENT_BUNDLE_ERRORS: tuple[str, ...] = ()
 STREAMED_COMMAND_TAIL_LINES = 1000
 
 
@@ -359,7 +350,9 @@ def patch_remote_server_build(zed_root: Path, platform: str) -> None:
     if platform == "linux":
         patch_linux_remote_server_build(zed_root / "script" / "bundle-linux")
     elif platform == "macos":
-        patch_macos_remote_server_build(zed_root / "script" / "bundle-mac")
+        bundle_macos = zed_root / "script" / "bundle-mac"
+        patch_macos_remote_server_build(bundle_macos)
+        patch_macos_bundle_transient_retries(bundle_macos)
     elif platform == "windows":
         patch_windows_remote_server_build(zed_root / "script" / "bundle-windows.ps1")
     else:
@@ -468,6 +461,249 @@ cargo build ${build_flag} --package remote_server --target $target_triple
     if "--package remote_server" in script or "zed-remote-server-macos" in script:
         raise ValueError("failed to remove macOS remote_server build steps")
     path.write_text(script, encoding="utf-8")
+
+
+MACOS_GIT_DOWNLOAD_RETRY_FUNCTION = r'''
+function download_and_unpack() {
+    local url=$1
+    local path_to_unpack=$2
+    local target_path=$3
+    local temp_dir=""
+    local rc=0
+
+    if ! command -v curl &> /dev/null; then
+        echo "curl is not installed. Please install curl to continue."
+        exit 1
+    fi
+
+    for attempt in 1 2 3; do
+        temp_dir=$(mktemp -d)
+        if curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - "$path_to_unpack"; then
+            if mv "$temp_dir/$path_to_unpack" "$target_path"; then
+                rm -rf "$temp_dir"
+                return 0
+            else
+                rc=$?
+                rm -rf "$temp_dir"
+                return "$rc"
+            fi
+        else
+            rc=$?
+            rm -rf "$temp_dir"
+            if [[ "$attempt" = "3" ]]; then
+                return "$rc"
+            fi
+            echo "Retrying git binary download after failed unpack attempt $attempt"
+            sleep 5
+        fi
+    done
+}
+'''.lstrip()
+
+
+MACOS_GIT_DOWNLOAD_FUNCTION = r'''
+function download_git() {
+    local architecture=$1
+    local target_binary=$2
+    local tmp_dir=""
+    local rc=0
+
+    tmp_dir=$(mktemp -d)
+    pushd "$tmp_dir"
+
+    case "$architecture" in
+        aarch64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git || rc=$?
+            ;;
+        x86_64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git || rc=$?
+            ;;
+        *)
+            echo "Unsupported architecture: $architecture"
+            rc=1
+            ;;
+    esac
+
+    popd
+
+    if [[ "$rc" -ne 0 ]]; then
+        rm -rf "$tmp_dir"
+        return "$rc"
+    fi
+
+    if mv "${tmp_dir}/git" "${target_binary}"; then
+        rm -rf "$tmp_dir"
+        return 0
+    else
+        rc=$?
+        rm -rf "$tmp_dir"
+        return "$rc"
+    fi
+}
+'''.lstrip()
+
+
+MACOS_DMG_RETRY_HELPER = r'''
+function cleanup_dmg_create_retry_state() {
+    local source_directory=$1
+    local file_path=$2
+    local absolute_file_path=""
+    local hdiutil_info=""
+
+    absolute_file_path="$(cd "$(dirname "$file_path")" && pwd)/$(basename "$file_path")"
+    hdiutil_info="$(hdiutil info 2>&1 || true)"
+    printf "%s\n" "$hdiutil_info"
+    printf "%s\n" "$hdiutil_info" | awk -v target="$absolute_file_path" '
+        $0 ~ /^image-path[[:space:]]*:/ {
+            image_path=$0
+            sub(/^image-path[[:space:]]*:[[:space:]]*/, "", image_path)
+            in_target=(image_path == target)
+            next
+        }
+        in_target && $1 ~ /^\/dev\/disk/ {
+            print $1
+        }
+        $0 ~ /^=+/ {
+            in_target=0
+        }
+    ' | while read -r device; do
+        hdiutil detach "$device" -force || true
+    done
+
+    for volume in "/Volumes/Zed" "/Volumes/Zed 1"; do
+        if [[ -e "$volume" ]]; then
+            hdiutil detach "$volume" -force || true
+        fi
+    done
+    rm -f "${source_directory}/Applications" || true
+    rm -f "$file_path" || true
+}
+
+function create_dmg_with_retry() {
+    local source_directory=$1
+    local file_path=$2
+    local create_output=""
+
+    for attempt in 1 2 3; do
+        rm -f "${source_directory}/Applications" || true
+        rm -f "$file_path" || true
+        ln -s /Applications "${source_directory}/Applications"
+
+        create_output="$(hdiutil create -volname Zed -srcfolder "${source_directory}" -ov -format UDZO "${file_path}" 2>&1)"
+        local rc=$?
+        if [[ "$rc" -eq 0 ]]; then
+            printf "%s\n" "$create_output"
+            return 0
+        fi
+
+        printf "%s\n" "$create_output" >&2
+        cleanup_dmg_create_retry_state "$source_directory" "$file_path"
+        if [[ "$create_output" != *"hdiutil: create failed - Resource busy"* || "$attempt" = "3" ]]; then
+            return "$rc"
+        fi
+
+        echo "Detected retryable hdiutil create failure: Resource busy"
+        sleep 10
+        echo "Retrying hdiutil create after cleanup (attempt $((attempt + 1)) of 3)"
+    done
+}
+'''.lstrip()
+
+
+def patch_macos_git_download_transient_retries(path: Path) -> None:
+    script = path.read_text(encoding="utf-8")
+
+    original_unpack = r'''
+function download_and_unpack() {
+    local url=$1
+    local path_to_unpack=$2
+    local target_path=$3
+
+    temp_dir=$(mktemp -d)
+
+    if ! command -v curl &> /dev/null; then
+        echo "curl is not installed. Please install curl to continue."
+        exit 1
+    fi
+
+    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
+
+    mv "$temp_dir/$path_to_unpack" "$target_path"
+
+    rm -rf "$temp_dir"
+}
+'''.lstrip()
+    if "Retrying git binary download after failed unpack attempt" not in script:
+        if script.count(original_unpack) != 1:
+            raise ValueError(f"expected one download_and_unpack target in {path}")
+        script = script.replace(original_unpack, MACOS_GIT_DOWNLOAD_RETRY_FUNCTION, 1)
+
+    original_download_git = r'''
+function download_git() {
+    local architecture=$1
+    local target_binary=$2
+
+    tmp_dir=$(mktemp -d)
+    pushd "$tmp_dir"
+
+    case "$architecture" in
+        aarch64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
+            ;;
+        x86_64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
+            ;;
+        *)
+            echo "Unsupported architecture: $architecture"
+            exit 1
+            ;;
+    esac
+
+    popd
+
+    mv "${tmp_dir}/git" "${target_binary}"
+    rm -rf "$tmp_dir"
+}
+'''.lstrip()
+    patched_download_git_marker = (
+        'download_and_unpack "https://github.com/desktop/dugite-native/releases/download/'
+        '${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" '
+        "bin/git ./git || rc=$?"
+    )
+    if patched_download_git_marker not in script:
+        if script.count(original_download_git) != 1:
+            raise ValueError(f"expected one download_git target in {path}")
+        script = script.replace(original_download_git, MACOS_GIT_DOWNLOAD_FUNCTION, 1)
+
+    path.write_text(script, encoding="utf-8")
+
+
+def patch_macos_dmg_create_transient_retries(path: Path) -> None:
+    script = path.read_text(encoding="utf-8")
+    retry_call = 'create_dmg_with_retry "${dmg_source_directory}" "${dmg_file_path}"'
+    if "function create_dmg_with_retry()" in script:
+        if retry_call not in script:
+            raise ValueError(f"macOS DMG retry helper exists without call site in {path}")
+        return
+
+    helper_anchor = "function sign_app_binaries() {\n"
+    if script.count(helper_anchor) != 1:
+        raise ValueError(f"expected one sign_app_binaries function target in {path}")
+    script = script.replace(helper_anchor, MACOS_DMG_RETRY_HELPER + "\n" + helper_anchor, 1)
+
+    hdiutil_call = (
+        '        hdiutil create -volname Zed -srcfolder "${dmg_source_directory}" '
+        '-ov -format UDZO "${dmg_file_path}"'
+    )
+    if script.count(hdiutil_call) != 1:
+        raise ValueError(f"expected one hdiutil create target in {path}")
+    script = script.replace(hdiutil_call, f"        {retry_call}", 1)
+    path.write_text(script, encoding="utf-8")
+
+
+def patch_macos_bundle_transient_retries(path: Path) -> None:
+    patch_macos_git_download_transient_retries(path)
+    patch_macos_dmg_create_transient_retries(path)
 
 
 def patch_windows_remote_server_build(path: Path) -> None:
@@ -682,9 +918,6 @@ def macos_bundle_retry_reason(output: str) -> str | None:
     for pattern in MACOS_TRANSIENT_BUNDLE_ERRORS:
         if pattern in output:
             return pattern
-    for marker in MACOS_BUNDLE_RETRY_STAGE_MARKERS:
-        if marker in output:
-            return f"bundle stage reached: {marker}"
     return None
 
 
@@ -697,6 +930,7 @@ def macos_arch_suffix(bundle_target: str) -> str:
 
 
 def cleanup_macos_bundle_retry_state(zed_root: Path, bundle_target: str) -> None:
+    # Dormant emergency fallback for future transients that cannot be isolated in bundle-mac.
     arch_suffix = macos_arch_suffix(bundle_target)
     dmg_target_directory = zed_root / "target" / bundle_target / "release"
     dmg_source_directory = dmg_target_directory / "dmg"
@@ -732,6 +966,7 @@ def run_bundle_command_with_retry(
         if retry_reason is None:
             raise
 
+        # Currently unreachable while MACOS_TRANSIENT_BUNDLE_ERRORS is empty by design.
         print(f"Detected retryable macOS bundle failure: {retry_reason}")
         cleanup_macos_bundle_retry_state(zed_root, bundle_target)
         print("Retrying macOS bundle command once")

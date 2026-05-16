@@ -125,6 +125,15 @@ jobs:
             uv run zed-i18n validate --language "$locale"
           done
 
+      - name: Fetch Zed source for patch contract tests
+        run: uv run zed-i18n fetch-zed
+
+      - name: Validate Zed patch contracts
+        env:
+          ZED_I18N_REQUIRE_ZED_PATCH_CONTRACT: "1"
+          ZED_I18N_PATCH_CONTRACT_ZED_ROOT: .cache/zed/${{ needs.prepare.outputs.zed-version }}
+        run: uv run python -m unittest tests.test_zed_patch_contracts
+
   build-linux:
     name: Build Linux ${{ matrix.id }}
     needs:

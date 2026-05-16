@@ -43,6 +43,8 @@ fetch-zed
 - `.cache/zed/<version>` — for `apply` and local builds.
 - Do not delete `.cache/zed` or run `cargo clean` unless the user explicitly asks.
 - When bumping the Zed version in `config/project.toml`, manually review the `distribution.py` patch targets against the fetched Zed checkout before release work.
+- After bumping the Zed version and running `fetch-zed`, run the Zed patch contract test before release work:
+  `ZED_I18N_REQUIRE_ZED_PATCH_CONTRACT=1 ZED_I18N_PATCH_CONTRACT_ZED_ROOT=.cache/zed/<version> uv run python -m unittest tests.test_zed_patch_contracts`.
 - If Zed-side changes require code updates during a version bump, update this project for the current target Zed version instead of preserving compatibility with older Zed versions.
 
 ## Translation Workflow

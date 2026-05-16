@@ -19,7 +19,11 @@ from tools.zed_i18n.ci_release import (
     generate_release_metadata,
     github_matrix_outputs,
     list_translation_languages,
+    MACOS_TRANSIENT_BUNDLE_ERRORS,
     patch_remote_server_build,
+    patch_macos_dmg_create_transient_retries,
+    patch_macos_bundle_transient_retries,
+    patch_macos_git_download_transient_retries,
     run_bundle_command_with_retry,
     run_streaming_command,
     runner_override_env_name,
@@ -398,6 +402,20 @@ class CiReleaseTests(unittest.TestCase):
         )
         self.assertNotIn("inputs.distribution_patches == false && ''", workflow)
 
+    def test_release_workflow_validates_zed_patch_contracts_before_build_jobs(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Fetch Zed source for patch contract tests", workflow)
+        self.assertIn("Validate Zed patch contracts", workflow)
+        self.assertIn("ZED_I18N_REQUIRE_ZED_PATCH_CONTRACT: \"1\"", workflow)
+        self.assertIn(
+            "ZED_I18N_PATCH_CONTRACT_ZED_ROOT: .cache/zed/${{ needs.prepare.outputs.zed-version }}",
+            workflow,
+        )
+        self.assertIn("uv run python -m unittest tests.test_zed_patch_contracts", workflow)
+
     def test_release_workflow_uses_clear_publish_boundary(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
@@ -624,7 +642,12 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae", workflow)
         self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
 
-    def test_macos_bundle_retries_transient_git_archive_failure_once(self) -> None:
+    def test_full_macos_bundle_retry_fallback_is_intentionally_disabled(self) -> None:
+        # Keep the broad fallback dormant; targeted bundle-mac patches own known transients.
+        self.assertEqual(MACOS_TRANSIENT_BUNDLE_ERRORS, ())
+
+    def test_macos_bundle_does_not_retry_git_archive_failure_with_full_script(self) -> None:
+        # This pins the dormant full-script fallback for a now-targeted git download transient.
         command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
         failure = subprocess.CalledProcessError(
             1,
@@ -635,24 +658,24 @@ class CiReleaseTests(unittest.TestCase):
         with (
             patch(
                 "tools.zed_i18n.ci_release.run_streaming_command",
-                side_effect=[failure, None],
+                side_effect=failure,
             ) as run_command,
             patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state") as cleanup,
-            patch("tools.zed_i18n.ci_release.time.sleep") as sleep,
         ):
-            run_bundle_command_with_retry(
-                "macos",
-                "aarch64-apple-darwin",
-                command,
-                self.temp_root,
-                {},
-            )
+            with self.assertRaises(subprocess.CalledProcessError):
+                run_bundle_command_with_retry(
+                    "macos",
+                    "aarch64-apple-darwin",
+                    command,
+                    self.temp_root,
+                    {},
+                )
 
-        self.assertEqual(run_command.call_count, 2)
-        cleanup.assert_called_once_with(self.temp_root, "aarch64-apple-darwin")
-        sleep.assert_called_once()
+        self.assertEqual(run_command.call_count, 1)
+        cleanup.assert_not_called()
 
-    def test_macos_bundle_retries_transient_hdiutil_failure_once(self) -> None:
+    def test_macos_bundle_does_not_retry_hdiutil_failure_with_full_script(self) -> None:
+        # This pins the dormant full-script fallback for a now-targeted hdiutil transient.
         command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
         failure = subprocess.CalledProcessError(
             1,
@@ -663,22 +686,23 @@ class CiReleaseTests(unittest.TestCase):
         with (
             patch(
                 "tools.zed_i18n.ci_release.run_streaming_command",
-                side_effect=[failure, None],
+                side_effect=failure,
             ) as run_command,
-            patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state"),
-            patch("tools.zed_i18n.ci_release.time.sleep"),
+            patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state") as cleanup,
         ):
-            run_bundle_command_with_retry(
-                "macos",
-                "aarch64-apple-darwin",
-                command,
-                self.temp_root,
-                {},
-            )
+            with self.assertRaises(subprocess.CalledProcessError):
+                run_bundle_command_with_retry(
+                    "macos",
+                    "aarch64-apple-darwin",
+                    command,
+                    self.temp_root,
+                    {},
+                )
 
-        self.assertEqual(run_command.call_count, 2)
+        self.assertEqual(run_command.call_count, 1)
+        cleanup.assert_not_called()
 
-    def test_macos_bundle_retries_after_packaging_stage_marker_once(self) -> None:
+    def test_macos_bundle_does_not_retry_generic_packaging_stage_marker(self) -> None:
         command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
         failure = subprocess.CalledProcessError(
             1,
@@ -689,21 +713,21 @@ class CiReleaseTests(unittest.TestCase):
         with (
             patch(
                 "tools.zed_i18n.ci_release.run_streaming_command",
-                side_effect=[failure, None],
+                side_effect=failure,
             ) as run_command,
             patch("tools.zed_i18n.ci_release.cleanup_macos_bundle_retry_state") as cleanup,
-            patch("tools.zed_i18n.ci_release.time.sleep"),
         ):
-            run_bundle_command_with_retry(
-                "macos",
-                "aarch64-apple-darwin",
-                command,
-                self.temp_root,
-                {},
-            )
+            with self.assertRaises(subprocess.CalledProcessError):
+                run_bundle_command_with_retry(
+                    "macos",
+                    "aarch64-apple-darwin",
+                    command,
+                    self.temp_root,
+                    {},
+                )
 
-        self.assertEqual(run_command.call_count, 2)
-        cleanup.assert_called_once_with(self.temp_root, "aarch64-apple-darwin")
+        self.assertEqual(run_command.call_count, 1)
+        cleanup.assert_not_called()
 
     def test_macos_bundle_does_not_retry_other_failures(self) -> None:
         command = ["bash", "./script/bundle-mac", "aarch64-apple-darwin"]
@@ -766,6 +790,54 @@ gzip -f --stdout --best "${target_dir}/${remote_server_triple}/release/remote_se
         (script_dir / "bundle-mac").write_text(
             """
 cargo build ${build_flag} --package remote_server --target $target_triple
+function download_and_unpack() {
+    local url=$1
+    local path_to_unpack=$2
+    local target_path=$3
+
+    temp_dir=$(mktemp -d)
+
+    if ! command -v curl &> /dev/null; then
+        echo "curl is not installed. Please install curl to continue."
+        exit 1
+    fi
+
+    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
+
+    mv "$temp_dir/$path_to_unpack" "$target_path"
+
+    rm -rf "$temp_dir"
+}
+
+function download_git() {
+    local architecture=$1
+    local target_binary=$2
+
+    tmp_dir=$(mktemp -d)
+    pushd "$tmp_dir"
+
+    case "$architecture" in
+        aarch64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
+            ;;
+        x86_64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
+            ;;
+        *)
+            echo "Unsupported architecture: $architecture"
+            exit 1
+            ;;
+    esac
+
+    popd
+
+    mv "${tmp_dir}/git" "${target_binary}"
+    rm -rf "$tmp_dir"
+}
+
+function sign_app_binaries() {
+        hdiutil create -volname Zed -srcfolder "${dmg_source_directory}" -ov -format UDZO "${dmg_file_path}"
+}
 sign_binary "target/$target_triple/release/remote_server"
 gzip -f --stdout --best target/$target_triple/release/remote_server > target/zed-remote-server-macos-$arch_suffix.gz
 """.lstrip(),
@@ -791,7 +863,213 @@ ZipZedAndItsFriendsDebug
         self.assertNotIn("zed-remote-server-linux", linux)
         self.assertNotIn("--package remote_server", macos)
         self.assertNotIn("zed-remote-server-macos", macos)
+        self.assertIn("function create_dmg_with_retry()", macos)
+        self.assertIn("Retrying git binary download", macos)
         self.assertNotIn("BuildRemoteServer", windows)
+
+    def test_patches_macos_bundle_script_to_retry_hdiutil_create_locally(self) -> None:
+        script = self.temp_root / "bundle-mac"
+        script.write_text(
+            """
+#!/usr/bin/env bash
+set -euo pipefail
+function sign_app_binaries() {
+    echo "Creating final DMG at ${dmg_file_path} using ${dmg_source_directory}"
+        hdiutil create -volname Zed -srcfolder "${dmg_source_directory}" -ov -format UDZO "${dmg_file_path}"
+    echo "Adding license agreement to DMG"
+}
+""".lstrip(),
+            encoding="utf-8",
+        )
+
+        patch_macos_dmg_create_transient_retries(script)
+
+        patched = script.read_text(encoding="utf-8")
+        self.assertIn("function create_dmg_with_retry()", patched)
+        self.assertIn(
+            'create_dmg_with_retry "${dmg_source_directory}" "${dmg_file_path}"',
+            patched,
+        )
+        self.assertIn("for attempt in 1 2 3; do", patched)
+        self.assertIn('create_output="$(hdiutil create', patched)
+        self.assertIn('local rc=$?\n        if [[ "$rc" -eq 0 ]]; then', patched)
+        self.assertIn('hdiutil: create failed - Resource busy', patched)
+        self.assertIn('rm -f "${source_directory}/Applications"', patched)
+        self.assertIn('rm -f "${source_directory}/Applications" || true', patched)
+        self.assertIn('ln -s /Applications "${source_directory}/Applications"', patched)
+        self.assertIn('rm -f "$file_path"', patched)
+        self.assertIn('rm -f "$file_path" || true', patched)
+        self.assertIn('awk -v target="$absolute_file_path"', patched)
+        self.assertIn('hdiutil detach "$device" -force || true', patched)
+        self.assertNotIn('rm -rf "$source_directory"', patched)
+        self.assertEqual(
+            patched.count('create_dmg_with_retry "${dmg_source_directory}" "${dmg_file_path}"'),
+            1,
+        )
+
+    def test_macos_bundle_retry_patch_is_idempotent(self) -> None:
+        script = self.temp_root / "bundle-mac"
+        script.write_text(
+            """
+#!/usr/bin/env bash
+set -euo pipefail
+function sign_app_binaries() {
+        hdiutil create -volname Zed -srcfolder "${dmg_source_directory}" -ov -format UDZO "${dmg_file_path}"
+}
+""".lstrip(),
+            encoding="utf-8",
+        )
+
+        patch_macos_dmg_create_transient_retries(script)
+        once = script.read_text(encoding="utf-8")
+        patch_macos_dmg_create_transient_retries(script)
+
+        self.assertEqual(script.read_text(encoding="utf-8"), once)
+
+    def test_macos_bundle_retry_patch_fails_when_hdiutil_target_changes(self) -> None:
+        script = self.temp_root / "bundle-mac"
+        script.write_text(
+            """
+function sign_app_binaries() {
+    echo no dmg creation here
+}
+""".lstrip(),
+            encoding="utf-8",
+        )
+
+        with self.assertRaisesRegex(ValueError, "hdiutil create"):
+            patch_macos_dmg_create_transient_retries(script)
+
+    def test_patches_macos_bundle_script_to_retry_git_download_locally(self) -> None:
+        script = self.temp_root / "bundle-mac"
+        script.write_text(
+            """
+function download_and_unpack() {
+    local url=$1
+    local path_to_unpack=$2
+    local target_path=$3
+
+    temp_dir=$(mktemp -d)
+
+    if ! command -v curl &> /dev/null; then
+        echo "curl is not installed. Please install curl to continue."
+        exit 1
+    fi
+
+    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
+
+    mv "$temp_dir/$path_to_unpack" "$target_path"
+
+    rm -rf "$temp_dir"
+}
+
+function download_git() {
+    local architecture=$1
+    local target_binary=$2
+
+    tmp_dir=$(mktemp -d)
+    pushd "$tmp_dir"
+
+    case "$architecture" in
+        aarch64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
+            ;;
+        x86_64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
+            ;;
+        *)
+            echo "Unsupported architecture: $architecture"
+            exit 1
+            ;;
+    esac
+
+    popd
+
+    mv "${tmp_dir}/git" "${target_binary}"
+    rm -rf "$tmp_dir"
+}
+""".lstrip(),
+            encoding="utf-8",
+        )
+
+        patch_macos_git_download_transient_retries(script)
+
+        patched = script.read_text(encoding="utf-8")
+        self.assertIn("for attempt in 1 2 3; do", patched)
+        self.assertIn("Retrying git binary download", patched)
+        self.assertIn('curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir"', patched)
+        self.assertIn('if mv "$temp_dir/$path_to_unpack" "$target_path"; then', patched)
+        self.assertIn('rm -rf "$temp_dir"', patched)
+        self.assertIn("local rc=0", patched)
+        self.assertIn("|| rc=$?", patched)
+        self.assertIn('if mv "${tmp_dir}/git" "${target_binary}"; then', patched)
+        self.assertIn('rm -rf "$tmp_dir"', patched)
+        self.assertIn('return "$rc"', patched)
+
+    def test_macos_git_download_retry_patch_is_idempotent(self) -> None:
+        script = self.temp_root / "bundle-mac"
+        script.write_text(
+            """
+function download_and_unpack() {
+    local url=$1
+    local path_to_unpack=$2
+    local target_path=$3
+
+    temp_dir=$(mktemp -d)
+
+    if ! command -v curl &> /dev/null; then
+        echo "curl is not installed. Please install curl to continue."
+        exit 1
+    fi
+
+    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
+
+    mv "$temp_dir/$path_to_unpack" "$target_path"
+
+    rm -rf "$temp_dir"
+}
+
+function download_git() {
+    local architecture=$1
+    local target_binary=$2
+
+    tmp_dir=$(mktemp -d)
+    pushd "$tmp_dir"
+
+    case "$architecture" in
+        aarch64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
+            ;;
+        x86_64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
+            ;;
+        *)
+            echo "Unsupported architecture: $architecture"
+            exit 1
+            ;;
+    esac
+
+    popd
+
+    mv "${tmp_dir}/git" "${target_binary}"
+    rm -rf "$tmp_dir"
+}
+""".lstrip(),
+            encoding="utf-8",
+        )
+
+        patch_macos_git_download_transient_retries(script)
+        once = script.read_text(encoding="utf-8")
+        patch_macos_git_download_transient_retries(script)
+
+        self.assertEqual(script.read_text(encoding="utf-8"), once)
+
+    def test_macos_git_download_retry_patch_fails_when_target_changes(self) -> None:
+        script = self.temp_root / "bundle-mac"
+        script.write_text("function download_and_unpack() { echo changed; }\n", encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, "download_and_unpack"):
+            patch_macos_git_download_transient_retries(script)
 
 
 if __name__ == "__main__":
