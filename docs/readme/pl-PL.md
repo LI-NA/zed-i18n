@@ -33,17 +33,31 @@
 
 Zed-i18n to narzędzie, które wyodrębnia ciągi interfejsu użytkownika z wydań edytora [Zed](https://zed.dev) i stosuje tłumaczenia, aby tworzyć wielojęzyczne kompilacje.
 
+> Zed-i18n to projekt społecznościowy niezwiązany z Zed Industries; nie jest oficjalnie sponsorowany ani autoryzowany.
+
 ## Obsługiwane języki
 
-Obecnie w katalogu `translations/` znajdują się tłumaczenia dla 13 języków.
+Obecnie w katalogu `translations/` znajdują się tłumaczenia dla 13 języków. Wszystkie obecne tłumaczenia zostały wygenerowane przez AI; wkład rodzimych użytkowników języka jest mile widziany.
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## Pobieranie
 
-Najnowsze kompilacje można pobrać ze strony [Releases](https://github.com/LI-NA/zed-i18n/releases). Jeśli wolisz zbudować je samodzielnie, wykonaj poniższe kroki.
+Najnowsze kompilacje można pobrać ze strony [Releases](https://github.com/LI-NA/zed-i18n/releases).
 
-Pliki dystrybucyjne nie są obecnie podpisane kodem. Jeśli macOS je zablokuje, otwieraj w ten sposób tylko zaufane pliki: w Finderze kliknij prawym przyciskiem i wybierz `Otwórz`, albo usuń atrybut kwarantanny poleceniem `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+Szczegóły procesu kompilacji najnowszych wydań znajdują się w sekcji [Kompilacje wydaniowe](#kompilacje-wydaniowe), a jeśli chcesz zbudować Zed-i18n samodzielnie, zajrzyj do sekcji [Ręczna kompilacja](#ręczna-kompilacja).
+
+### Wiarygodność kompilacji
+
+- Wydawane pliki binarne nie są podpisane kodem. W systemach Windows i macOS mogą pojawiać się ostrzeżenia bezpieczeństwa.
+- Wszystkie wydania są budowane przy użyciu `.github/workflows/i18n-release.yml`, a logi kompilacji można szczegółowo przejrzeć w zakładce [Actions](https://github.com/LI-NA/zed-i18n/actions).
+- Źródło Zed jest przypięte do skrótu SHA `zed_commit` w pliku `config/project.toml`, dzięki czemu można zweryfikować, na podstawie jakiego dokładnie kodu źródłowego powstała kompilacja.
+
+Unikaj kompilacji z niezaufanych źródeł; tam, gdzie to możliwe, buduj samodzielnie, aby ograniczyć zagrożenia bezpieczeństwa.
+
+### Otwieranie w systemie macOS
+
+W przypadku zaufanych plików w Finderze kliknij prawym przyciskiem i wybierz `Otwórz`, albo w Terminalu usuń atrybut kwarantanny poleceniem `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
 
 ## Instalacja
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Kompilacje wydaniowe są wykonywane automatycznie przez GitHub Actions zgodnie z przepływem pracy zdefiniowanym w `.github/workflows/i18n-release.yml`. Kod źródłowy Zed jest przypięty do tagu `zed_version` i skrótu SHA `zed_commit` w pliku `config/project.toml`.
 
-Przepływ pracy wydania stosuje `config/distribution.toml`, aby zaktualizować identyfikator `zed-i18n`, informacje w sekcji About oraz ścieżkę automatycznych aktualizacji. W tym procesie ścieżka automatycznych aktualizacji zmienia się na `zed-i18n`.
+Przepływ pracy wydania stosuje `config/distribution.toml` wraz z tłumaczeniami dla poszczególnych języków, aby zaktualizować identyfikator `zed-i18n`, informacje w sekcji About oraz ścieżkę automatycznych aktualizacji. W tym procesie ścieżka automatycznych aktualizacji zmienia się na `zed-i18n`.
+
+> **Uwaga:** kompilacje Zed-i18n zmieniają punkt końcowy automatycznych aktualizacji z oficjalnego serwera Zed na plik `manifest.json` w wydaniach tego repozytorium. Jeśli wolisz, możesz wyłączyć automatyczne aktualizacje w ustawieniach.
+
+### Telemetria
+
+Zed-i18n nie zmienia zachowania telemetrii. Przy ustawieniach domyślnych anonimowe metryki użycia oraz raporty awarii mogą być wysyłane na serwery Zed Industries. Aby wyłączyć telemetrię, w ustawieniach Zed ustaw `telemetry.metrics` oraz `telemetry.diagnostics` na `false`.
 
 ## Znane ograniczenia
 
 Większość ciągów interfejsu użytkownika — menu, przyciski, podpowiedzi, ustawienia, opisy akcji — jest obsługiwana przez bezpośrednie podstawianie. Jednak niektóre nazwy akcji generowane dynamicznie w czasie działania programu w Palecie poleceń lub Edytorze mapy klawiszy wymagają oddzielnej poprawki i nie są jeszcze obsługiwane.
 
-Jeśli znasz sposób na niezawodne stosowanie poprawek w różnych wersjach Zed, będziemy wdzięczni za wkład.
+W odniesieniu do tych nieprzetłumaczonych fragmentów chętnie przyjmiemy wkład dotyczący sposobu niezawodnego stosowania poprawek w różnych wersjach Zed.
 
 ## Informacja o użyciu AI
 
-Większość kodu w tym projekcie została napisana przy pomocy narzędzi AI, a wszystkie tłumaczenia zostały wygenerowane przez AI. Jeśli zauważysz coś nieprawidłowego w kodzie lub tłumaczeniach bądź uważasz, że istnieje lepsze podejście, zapraszamy do otwarcia PR-a.
+Większość kodu w tym projekcie została napisana przy pomocy narzędzi AI, a wszystkie tłumaczenia zostały wygenerowane przez AI. Wyniki tłumaczeń nie zostały bezpośrednio zweryfikowane przez człowieka, dlatego możliwe są błędy w tłumaczeniach oraz kwestie związane z brandingiem. Jeśli zauważysz problem z tłumaczeniem — także w tym dokumencie — albo masz propozycję lepszego tłumaczenia, zapraszamy do zgłoszenia issue lub otwarcia PR-a.
+
+### Proces tłumaczenia
+
+Wszystkie tłumaczenia zostały przeprowadzone zgodnie z procesem opisanym w sekcji [Tłumaczenie z użyciem AI](#tłumaczenie-z-użyciem-ai).
+
+1. `extract` pobiera kandydatów na ciągi interfejsu użytkownika ze źródeł Zed. Wyniki są zapisywane w `catalog/en-US.json` oraz `manifest/ui-strings.json`.
+2. `audit-candidates` sprawdza, które ciągi reguły ekstrakcji wychwyciły, a które pominęły — służy to do zarządzania faktyczną listą tłumaczonych ciągów (`accepted`).
+3. `prepare-translation` generuje partie dla poszczególnych języków, dołączając przewodnik stylistyczny, słownik terminów oraz — jeśli są dostępne — materiały referencyjne z pakietów językowych VS Code.
+4. Model AI tworzy wynik tłumaczenia w formacie JSON, partia po partii.
+5. `merge-translation` scala wyniki, a `validate` weryfikuje brakujące lub nadmiarowe wpisy, symbole zastępcze oraz spójność tokenów chronionych.
+
+Obecnie zarejestrowane tłumaczenia przeszły powyższy proces dla każdego języka z użyciem dwóch modeli — `Sonnet 4.6` oraz `GPT-5.5` — z których każdy niezależnie wygenerował pełne tłumaczenie poddane następnie ponownej weryfikacji. Oba ukończone tłumaczenia zostały później ponownie zweryfikowane i scalone w wynik końcowy z wykorzystaniem modelu `Opus 4.6`.
+
+Więcej informacji o procesie tłumaczenia z użyciem AI znajdziesz w plikach w katalogu `prompts\commands`.
 
 ## Licencja
 
-Treści pochodzące ze źródeł Zed (`catalog/`, `translations/`, `manifest/` oraz artefakty wydań) są objęte licencją [GPL-3.0](../../LICENSE). Kod źródłowy `zed-i18n` oraz słowniki tłumaczeń (`prompts/translation/glossary/`) wyodrębnione z [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) są objęte licencją [MIT](../../LICENSE-MIT). Prawa autorskie do zawartości pakietów językowych VS Code należą do Microsoft Corporation.
+Treści pochodzące ze źródeł Zed (`catalog/`, `translations/`, `manifest/`, artefakty wydań itp.) są objęte licencją [GPL-3.0](../../LICENSE). Projekt ten dystrybuuje zmodyfikowane kompilacje Zed. Kod źródłowy `zed-i18n` oraz słowniki tłumaczeń (`prompts/translation/glossary/`) wyodrębnione z [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) są objęte licencją [MIT](../../LICENSE-MIT).
+
+Zed oraz logo Zed są własnością Zed Industries, a prawa autorskie do zawartości VS Code oraz pakietów językowych VS Code należą do Microsoft Corporation.

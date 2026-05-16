@@ -33,17 +33,29 @@
 
 Zed-i18n es una herramienta que extrae cadenas de la interfaz de usuario de las versiones publicadas del editor [Zed](https://zed.dev) y aplica traducciones para producir compilaciones multilingües.
 
+> Zed-i18n es un proyecto comunitario sin relación con Zed Industries; no cuenta con patrocinio ni respaldo oficial.
+
 ## Idiomas admitidos
 
-Actualmente se incluyen traducciones para 13 idiomas en `translations/`.
+Actualmente se incluyen traducciones para 13 idiomas en `translations/`. Todas las traducciones actuales han sido generadas por IA; las contribuciones de hablantes nativos son bienvenidas.
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## Descargas
 
-Puedes obtener las compilaciones más recientes en [Releases](https://github.com/LI-NA/zed-i18n/releases). Si prefieres compilar el proyecto tú mismo, sigue los pasos que se indican a continuación.
+Puedes obtener las compilaciones más recientes en [Releases](https://github.com/LI-NA/zed-i18n/releases). Encontrarás más detalles sobre el proceso de la última compilación en [Compilaciones de lanzamiento](#compilaciones-de-lanzamiento); si prefieres compilar el proyecto tú mismo, consulta [Compilación manual](#compilación-manual).
 
-Los archivos distribuidos todavía no tienen firma de código. Si macOS bloquea la app, hazlo solo con archivos de confianza: ábrela desde Finder con clic derecho y `Abrir`, o elimina el atributo de cuarentena con `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+### Confianza en las compilaciones
+
+- Los binarios publicados NO están firmados digitalmente; pueden aparecer advertencias de seguridad en Windows o macOS.
+- Todas las versiones se generan a través de `.github/workflows/i18n-release.yml`; los registros de compilación pueden consultarse en la pestaña [Actions](https://github.com/LI-NA/zed-i18n/actions).
+- El código fuente de Zed queda fijado por el SHA `zed_commit` en `config/project.toml`, por lo que es posible verificar la fuente exacta utilizada para la compilación.
+
+Evita las compilaciones de fuentes no confiables; cuando sea posible, compila tú mismo para reducir las preocupaciones de seguridad.
+
+### Apertura en macOS
+
+Solo para archivos de confianza: en Finder, haz clic derecho y selecciona `Abrir`, o ejecuta `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` en el Terminal para eliminar el atributo de cuarentena.
 
 ## Instalación
 
@@ -110,18 +122,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Las compilaciones de lanzamiento se ejecutan automáticamente a través de GitHub Actions y están definidas en `.github/workflows/i18n-release.yml`. El código fuente de Zed queda fijado por la etiqueta `zed_version` y el SHA `zed_commit` en `config/project.toml`.
 
-El flujo de lanzamiento aplica `config/distribution.toml` para parchear el identificador de zed-i18n, la información de About y la ruta de actualización automática. Esto redirige la ruta de actualización automática a `zed-i18n`.
+El flujo de lanzamiento aplica `config/distribution.toml` junto con las traducciones de cada idioma para parchear el identificador de zed-i18n, la información de About y la ruta de actualización automática. Esto redirige la ruta de actualización automática a `zed-i18n`.
+
+> **Nota:** Las compilaciones de Zed-i18n cambian el destino de la actualización automática del servidor oficial de Zed al archivo `manifest.json` de las versiones de este repositorio. Si prefieres no usar la actualización automática, puedes desactivarla en la configuración.
+
+### Telemetría
+
+Zed-i18n no modifica el comportamiento de la telemetría. Con la configuración predeterminada, pueden enviarse métricas de uso anónimas e informes de fallos a los servidores de Zed Industries. Para desactivar la telemetría, establece `telemetry.metrics` y `telemetry.diagnostics` en `false` en la configuración de Zed.
 
 ## Limitaciones conocidas
 
 La mayoría de las cadenas de la interfaz de usuario —menús, botones, información sobre herramientas, configuración, descripciones de acciones— se gestionan mediante sustitución directa. Sin embargo, algunos nombres de acción que se generan dinámicamente en tiempo de ejecución en la paleta de comandos o el Editor de mapa de teclas requieren un parche adicional y aún no están cubiertos.
 
-Si conoces alguna forma de aplicar parches de manera fiable entre versiones de Zed, las contribuciones son muy bienvenidas.
+Para estas partes sin traducir, son bienvenidas las contribuciones sobre cómo aplicar parches de manera fiable entre versiones de Zed.
 
 ## Sobre el uso de IA
 
-La mayor parte del código de este proyecto se ha escrito con la ayuda de herramientas de IA, y todas las traducciones han sido generadas por IA. Si detectas algo incorrecto en el código o en las traducciones, o crees que existe un enfoque mejor, no dudes en abrir una PR.
+La mayor parte del código de este proyecto se ha escrito con la ayuda de herramientas de IA, y todas las traducciones han sido generadas por IA. Los resultados de la traducción no han sido revisados directamente por personas, por lo que pueden existir traducciones incorrectas o problemas relacionados con la marca. Si detectas algún problema de traducción en este documento o en otras traducciones, o crees que puede haber una traducción mejor, no dudes en abrir una issue o una PR.
+
+### Proceso de traducción
+
+Todas las traducciones se han realizado siguiendo el proceso descrito en [Traducción con IA](#traducción-con-ia).
+
+1. `extract` extrae las cadenas candidatas de la interfaz desde el código fuente de Zed. Los resultados se guardan en `catalog/en-US.json` y `manifest/ui-strings.json`.
+2. `audit-candidates` revisa qué cadenas han recogido las reglas de extracción y cuáles se han omitido, lo que sirve para gestionar la lista real de cadenas a traducir (`accepted`).
+3. `prepare-translation` genera los lotes por idioma, incluyendo la guía de estilo, el glosario y, cuando están disponibles, las referencias de los paquetes de idiomas de VS Code.
+4. Un modelo de IA escribe el JSON con el resultado de la traducción lote a lote.
+5. `merge-translation` fusiona los resultados, y `validate` comprueba si hay entradas faltantes o sobrantes, así como la coherencia de los marcadores de posición y de los tokens protegidos.
+
+Las traducciones registradas actualmente han pasado por este proceso para todos los idiomas utilizando dos modelos —`Sonnet 4.6` y `GPT-5.5`—, cada uno de los cuales produjo una traducción completa e independiente que fue revisada de nuevo. Las dos traducciones finalizadas se revisaron una vez más y se fusionaron en el resultado final mediante `Opus 4.6`.
+
+Para obtener más información sobre el proceso de traducción con IA, consulta los archivos en `prompts\commands`.
 
 ## Licencia
 
-El contenido derivado del código fuente de Zed (`catalog/`, `translations/`, `manifest/` y los artefactos de lanzamiento) está bajo la licencia [GPL-3.0](../../LICENSE). El código propio de `zed-i18n` y los glosarios de traducción (`prompts/translation/glossary/`) extraídos de [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) están bajo la licencia [MIT](../../LICENSE-MIT). El contenido de los paquetes de idiomas de VS Code es propiedad de Microsoft Corporation.
+El contenido derivado del código fuente de Zed (`catalog/`, `translations/`, `manifest/`, los artefactos de lanzamiento, etc.) está bajo la licencia [GPL-3.0](../../LICENSE). Este proyecto distribuye compilaciones modificadas de Zed. El código propio de `zed-i18n` y los glosarios de traducción (`prompts/translation/glossary/`) extraídos de [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) están bajo la licencia [MIT](../../LICENSE-MIT).
+
+Zed y el logotipo de Zed son propiedad de Zed Industries. El contenido de VS Code y de los paquetes de idiomas de VS Code es propiedad de Microsoft Corporation.

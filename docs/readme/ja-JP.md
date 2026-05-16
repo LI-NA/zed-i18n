@@ -33,17 +33,31 @@
 
 Zed-i18n は、[Zed](https://zed.dev) エディターのリリース版から UI 文字列を抽出し、翻訳を適用して多言語ビルドを生成するツールです。
 
+> Zed-i18n は Zed Industries とは無関係のコミュニティプロジェクトであり、公式の後援や承認を受けていません。
+
 ## 対応言語
 
-現在、`translations/` 以下に 13 言語の翻訳が収録されています。
+現在、`translations/` 以下に 13 言語の翻訳が収録されています。すべての翻訳は AI によって生成されており、各言語のネイティブスピーカーによる貢献を歓迎します。
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## ダウンロード
 
-最新ビルドは [Releases](https://github.com/LI-NA/zed-i18n/releases) から入手できます。自分でビルドする場合は、以下の手順に従ってください。
+最新ビルドは [Releases](https://github.com/LI-NA/zed-i18n/releases) から入手できます。
 
-現在の配布ファイルにはコード署名が適用されていません。macOS で開けない場合は、信頼できるファイルに限り Finder で右クリックして `開く` を選ぶか、ターミナルで `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` を実行して隔離属性を削除してください。
+最新ビルドの仕組みについては [リリースビルド](#リリースビルド) で詳しく確認でき、自分でビルドしたい場合は [手動ビルド](#手動ビルド) を参照してください。
+
+### ビルドの信頼性
+
+- 現在の配布バイナリにはコード署名が適用されていません。Windows や macOS でセキュリティ警告が表示されることがあります。
+- すべてのリリースは `.github/workflows/i18n-release.yml` を通じてビルドされており、ビルドログは [Actions](https://github.com/LI-NA/zed-i18n/actions) タブで確認できます。
+- Zed の元ソースは `config/project.toml` の `zed_commit` SHA で固定されているため、ビルドに使用された正確なソースを検証できます。
+
+信頼できないソースのビルドは使用せず、可能であれば自分でビルドすることでセキュリティ上の懸念を軽減できます。
+
+### macOS で開けないとき
+
+信頼できるファイルに限り、Finder で右クリックして `開く` を選択するか、ターミナルで `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` コマンドを実行して隔離属性を削除してください。
 
 ## インストール
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 リリースビルドは `.github/workflows/i18n-release.yml` で定義された GitHub Actions を通じて自動的に実行されます。Zed のソースは `config/project.toml` 内の `zed_version` タグと `zed_commit` SHA に固定されています。
 
-リリースワークフローは `config/distribution.toml` を適用して、zed-i18n の識別子、About 情報、および自動更新パスにパッチを当てます。これにより、自動更新パスが `zed-i18n` に書き換えられます。
+リリースワークフローは言語ごとの翻訳とともに `config/distribution.toml` を適用して、zed-i18n の識別子、About 情報、および自動更新パスにパッチを当てます。これにより、自動更新パスが `zed-i18n` に書き換えられます。
+
+> **注意:** Zed-i18n のビルドは、自動更新エンドポイントを Zed の公式サーバーから本リポジトリのリリースにある `manifest.json` に変更します。自動更新が不要な場合は、設定で無効化してください。
+
+### テレメトリ
+
+Zed-i18n はテレメトリの動作を変更しません。デフォルト設定では、匿名の使用状況メトリクスやクラッシュレポートが Zed Industries のサーバーに送信されることがあります。テレメトリを無効化するには、Zed の設定で `telemetry.metrics` と `telemetry.diagnostics` を `false` に設定してください。
 
 ## 既知の制限事項
 
 メニュー、ボタン、ツールチップ、設定、アクション説明など、ほとんどの UI 文字列は直接置換で対応しています。ただし、コマンドパレットやキーマップエディターでランタイムに動的生成されるアクション名の一部は、別途パッチが必要なため現時点では対応していません。
 
-Zed のバージョン間でパッチを安定して適用する方法をご存知の方は、ぜひ貢献をお待ちしています。
+これらの未翻訳部分について、Zed のバージョンが変わっても安定してパッチを適用できる方法をご存知の方からの貢献を歓迎します。
 
 ## AI の活用について
 
-このプロジェクトのコードの大部分は AI ツールの支援を受けて作成されており、すべての翻訳も AI によって生成されています。コードや翻訳に問題を見つけた場合、またはより良いアプローチがあると思われる場合は、お気軽に PR を開いてください。
+このプロジェクトのコードの大部分は AI ツールの支援を受けて作成されており、すべての翻訳も AI によって生成されています。翻訳結果は人による直接的なレビューを経ていないため、誤訳やブランディング上の問題が含まれている可能性があります。本ドキュメントを含め、翻訳に問題があると思われる場合や、より良い翻訳が可能だと感じられた場合は、いつでもイシューや PR を投稿してください。
+
+### 翻訳プロセス
+
+すべての翻訳は [AI 翻訳](#ai-翻訳) で説明したプロセスを経て行われました。
+
+1. `extract` で Zed のソースから UI 文字列の候補を抽出します。結果は `catalog/en-US.json` と `manifest/ui-strings.json` に保存されます。
+2. `audit-candidates` で抽出ルールが捕捉した文字列と漏れた候補を点検し、これをもとに実際の翻訳対象（`accepted`）を管理します。
+3. `prepare-translation` で言語ごとのバッチを生成します。スタイルガイド、用語集、可能な場合は VS Code 言語パックの参照が同梱されます。
+4. AI モデルがバッチ単位で翻訳結果の JSON を作成します。
+5. `merge-translation` で結果をマージし、`validate` で欠落・余分な項目、プレースホルダー、保護トークンの一致を検証します。
+
+現在登録されている翻訳は、すべての言語について上記のプロセスを `Sonnet 4.6` と `GPT-5.5` の 2 つのモデルで繰り返し、それぞれが個別に全体を翻訳して再レビューを行いました。その後、完成した 2 種類の翻訳ファイルを `Opus 4.6` モデルで再レビュー・マージして最終的な成果物としています。
+
+AI 翻訳のプロセスについては、`prompts\commands` 配下のファイルで詳しく確認できます。
 
 ## ライセンス
 
-Zed のソースから派生したコンテンツ（`catalog/`、`translations/`、`manifest/`、およびリリース成果物）は [GPL-3.0](../../LICENSE) のもとでライセンスされています。`zed-i18n` のソースコードおよび [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) から抽出された翻訳用語集（`prompts/translation/glossary/`）は [MIT](../../LICENSE-MIT) のもとでライセンスされています。VS Code 言語パックのコンテンツは Microsoft Corporation の著作物です。
+Zed のソースから派生したコンテンツ（`catalog/`、`translations/`、`manifest/`、リリース成果物など）は [GPL-3.0](../../LICENSE) のもとでライセンスされています。本プロジェクトは Zed の改変版ビルドを配布しています。`zed-i18n` のソースコードおよび [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) から抽出された翻訳用語集（`prompts/translation/glossary/`）は [MIT](../../LICENSE-MIT) のもとでライセンスされています。
+
+Zed および Zed のロゴは Zed Industries の資産であり、VS Code および VS Code 言語パックのコンテンツの著作権は Microsoft Corporation に帰属します。

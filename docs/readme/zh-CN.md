@@ -33,17 +33,31 @@
 
 Zed-i18n 是一个工具集，用于从 [Zed](https://zed.dev) 编辑器的发布版本中提取 UI 字符串，并应用翻译以生成多语言版本。
 
+> Zed-i18n 是一个与 Zed Industries 无关的社区项目，未获得官方赞助或认证。
+
 ## 支持的语言
 
-`translations/` 目录下目前包含 13 种语言的翻译。
+`translations/` 目录下目前包含 13 种语言的翻译。所有现有翻译均由 AI 生成，欢迎各语言的母语者参与贡献。
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## 下载
 
-你可以从 [Releases](https://github.com/LI-NA/zed-i18n/releases) 页面获取最新的二进制文件。如果你希望自行构建，请参照以下步骤。
+你可以从 [Releases](https://github.com/LI-NA/zed-i18n/releases) 页面获取最新的构建版本。
 
-当前发布文件尚未进行代码签名。如果 macOS 阻止打开，请仅对你信任的文件在 Finder 中右键选择 `打开`，或在终端运行 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` 移除隔离属性。
+构建过程详见 [发布版本构建](#发布版本构建)，若想自行构建，请参考 [手动构建](#手动构建)。
+
+### 构建可信度
+
+- 当前发布文件尚未进行代码签名，在 Windows 或 macOS 上可能出现安全警告。
+- 所有发布版本均通过 `.github/workflows/i18n-release.yml` 构建，构建日志可在 [Actions](https://github.com/LI-NA/zed-i18n/actions) 标签页查看。
+- Zed 原始源码已通过 `config/project.toml` 中的 `zed_commit` SHA 固定，可以准确核实构建所基于的源代码。
+
+请勿使用来自不可信来源的构建产物，建议尽量自行构建以缓解安全方面的顾虑。
+
+### 在 macOS 上无法打开时
+
+仅对你信任的文件，可在 Finder 中右键选择 `打开`，或在终端运行 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` 命令移除隔离属性。
 
 ## 安装
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 发布版本通过 GitHub Actions 自动构建，定义在 `.github/workflows/i18n-release.yml` 中。Zed 源码已固定到 `config/project.toml` 中的 `zed_version` 标签和 `zed_commit` SHA。
 
-发布工作流会应用 `config/distribution.toml`，以修补 zed-i18n 标识符、About 信息及自动更新路径，从而将自动更新路径重写为 `zed-i18n`。
+发布工作流会与各语言的翻译一起应用 `config/distribution.toml`，以修补 zed-i18n 标识符、About 信息及自动更新路径，从而将自动更新路径重写为 `zed-i18n`。
+
+> **注意：** Zed-i18n 构建会将自动更新地址从 Zed 官方服务器更改为本仓库发布产物中的 `manifest.json`。如果你不希望使用自动更新，可以在设置中将其关闭。
+
+### 遥测
+
+Zed-i18n 不会改变遥测行为。在默认设置下，匿名使用指标和崩溃报告可能会发送到 Zed Industries 的服务器。如需关闭遥测，请在 Zed 设置中将 `telemetry.metrics` 和 `telemetry.diagnostics` 设为 `false`。
 
 ## 已知限制
 
 大多数 UI 字符串——菜单、按钮、工具提示、设置、操作描述——均通过直接替换处理。但是，某些在运行时由命令面板或键位映射编辑器动态生成的操作名称需要单独打补丁，目前尚未覆盖。
 
-如果你知道一种可在不同 Zed 版本间可靠应用补丁的方法，欢迎贡献代码。
+对于这些尚未翻译的部分，如果你知道一种可在不同 Zed 版本间可靠应用补丁的方法，欢迎贡献代码。
 
 ## 关于 AI 的使用
 
-本项目的大部分代码借助 AI 工具编写，所有翻译均由 AI 生成。如果你发现代码或翻译中有任何问题，或认为有更好的实现方式，欢迎提交 PR。
+本项目的大部分代码借助 AI 工具编写，所有翻译均由 AI 生成。由于翻译结果未经人工直接审校，可能存在误译或品牌相关的问题。包括本文档在内，如果你认为翻译有问题，或有更好的译法，欢迎随时提交 issue 或 PR。
+
+### 翻译流程
+
+所有翻译均经过 [AI 翻译](#ai-翻译) 中所述的流程进行。
+
+1. `extract` 从 Zed 源码中提取 UI 字符串候选项，结果保存到 `catalog/en-US.json` 与 `manifest/ui-strings.json`。
+2. `audit-candidates` 检查哪些字符串被提取规则纳入或遗漏，并据此管理实际的翻译目标列表（`accepted`）。
+3. `prepare-translation` 生成各语言的批次，并附带风格指南、词汇表，以及在可用时附带 VS Code 语言包的参考资料。
+4. 由 AI 模型按批次生成翻译结果 JSON。
+5. `merge-translation` 合并结果，`validate` 检查是否存在条目缺失或多余、占位符及保护令牌的一致性问题。
+
+当前已纳入的翻译，针对每一种语言均使用 `Sonnet 4.6` 和 `GPT-5.5` 两个模型独立完成整套翻译并各自重新审校。随后，使用 `Opus 4.6` 模型对完成的两份翻译进行整体复审与合并，得到最终结果。
+
+有关 AI 翻译流程的更多内容，可参见 `prompts\commands` 目录下的文件。
 
 ## 许可证
 
-源自 Zed 的内容（`catalog/`、`translations/`、`manifest/` 及发布产物）依据 [GPL-3.0](../../LICENSE) 授权。`zed-i18n` 源代码及从 [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) 中提取的翻译词汇表（`prompts/translation/glossary/`）依据 [MIT](../../LICENSE-MIT) 授权。VS Code 语言包内容的版权归 Microsoft Corporation 所有。
+源自 Zed 的内容（`catalog/`、`translations/`、`manifest/` 及发布产物等）依据 [GPL-3.0](../../LICENSE) 授权。本项目分发 Zed 的修改版构建产物。`zed-i18n` 源代码及从 [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) 中提取的翻译词汇表（`prompts/translation/glossary/`）依据 [MIT](../../LICENSE-MIT) 授权。
+
+Zed 与 Zed 徽标为 Zed Industries 的资产；VS Code 及 VS Code 语言包内容的版权归 Microsoft Corporation 所有。

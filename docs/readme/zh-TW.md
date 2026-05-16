@@ -33,17 +33,31 @@
 
 Zed-i18n 是一套工具組，可從 [Zed](https://zed.dev) 編輯器的發行版本中擷取 UI 字串，並套用翻譯以產生多語言版本。
 
+> Zed-i18n 是與 Zed Industries 無關的社群專案，未獲得官方贊助或認證。
+
 ## 支援語言
 
-目前 `translations/` 目錄下包含 13 種語言的翻譯。
+目前 `translations/` 目錄下包含 13 種語言的翻譯。所有翻譯皆由 AI 產生，歡迎各語言的母語人士參與貢獻。
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## 下載
 
-你可以從 [Releases](https://github.com/LI-NA/zed-i18n/releases) 下載最新建置。若想自行建置，請依照下列步驟進行。
+你可以從 [Releases](https://github.com/LI-NA/zed-i18n/releases) 下載最新建置。
 
-目前發布檔案尚未套用程式碼簽署。如果 macOS 阻擋開啟，請僅對你信任的檔案在 Finder 中按右鍵選擇 `打開`，或在終端機執行 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` 移除隔離屬性。
+最新建置的流程可在[正式版建置](#正式版建置)中進一步了解，若想自行建置，請參考[手動建置](#手動建置)。
+
+### 建置可信度
+
+- 目前發布檔案尚未套用程式碼簽署，在 Windows 或 macOS 上可能會出現安全性警告。
+- 所有發布版本皆透過 `.github/workflows/i18n-release.yml` 建置，建置紀錄可在 [Actions](https://github.com/LI-NA/zed-i18n/actions) 分頁中檢視。
+- Zed 原始碼以 `config/project.toml` 中的 `zed_commit` SHA 固定，可確認建置所使用的原始碼版本。
+
+請避免使用來自不明來源的建置；若情況允許，請自行建置以降低安全疑慮。
+
+### 在 macOS 上無法開啟時
+
+針對你信任的檔案，可在 Finder 中按右鍵選擇 `開啟`，或在終端機執行 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` 移除隔離屬性。
 
 ## 安裝
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 正式版建置會透過 GitHub Actions 自動執行，定義於 `.github/workflows/i18n-release.yml`。Zed 原始碼固定於 `config/project.toml` 中的 `zed_version` 標籤與 `zed_commit` SHA。
 
-發布工作流程會套用 `config/distribution.toml`，以修補 zed-i18n 識別碼、About 資訊及自動更新路徑，將自動更新路徑改寫為 `zed-i18n`。
+發布工作流程會連同各語言的翻譯套用 `config/distribution.toml`，以修補 zed-i18n 識別碼、About 資訊及自動更新路徑，將自動更新路徑改寫為 `zed-i18n`。
+
+> **注意事項：** Zed-i18n 建置會將自動更新路徑從 Zed 官方伺服器改為本儲存庫發布的 `manifest.json` 檔案。若不希望啟用自動更新，可在設定中停用。
+
+### 遙測
+
+Zed-i18n 不會變更遙測行為。在預設設定下，匿名使用指標與當機報告可能會傳送至 Zed Industries 的伺服器。若要關閉遙測，請在 Zed 設定中將 `telemetry.metrics` 與 `telemetry.diagnostics` 設為 `false`。
 
 ## 已知限制
 
 大多數 UI 字串——選單、按鈕、工具提示、設定、動作說明——均透過直接替換來處理。然而，部分在執行時由命令選擇區或鍵盤對應編輯器動態產生的動作名稱，需要另行修補，目前尚未涵蓋。
 
-若你知道如何可靠地跨 Zed 版本套用修補，非常歡迎貢獻。
+針對這些尚未翻譯的部分，若你知道如何可靠地跨 Zed 版本套用修補，非常歡迎貢獻。
 
 ## 關於 AI 的使用
 
-本專案的大部分程式碼是在 AI 工具的協助下撰寫的，所有翻譯也均由 AI 產生。若你發現程式碼或翻譯有任何問題，或認為有更好的做法，歡迎開啟 PR。
+本專案的大部分程式碼是在 AI 工具的協助下撰寫的，所有翻譯也均由 AI 產生。由於翻譯結果未經人工直接審閱，可能存在誤譯或品牌標示上的問題。若你認為翻譯（包含本文件在內）有問題，或有更好的譯法，歡迎隨時提出 issue 或 PR。
+
+### 翻譯流程
+
+所有翻譯皆依照 [AI 翻譯](#ai-翻譯)中說明的流程進行。
+
+1. `extract` 會從 Zed 原始碼中擷取 UI 字串候選項，結果儲存於 `catalog/en-US.json` 與 `manifest/ui-strings.json`。
+2. `audit-candidates` 會檢視哪些字串已被擷取規則納入、哪些尚未涵蓋，並據此管理實際的翻譯對象清單（`accepted`）。
+3. `prepare-translation` 會產生各語言的批次，並一併附上風格指南、詞彙表，以及在可用時的 VS Code 語言套件參考資料。
+4. AI 模型以批次為單位撰寫翻譯結果 JSON。
+5. `merge-translation` 會合併結果，`validate` 則會檢查是否有遺漏或多餘的項目、佔位符與保護 Token 的一致性。
+
+目前所登錄的翻譯，皆針對每種語言以 `Sonnet 4.6` 與 `GPT-5.5` 兩款模型分別重複上述流程，各自獨立完成整份翻譯並再次檢閱。隨後，完成的兩份翻譯再透過 `Opus 4.6` 重新檢閱並合併為最終結果。
+
+關於 AI 翻譯流程的更多細節，可在 `prompts\commands` 目錄下進一步了解。
 
 ## 授權條款
 
-衍生自 Zed 原始碼的內容（`catalog/`、`translations/`、`manifest/` 及發布產物）依 [GPL-3.0](../../LICENSE) 授權。`zed-i18n` 原始碼及從 [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) 中擷取的翻譯詞彙表（`prompts/translation/glossary/`）依 [MIT](../../LICENSE-MIT) 授權。VS Code 語言套件的內容版權歸 Microsoft Corporation 所有。
+衍生自 Zed 原始碼的內容（`catalog/`、`translations/`、`manifest/` 及發布產物等）依 [GPL-3.0](../../LICENSE) 授權。本專案發布的是 Zed 的修改版建置。`zed-i18n` 原始碼及從 [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) 中擷取的翻譯詞彙表（`prompts/translation/glossary/`）依 [MIT](../../LICENSE-MIT) 授權。
+
+Zed 及 Zed 標誌為 Zed Industries 的資產；VS Code 及 VS Code 語言套件內容的版權歸 Microsoft Corporation 所有。

@@ -33,17 +33,31 @@
 
 Zed-i18n ist ein Toolkit, das UI-Strings aus Release-Builds des [Zed](https://zed.dev)-Editors extrahiert und Übersetzungen einsetzt, um mehrsprachige Builds zu erstellen.
 
+> Zed-i18n ist ein Community-Projekt ohne Verbindung zu Zed Industries und wird weder offiziell gesponsert noch unterstützt.
+
 ## Unterstützte Sprachen
 
-Übersetzungen für 13 Sprachen sind derzeit unter `translations/` gebündelt.
+Übersetzungen für 13 Sprachen sind derzeit unter `translations/` gebündelt. Alle aktuellen Übersetzungen wurden mit KI erstellt; Beiträge von Muttersprachlern sind willkommen.
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## Downloads
 
-Die aktuellen Binärdateien sind unter [Releases](https://github.com/LI-NA/zed-i18n/releases) verfügbar. Wer das Projekt lieber selbst bauen möchte, folgt den nachstehenden Schritten.
+Die aktuellen Builds sind unter [Releases](https://github.com/LI-NA/zed-i18n/releases) verfügbar.
 
-Die Release-Dateien sind derzeit nicht codesigniert. Falls macOS die App blockiert, öffnen Sie nur vertrauenswürdige Dateien im Finder per Rechtsklick und `Öffnen`, oder entfernen Sie das Quarantäne-Attribut mit `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+Details zum aktuellen Build-Prozess finden sich unter [Release-Builds](#release-builds); zum Selbstbauen siehe [Manueller Build](#manueller-build).
+
+### Vertrauenswürdigkeit der Builds
+
+- Die veröffentlichten Binärdateien sind nicht codesigniert; unter Windows oder macOS können Sicherheitswarnungen erscheinen.
+- Alle Releases werden über `.github/workflows/i18n-release.yml` gebaut; die Build-Logs sind im [Actions](https://github.com/LI-NA/zed-i18n/actions)-Tab einsehbar.
+- Die Zed-Quellen sind über den `zed_commit` SHA in `config/project.toml` festgeschrieben, sodass sich der exakt verwendete Quellstand für den Build verifizieren lässt.
+
+Builds aus nicht vertrauenswürdigen Quellen sind zu vermeiden; wo möglich, sollte selbst gebaut werden, um Sicherheitsbedenken zu reduzieren.
+
+### Öffnen unter macOS
+
+Bei vertrauenswürdigen Dateien lässt sich die App im Finder per Rechtsklick und `Öffnen` starten, oder das Quarantäne-Attribut kann im Terminal mit `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` entfernt werden.
 
 ## Installation
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Release-Builds laufen automatisch über GitHub Actions, definiert in `.github/workflows/i18n-release.yml`. Die Zed-Quellen sind auf den `zed_version`-Tag und den `zed_commit`-SHA in `config/project.toml` festgeschrieben.
 
-Der Release-Workflow wendet `config/distribution.toml` an, um die zed-i18n-Kennung, die About-Informationen und den automatischen Update-Pfad anzupassen. Dadurch wird der automatische Update-Pfad auf `zed-i18n` umgeschrieben.
+Der Release-Workflow wendet zusammen mit den sprachspezifischen Übersetzungen `config/distribution.toml` an, um die zed-i18n-Kennung, die About-Informationen und den automatischen Update-Pfad anzupassen. Dadurch wird der automatische Update-Pfad auf `zed-i18n` umgeschrieben.
+
+> **Hinweis:** Zed-i18n-Builds ändern den Auto-Update-Endpunkt vom offiziellen Zed-Server auf die `manifest.json` in den Releases dieses Repositorys. Wer kein automatisches Update wünscht, kann dieses in den Einstellungen deaktivieren.
+
+### Telemetrie
+
+Zed-i18n ändert das Telemetrieverhalten nicht. Mit den Standardeinstellungen können anonyme Nutzungsmetriken und Crash-Berichte an die Server von Zed Industries gesendet werden. Um die Telemetrie zu deaktivieren, setzen Sie `telemetry.metrics` und `telemetry.diagnostics` in den Zed-Einstellungen auf `false`.
 
 ## Bekannte Einschränkungen
 
 Die meisten UI-Strings — Menüs, Schaltflächen, Tooltips, Einstellungen, Aktionsbeschreibungen — werden durch direkte Substitution behandelt. Einige Aktionsnamen, die zur Laufzeit dynamisch in der Befehlspalette oder im Tastenzuordnungs-Editor erzeugt werden, erfordern jedoch einen gesonderten Patch und sind noch nicht abgedeckt.
 
-Wer einen Weg kennt, Patches zuverlässig über Zed-Versionen hinweg einzuspielen, ist herzlich eingeladen, einen Beitrag zu leisten.
+Für diese nicht übersetzten Teile sind Beiträge willkommen, die zeigen, wie sich Patches zuverlässig über Zed-Versionen hinweg einspielen lassen.
 
 ## Hinweis zur KI-Nutzung
 
-Ein Großteil des Codes in diesem Projekt wurde mithilfe von KI-Werkzeugen geschrieben, und jede Übersetzung wurde von KI erstellt. Wer im Code oder in den Übersetzungen etwas Unstimmiges entdeckt oder einen besseren Ansatz kennt, darf gerne einen PR eröffnen.
+Ein Großteil des Codes in diesem Projekt wurde mithilfe von KI-Werkzeugen geschrieben, und jede Übersetzung wurde von KI erstellt. Die Übersetzungsergebnisse wurden nicht direkt von Menschen geprüft, weshalb fehlerhafte Übersetzungen oder Probleme beim Branding möglich sind. Wer in den Übersetzungen — auch in diesem Dokument — ein Problem entdeckt oder eine bessere Übersetzung vorschlagen möchte, kann jederzeit ein Issue oder einen PR eröffnen.
+
+### Übersetzungsprozess
+
+Alle Übersetzungen haben den unter [KI-gestützte Übersetzung](#ki-gestützte-übersetzung) beschriebenen Prozess durchlaufen.
+
+1. `extract` ermittelt UI-String-Kandidaten aus den Zed-Quellen. Die Ergebnisse werden in `catalog/en-US.json` und `manifest/ui-strings.json` gespeichert.
+2. `audit-candidates` prüft, welche Strings von den Extraktionsregeln erfasst und welche übersehen wurden, und dient dazu, die tatsächliche Liste der Übersetzungsziele (`accepted`) zu verwalten.
+3. `prepare-translation` erzeugt sprachspezifische Batches und bündelt darin den Stilguide, das Glossar und – sofern verfügbar – Referenzen aus VS Code-Sprachpaketen.
+4. Ein KI-Modell schreibt das Übersetzungsergebnis als JSON Batch für Batch.
+5. `merge-translation` führt die Ergebnisse zusammen, und `validate` prüft auf fehlende oder zusätzliche Einträge, Platzhalter sowie die Konsistenz geschützter Tokens.
+
+Die aktuell eingepflegten Übersetzungen durchliefen diesen Prozess für jede Sprache mit zwei Modellen — `Sonnet 4.6` und `GPT-5.5` —, die jeweils eine vollständige eigenständige Übersetzung erzeugten, die anschließend erneut überprüft wurde. Die beiden fertiggestellten Übersetzungsdateien wurden anschließend mit `Opus 4.6` nochmals geprüft und zur finalen Ausgabe zusammengeführt.
+
+Weitere Details zum KI-Übersetzungsprozess finden sich in den Dateien unter `prompts\commands`.
 
 ## Lizenz
 
-Inhalte, die aus Zed-Quellen abgeleitet wurden (`catalog/`, `translations/`, `manifest/` sowie Release-Artefakte), stehen unter der [GPL-3.0](../../LICENSE)-Lizenz. Der `zed-i18n`-Quellcode und die Übersetzungsglossare (`prompts/translation/glossary/`), die aus [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) extrahiert wurden, stehen unter der [MIT](../../LICENSE-MIT)-Lizenz. Die Inhalte der VS Code-Sprachpakete unterliegen dem Copyright der Microsoft Corporation.
+Inhalte, die aus Zed-Quellen abgeleitet wurden (`catalog/`, `translations/`, `manifest/`, Release-Artefakte usw.), stehen unter der [GPL-3.0](../../LICENSE)-Lizenz. Dieses Projekt verteilt modifizierte Builds von Zed. Der `zed-i18n`-Quellcode und die Übersetzungsglossare (`prompts/translation/glossary/`), die aus [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) extrahiert wurden, stehen unter der [MIT](../../LICENSE-MIT)-Lizenz.
+
+Zed und das Zed-Logo sind Eigentum von Zed Industries. Die Inhalte von VS Code und den VS Code-Sprachpaketen unterliegen dem Copyright der Microsoft Corporation.

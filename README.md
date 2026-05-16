@@ -33,17 +33,31 @@
 
 Zed-i18n is a tool that extracts UI strings from release versions of the [Zed](https://zed.dev) editor and applies translations to create multilingual builds.
 
+> Zed-i18n is a community project unaffiliated with Zed Industries and is not officially endorsed or certified by Zed Industries.
+
 ## Supported Languages
 
-Translations for 13 languages are currently bundled under `translations/`.
+Translations for 13 languages are currently bundled under `translations/`. All current translations are AI-generated; contributions from native speakers are welcome.
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## Downloads
 
-You can download the latest builds from [Releases](https://github.com/LI-NA/zed-i18n/releases). If you would rather build them manually, follow the steps below.
+You can download the latest builds from [Releases](https://github.com/LI-NA/zed-i18n/releases).
 
-Release files are not code-signed yet. On macOS, if the app is blocked, only open files you trust: right-click it in Finder and choose `Open`, or remove the quarantine attribute with `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
+See [Release Builds](#release-builds) for details on how builds are produced, or [Manual Build](#manual-build) if you would rather build them yourself.
+
+### Build Trust
+
+- Distributed binaries are not code-signed, so you may see security warnings on Windows or macOS.
+- All releases are built through `.github/workflows/i18n-release.yml`; build logs are available in the [Actions](https://github.com/LI-NA/zed-i18n/actions) tab.
+- The upstream Zed source is pinned by the `zed_commit` SHA in `config/project.toml`, so you can verify exactly which source the build came from.
+
+Avoid using builds from untrusted sources; building from source can reduce that risk.
+
+### Opening on macOS
+
+For files you trust, right-click the app in Finder and choose `Open`, or remove the quarantine attribute from Terminal with `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
 
 ## Installation
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Release builds run automatically through GitHub Actions, defined in `.github/workflows/i18n-release.yml`. The Zed source is pinned to the `zed_version` tag and `zed_commit` SHA in `config/project.toml`.
 
-The release workflow applies `config/distribution.toml` to patch the zed-i18n identifier, About information, and automatic updates. This redirects update checks to `zed-i18n`.
+The release workflow applies `config/distribution.toml` alongside per-language translations to patch the zed-i18n identifier, About information, and automatic updates. This redirects update checks to `zed-i18n`.
+
+> **Note:** Zed-i18n builds change the auto-update endpoint from Zed's official server to this repository's release `manifest.json`. You can disable auto-update in settings if you prefer.
+
+### Telemetry
+
+Zed-i18n does not alter telemetry behavior. With default settings, anonymous usage metrics and crash reports may be sent to Zed Industries' servers. To disable telemetry, set `telemetry.metrics` and `telemetry.diagnostics` to `false` in Zed settings.
 
 ## Known Limitations
 
 Most UI strings — menus, buttons, tooltips, settings, action descriptions — are handled through direct substitution. However, some action names that are generated dynamically at runtime in the Command Palette or Keymap Editor require a separate patch and are not yet covered.
 
-If you know of a way to apply patches reliably across Zed versions, contributions are very welcome.
+If you know a way to patch these untranslated areas reliably across Zed versions, contributions are very welcome.
 
 ## On AI Usage
 
-Most of the code in this project was written with the help of AI tools, and every translation was produced by AI. If you spot anything off in the code or translations, or think there is a better approach, please feel free to open a PR.
+Most of the code in this project was written with the help of AI tools, and every translation was produced by AI. Because the translation results were not reviewed by a human, mistranslations or branding issues may exist. If you see a problem with any translation — including this document — or think there is a better rendering, please open an issue or PR.
+
+### Translation Process
+
+All translations went through the process described in [AI Translation](#ai-translation).
+
+1. `extract` pulls UI string candidates from the Zed source. Results land in `catalog/en-US.json` and `manifest/ui-strings.json`.
+2. `audit-candidates` reviews which strings the extraction rules captured and which candidates they missed, then uses that to manage the actual translation targets (`accepted`).
+3. `prepare-translation` generates per-language batches, bundling the style guide, glossary, and (when available) VS Code language-pack references.
+4. An AI model writes the translation result JSON one batch at a time.
+5. `merge-translation` combines the batches, then `validate` checks for missing/extra entries, placeholder integrity, and protected-token consistency.
+
+The currently registered translations went through the above process for every language using two models — `Sonnet 4.6` and `GPT-5.5`. Each model produced a full independent translation, which was reviewed separately. The two completed translation files were then re-reviewed and merged into the final output using the `Opus 4.6` model.
+
+For more on the AI translation process, see the files under `prompts\commands`.
 
 ## License
 
-Content derived from Zed sources (`catalog/`, `translations/`, `manifest/`, and release artifacts) is licensed under [GPL-3.0](LICENSE). The `zed-i18n` source code and the translation glossaries (`prompts/translation/glossary/`) extracted from [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) are licensed under [MIT](LICENSE-MIT). The VS Code language pack content is copyrighted by Microsoft Corporation.
+Content derived from Zed sources (`catalog/`, `translations/`, `manifest/`, release artifacts, etc.) is licensed under [GPL-3.0](LICENSE). This project distributes modified builds of Zed. The `zed-i18n` source code and the translation glossaries (`prompts/translation/glossary/`) extracted from [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) are licensed under [MIT](LICENSE-MIT).
+
+Zed and the Zed logo are the property of Zed Industries. VS Code and the VS Code language pack content are copyrighted by Microsoft Corporation.

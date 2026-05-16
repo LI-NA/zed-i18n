@@ -33,17 +33,31 @@
 
 Zed-i18n, [Zed](https://zed.dev) editörünün yayın sürümlerinden arayüz dizelerini çıkaran ve çok dilli sürümler üretmek amacıyla çevirileri uygulayan bir araç setidir.
 
+> Zed-i18n, Zed Industries ile bağlantısı olmayan bir topluluk projesidir; resmi olarak sponsor olunmamış veya onaylanmamıştır.
+
 ## Desteklenen Diller
 
-`translations/` dizini altında şu anda 13 dil için çeviri bulunmaktadır.
+`translations/` dizini altında şu anda 13 dil için çeviri bulunmaktadır. Mevcut çevirilerin tamamı yapay zeka tarafından üretilmiştir; ana dili konuşanların katkıları memnuniyetle karşılanır.
 
 cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## İndirmeler
 
-En güncel ikili dosyaları [Releases](https://github.com/LI-NA/zed-i18n/releases) sayfasından indirebilirsiniz. Projeyi kendiniz derlemek isterseniz aşağıdaki adımları izleyin.
+En güncel ikili dosyaları [Releases](https://github.com/LI-NA/zed-i18n/releases) sayfasından indirebilirsiniz.
 
-Dağıtım dosyaları şu anda kod imzalı değildir. macOS uygulamayı engellerse bunu yalnızca güvendiğiniz dosyalar için yapın: Finder'da sağ tıklayıp `Aç` seçeneğini kullanın veya karantina özniteliğini `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` komutuyla kaldırın.
+En güncel derleme süreciyle ilgili ayrıntıları [Yayın Derlemeleri](#yayın-derlemeleri) bölümünde bulabilirsiniz; kendiniz derlemek isterseniz [Elle Derleme](#elle-derleme) bölümüne bakın.
+
+### Derleme Güvenilirliği
+
+- Mevcut dağıtım dosyalarına kod imzası uygulanmamıştır. Windows veya macOS üzerinde güvenlik uyarıları görülebilir.
+- Tüm yayınlar `.github/workflows/i18n-release.yml` üzerinden derlenir ve derleme günlükleri [Actions](https://github.com/LI-NA/zed-i18n/actions) sekmesinden ayrıntılı olarak incelenebilir.
+- Zed kaynak kodu, `config/project.toml` dosyasındaki `zed_commit` SHA değerine sabitlenmiştir; bu sayede derlemenin tam olarak hangi kaynağa dayandığı doğrulanabilir.
+
+Güvenilir olmayan kaynaklardan gelen derlemeleri kullanmaktan kaçının; mümkün olduğunda kendiniz derleyerek güvenlik risklerini azaltabilirsiniz.
+
+### macOS'ta Açılmadığında
+
+Yalnızca güvendiğiniz dosyalar için Finder'da sağ tıklayıp `Aç` seçeneğini kullanın ya da Terminal'de `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` komutuyla karantina özniteliğini kaldırın.
 
 ## Kurulum
 
@@ -110,18 +124,40 @@ cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 
 Yayın derlemeleri, `.github/workflows/i18n-release.yml` içinde tanımlanan GitHub Actions aracılığıyla otomatik olarak çalışır. Zed kaynak kodu, `config/project.toml` dosyasındaki `zed_version` etiketine ve `zed_commit` SHA değerine sabitlenmiştir.
 
-Yayın iş akışı, zed-i18n tanımlayıcısını, About bilgilerini ve otomatik güncelleme yolunu düzenlemek için `config/distribution.toml` dosyasını uygular. Bu işlem, otomatik güncelleme yolunu `zed-i18n` olarak yeniden yazar.
+Yayın iş akışı, zed-i18n tanımlayıcısını, About bilgilerini ve otomatik güncelleme yolunu düzenlemek için dile özgü çevirilerin yanı sıra `config/distribution.toml` dosyasını da uygular. Bu işlem, otomatik güncelleme yolunu `zed-i18n` olarak yeniden yazar.
+
+> **Not:** Zed-i18n derlemeleri, otomatik güncelleme adresini Zed'in resmi sunucusundan bu depo yayınlarındaki `manifest.json` dosyasına yönlendirir. Otomatik güncellemeyi istemiyorsanız ayarlardan devre dışı bırakabilirsiniz.
+
+### Telemetri
+
+Zed-i18n telemetri davranışını değiştirmez. Varsayılan ayarlarda anonim kullanım ölçümleri ve çökme raporları Zed Industries'in sunucularına gönderilebilir. Telemetriyi kapatmak için Zed ayarlarında `telemetry.metrics` ve `telemetry.diagnostics` değerlerini `false` olarak ayarlayın.
 
 ## Bilinen Kısıtlamalar
 
 Menüler, düğmeler, araç ipuçları, ayarlar ve eylem açıklamaları gibi arayüz dizelerinin büyük çoğunluğu doğrudan değiştirme yöntemiyle işlenir. Ancak Komut Paleti veya Tuş Haritası Düzenleyicisi'nde çalışma zamanında dinamik olarak oluşturulan bazı eylem adları ayrı bir yama gerektirmekte olup henüz kapsama alınmamıştır.
 
-Zed sürümü değişse bile yamaları güvenilir biçimde uygulamanın bir yolunu biliyorsanız katkılarınızı bekliyoruz.
+Çevirisi yapılmamış bu kısımlar için, Zed sürümleri arasında yamaları güvenilir biçimde uygulamanın bir yolunu biliyorsanız katkılarınızı bekliyoruz.
 
 ## Yapay Zeka Kullanımı Hakkında
 
-Bu projedeki kodun büyük bölümü yapay zeka araçlarının yardımıyla yazılmış olup tüm çeviriler yapay zeka tarafından üretilmiştir. Kod veya çevirilerde bir hata fark ederseniz ya da daha iyi bir yaklaşım olduğunu düşünüyorsanız PR açmaktan çekinmeyin.
+Bu projedeki kodun büyük bölümü yapay zeka araçlarının yardımıyla yazılmış olup tüm çeviriler yapay zeka tarafından üretilmiştir. Çeviri sonuçları doğrudan insan denetiminden geçmediği için hatalı çeviriler veya markalama sorunları olabilir. Bu belge de dahil olmak üzere çevirilerde bir sorun olduğunu düşünüyorsanız ya da daha iyi bir çeviri öneriniz varsa, lütfen issue veya PR açmaktan çekinmeyin.
+
+### Çeviri Süreci
+
+Tüm çeviriler [Yapay Zeka ile Çeviri](#yapay-zeka-ile-çeviri) bölümünde anlatılan süreçten geçirilmiştir.
+
+1. `extract`, Zed kaynak kodundan arayüz dizesi adaylarını çeker. Sonuçlar `catalog/en-US.json` ve `manifest/ui-strings.json` dosyalarına kaydedilir.
+2. `audit-candidates`, çıkarma kurallarının hangi dizeleri yakaladığını ya da kaçırdığını gözden geçirir; bu çıktı, gerçek çeviri hedef listesinin (`accepted`) yönetilmesinde kullanılır.
+3. `prepare-translation`, dile özgü toplu işlemler üretir; üslup rehberi, sözlük ve mevcut olduğunda VS Code dil paketi referanslarını birlikte paketler.
+4. Bir yapay zeka modeli, çeviri sonucu JSON dosyasını toplu işlem bazında yazar.
+5. `merge-translation` sonuçları birleştirir; `validate` ise eksik/fazla girdileri, yer tutucuları ve korunan token tutarlılığını denetler.
+
+Hâlihazırda kayıtlı çeviriler her dil için bu sürecin iki modelle (`Sonnet 4.6` ve `GPT-5.5`) ayrı ayrı tamamlanması ve sonuçların yeniden gözden geçirilmesiyle elde edilmiştir. Tamamlanan iki çeviri ardından `Opus 4.6` modeli aracılığıyla yeniden incelenip birleştirilerek nihai çıktıya dönüştürülmüştür.
+
+Yapay zeka çeviri süreciyle ilgili daha fazla ayrıntı için `prompts\commands` altındaki dosyalara bakın.
 
 ## Lisans
 
-Zed kaynaklarından türetilen içerikler (`catalog/`, `translations/`, `manifest/` ve yayın çıktıları) [GPL-3.0](../../LICENSE) lisansı kapsamındadır. `zed-i18n` kaynak kodu ve [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) kaynaklı çeviri sözlükleri (`prompts/translation/glossary/`) [MIT](../../LICENSE-MIT) lisansı kapsamındadır. VS Code dil paketi içeriğinin telif hakkı Microsoft Corporation'a aittir.
+Zed kaynaklarından türetilen içerikler (`catalog/`, `translations/`, `manifest/`, yayın çıktıları vb.) [GPL-3.0](../../LICENSE) lisansı kapsamındadır. Bu proje, Zed'in değiştirilmiş derlemelerini dağıtır. `zed-i18n` kaynak kodu ve [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) kaynaklı çeviri sözlükleri (`prompts/translation/glossary/`) [MIT](../../LICENSE-MIT) lisansı kapsamındadır.
+
+Zed ve Zed logosu Zed Industries'in mülkiyetindedir; VS Code ve VS Code dil paketi içeriğinin telif hakkı Microsoft Corporation'a aittir.
