@@ -28488,6 +28488,14 @@
         "kind": "language_model_effort_label",
         "line": 264,
         "start_byte": 9077
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 13029,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "language_model_effort_label",
+        "line": 408,
+        "start_byte": 13017
       }
     ],
     "status": "accepted"
@@ -34385,6 +34393,14 @@
       },
       {
         "call": "reasoning_effort_display",
+        "end_byte": 12959,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "language_model_effort_label",
+        "line": 407,
+        "start_byte": 12953
+      },
+      {
+        "call": "reasoning_effort_display",
         "end_byte": 2246,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "language_model_effort_label",
@@ -39523,6 +39539,14 @@
       },
       {
         "call": "reasoning_effort_display",
+        "end_byte": 12828,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "language_model_effort_label",
+        "line": 405,
+        "start_byte": 12823
+      },
+      {
+        "call": "reasoning_effort_display",
         "end_byte": 2139,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "language_model_effort_label",
@@ -40266,6 +40290,14 @@
       },
       {
         "call": "reasoning_effort_display",
+        "end_byte": 12894,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "language_model_effort_label",
+        "line": 406,
+        "start_byte": 12886
+      },
+      {
+        "call": "reasoning_effort_display",
         "end_byte": 2193,
         "file": "crates/language_models/src/provider/opencode.rs",
         "kind": "language_model_effort_label",
@@ -40552,6 +40584,14 @@
         "kind": "language_model_effort_label",
         "line": 260,
         "start_byte": 8795
+      },
+      {
+        "call": "reasoning_effort_display",
+        "end_byte": 12764,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "language_model_effort_label",
+        "line": 404,
+        "start_byte": 12755
       },
       {
         "call": "reasoning_effort_display",
@@ -63249,11 +63289,11 @@
       },
       {
         "call": "button_label",
-        "end_byte": 33895,
+        "end_byte": 35040,
         "file": "crates/language_models/src/provider/openai_subscribed.rs",
         "kind": "button_label",
-        "line": 992,
-        "start_byte": 33885
+        "line": 1021,
+        "start_byte": 35030
       },
       {
         "call": "action",
@@ -63348,11 +63388,11 @@
     "occurrences": [
       {
         "call": "Button::new",
-        "end_byte": 34905,
+        "end_byte": 36050,
         "file": "crates/language_models/src/provider/openai_subscribed.rs",
         "kind": "button",
-        "line": 1019,
-        "start_byte": 34883
+        "line": 1048,
+        "start_byte": 36028
       }
     ],
     "status": "accepted"
@@ -63361,11 +63401,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 34807,
+        "end_byte": 35952,
         "file": "crates/language_models/src/provider/openai_subscribed.rs",
         "kind": "label",
-        "line": 1016,
-        "start_byte": 34718
+        "line": 1045,
+        "start_byte": 35863
       }
     ],
     "status": "accepted"
@@ -63434,11 +63474,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 34262,
+        "end_byte": 35407,
         "file": "crates/language_models/src/provider/openai_subscribed.rs",
         "kind": "label",
-        "line": 1002,
-        "start_byte": 34247
+        "line": 1031,
+        "start_byte": 35392
       },
       {
         "call": "Label::new",
