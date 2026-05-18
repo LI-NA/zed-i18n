@@ -115,6 +115,100 @@ class TranslationPipelineTests(unittest.TestCase):
         self.assertIn("Base ko-KR prompt", prompt)
         self.assertIn("Rate Limit Reached", prompt)
 
+    def test_prepare_translation_batches_keeps_setting_group_atomic_and_includes_sibling_context(self) -> None:
+        self._write_json(
+            self.root / "manifest" / "ui-strings.json",
+            {
+                "Line Width": {
+                    "status": "accepted",
+                    "occurrences": [
+                        {
+                            "file": "crates/settings_ui/src/page_data.rs",
+                            "line": 3,
+                            "call": "SettingItem.title",
+                            "kind": "setting_title",
+                            "start_byte": 0,
+                            "end_byte": 0,
+                        }
+                    ],
+                },
+                "The width of the indent guides in pixels, between 1 and 10.": {
+                    "status": "accepted",
+                    "occurrences": [
+                        {
+                            "file": "crates/settings_ui/src/page_data.rs",
+                            "line": 4,
+                            "call": "SettingItem.description",
+                            "kind": "setting_description",
+                            "start_byte": 0,
+                            "end_byte": 0,
+                        }
+                    ],
+                },
+            },
+        )
+        self._write_json(
+            self.root / "translations" / "ko-KR.json",
+            {
+                "The width of the indent guides in pixels, between 1 and 10.": (
+                    "들여쓰기 가이드의 너비(픽셀), 1에서 10 사이입니다."
+                )
+            },
+        )
+        (self.root / "prompts" / "translation" / "ko-KR.md").write_text(
+            "Base ko-KR prompt",
+            encoding="utf-8",
+        )
+        (self.zed_root / "crates" / "settings_ui" / "src").mkdir(parents=True)
+        (self.zed_root / "crates" / "settings_ui" / "src" / "page_data.rs").write_text(
+            "\n".join(
+                [
+                    "fn page() {",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Line Width",',
+                    '        description: "The width of the indent guides in pixels, between 1 and 10.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("editor.indent_guides.line_width"),',
+                    "        }),",
+                    "    });",
+                    "}",
+                ]
+            ),
+            encoding="utf-8",
+        )
+
+        report = prepare_translation_batches(
+            root=self.root,
+            language="ko-KR",
+            zed_root=self.zed_root,
+            options=PrepareTranslationOptions(batch_size=1, context_lines=1),
+        )
+
+        self.assertEqual(report.source_count, 1)
+        self.assertEqual(report.batch_count, 1)
+        batch = self._read_json(
+            self.root / "reports" / "translation" / "ko-KR" / "batches" / "batch-001.json"
+        )
+        self.assertEqual([entry["source"] for entry in batch["entries"]], ["Line Width"])
+        context_group = batch["entries"][0]["context_group"]
+        self.assertEqual(context_group["type"], "setting")
+        self.assertEqual(context_group["context_key"], "editor.indent_guides.line_width")
+        self.assertEqual(
+            [(entry["role"], entry["source"], entry["target"]) for entry in context_group["entries"]],
+            [
+                ("title", "Line Width", True),
+                (
+                    "description",
+                    "The width of the indent guides in pixels, between 1 and 10.",
+                    False,
+                ),
+            ],
+        )
+        self.assertEqual(
+            context_group["entries"][1]["current_translation"],
+            "들여쓰기 가이드의 너비(픽셀), 1에서 10 사이입니다.",
+        )
+
     def test_prepare_translation_options_rejects_invalid_batch_size(self) -> None:
         with self.assertRaisesRegex(ValueError, "batch size must be positive"):
             PrepareTranslationOptions(batch_size=0)

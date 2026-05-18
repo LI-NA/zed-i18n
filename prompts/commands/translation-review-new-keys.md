@@ -56,6 +56,7 @@ Before any review work, ground yourself in the repository:
    - `translations/<LANG>.<MODEL_A_SLUG>.json`
    - `translations/<LANG>.<MODEL_B_SLUG>.json`
    - `prompts/translation/<LANG>.md`
+   - `reports/context-groups/<LANG>/` if it already exists (optional review context, not required)
 10. Inspect each model artifact before dispatch:
    - It should be much smaller than the final `translations/<LANG>.json`.
    - Its keys should be absent from the final `translations/<LANG>.json`.
@@ -75,6 +76,7 @@ Output a 5–8 line summary of findings (in Korean): detected languages, model s
 - Apply selected translations into the final `translations/<LANG>.json`.
 - Preserve all existing final translations unless the same key was still missing before this review.
 - Use one review sub-agent per language, called with `REVIEW_AGENT_MODEL`, to compare candidates with the language prompt, glossary/dictionary, source context, and existing translations.
+- Use generated batch `context_group` data, and `reports/context-groups/<LANG>/` when already present, to review setting title/description pairs and connected multi-line strings together.
 - Validate every updated final language file with `uv run zed-i18n validate --language <LANG> --no-cleanup`.
 - Never modify the model artifacts.
 - Never add keys that are absent from both model artifacts.
@@ -117,6 +119,7 @@ Give that sub-agent:
 - relevant glossary/dictionary files under `prompts/translation/glossary/` if they exist
 - `manifest/ui-strings.json`
 - relevant `reports/translation-runs/<LANG>/<MODEL_A_SLUG>/` and `reports/translation-runs/<LANG>/<MODEL_B_SLUG>/` plan/batch/summary/partial-validation files if they exist
+- `reports/context-groups/<LANG>/` if it already exists
 - source files under `.cache/zed/<zed-version>-clean-extract` only when needed to resolve ambiguity from manifest occurrences
 
 Tell it:
@@ -127,6 +130,7 @@ Tell it:
 - Use `prompts/translation/<LANG>.md` as the primary style guide.
 - Use glossary/dictionary files as terminology references.
 - Use manifest occurrences, `kind`, `call`, and source context to disambiguate short or ambiguous UI strings.
+- Use `context_group` data in batch files and optional context-group reports to judge setting title/description siblings and connected multi-line strings as one UI unit.
 - Choose the better candidate when one model is clearly better.
 - If both models are flawed but the intended UI meaning is clear, write a corrected translation.
 - If a source is ambiguous, internal-ID-shaped, or unsafe to translate, omit it from `selected.json` and record the reason in `review-summary.json`.
@@ -251,17 +255,18 @@ Apply these rules per source key:
 1. Pick the candidate that is more accurate, natural, concise for UI, and consistent with the language prompt.
 2. Prefer consistency with existing `translations/<LANG>.json` when both candidates are acceptable.
 3. If both candidates are wrong but the source context is clear, write a corrected translation yourself.
-4. If neither candidate is safe and the source context is not enough, omit the key from `selected.json` and record why.
-5. Do not translate internal IDs, action IDs, config keys, paths, URLs, file extensions, code-like values, or proper nouns unless the language prompt explicitly says otherwise.
-6. Preserve byte-for-byte inside translated values:
+4. For grouped settings and connected multi-line strings, prefer the candidate that makes the whole group coherent, not just the isolated source key.
+5. If neither candidate is safe and the source context is not enough, omit the key from `selected.json` and record why.
+6. Do not translate internal IDs, action IDs, config keys, paths, URLs, file extensions, code-like values, or proper nouns unless the language prompt explicitly says otherwise.
+7. Preserve byte-for-byte inside translated values:
    - Rust placeholders (`{}`, `{0}`, `{name}`, `{path}`, `{count:?}`)
    - Backtick code spans
    - URLs, paths, file extensions, JSON keys, setting keys
    - Command IDs, action IDs, keybindings
    - Product and proper names
    - Escape sequences (`\n`, `\t`, `\r`, `\\`)
-7. The language prompt's disambiguation and style rules override either model's choice.
-8. Glossary/dictionary files are baseline references; source context wins when there is a real conflict.
+8. The language prompt's disambiguation and style rules override either model's choice.
+9. Glossary/dictionary files are baseline references; source context wins when there is a real conflict.
 
 ---
 

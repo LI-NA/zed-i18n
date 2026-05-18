@@ -7,6 +7,12 @@ import re
 import shutil
 from typing import Any
 
+from .context_groups import (
+    build_context_groups,
+    context_groups_by_source,
+    preferred_occurrence_from_context,
+    source_batches_for_context_groups,
+)
 from .rust_strings import rust_format_placeholders
 from .translation_checks import protected_tokens_match
 from .vscode_loc import (
@@ -89,10 +95,14 @@ def prepare_translation_batches(
         base_prompt = "\n\n".join(part for part in [base_prompt.strip(), glossary_prompt] if part)
 
     sources = _sources_to_translate(manifest, translations, options.missing_only)
-    batches = [
-        sources[index : index + options.batch_size]
-        for index in range(0, len(sources), options.batch_size)
-    ]
+    context_groups = build_context_groups(zed_root, manifest, translations)
+    contexts_by_source = context_groups_by_source(context_groups, sources)
+    batches = source_batches_for_context_groups(
+        sources,
+        manifest,
+        context_groups,
+        options.batch_size,
+    )
     vscode_memory = (
         VscodeTranslationIndex(
             load_vscode_translation_memory(
@@ -128,6 +138,7 @@ def prepare_translation_batches(
                 options.context_lines,
                 vscode_memory,
                 options.vscode_reference_count,
+                contexts_by_source.get(source),
             )
             for source in batch_sources
         ]
@@ -271,9 +282,13 @@ def _translation_entry(
     context_lines: int,
     vscode_memory: VscodeTranslationIndex | None = None,
     vscode_reference_count: int = 3,
+    context_group: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     occurrences = manifest_entry.get("occurrences", [])
-    first_occurrence = occurrences[0] if occurrences else {}
+    first_occurrence = (
+        preferred_occurrence_from_context(context_group, source)
+        or (occurrences[0] if occurrences else {})
+    )
     entry = {
         "source": source,
         "kind": first_occurrence.get("kind", ""),
@@ -281,6 +296,8 @@ def _translation_entry(
         "occurrences": occurrences,
         "code_context": _code_context(zed_root, first_occurrence, context_lines),
     }
+    if context_group:
+        entry["context_group"] = context_group
     if vscode_memory and _source_can_use_vscode_references(source):
         references = find_vscode_references(
             source,
@@ -344,6 +361,9 @@ def _batch_prompt(base_prompt: str, batch_payload: dict[str, Any]) -> str:
             "Use `null` when the item should be left for manual review. "
             "When an entry has `vscode_references`, treat them as VS Code language-pack "
             "translation-memory hints, not mandatory replacements. "
+            "When an entry has `context_group`, use the grouped title/description or "
+            "connected-line context to keep related translations consistent, but still output "
+            "only the exact `source` keys listed in this batch's `entries`. "
             "Save the JSON response to the `output.result_file` path after translation.",
             "## Batch Payload\n"
             "```json\n"

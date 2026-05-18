@@ -11,6 +11,7 @@ from typing import Iterable
 from .apply import apply_translations
 from .audit import audit_repository
 from .config import load_project_config, zed_checkout_path, zed_clean_extract_checkout_path
+from .context_groups import build_context_groups, write_context_group_reports
 from .extract import extract_repository
 from .translation_pipeline import (
     PrepareTranslationOptions,
@@ -118,6 +119,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Translation JSON to write. Defaults to translations/<language>.json.",
     )
 
+    context_groups_parser = subparsers.add_parser("extract-context-groups")
+    context_groups_parser.add_argument("--language", required=True)
+    context_groups_parser.add_argument(
+        "--zed-root",
+        help="Clean Zed source checkout used to resolve grouped source context.",
+    )
+    context_groups_parser.add_argument(
+        "--group-type",
+        choices=("all", "settings", "connected"),
+        default="all",
+        help="Which grouped review reports to write.",
+    )
+    context_groups_parser.add_argument(
+        "--output-dir",
+        help="Defaults to reports/context-groups/<language>.",
+    )
+
     vscode_glossary_parser = subparsers.add_parser("generate-vscode-glossary")
     vscode_glossary_parser.add_argument(
         "--language",
@@ -183,6 +201,14 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "merge-translation":
         return run_merge_translation(root, args.language, args.results_dir, args.output)
+    if args.command == "extract-context-groups":
+        return run_extract_context_groups(
+            root,
+            args.language,
+            args.zed_root,
+            args.group_type,
+            args.output_dir,
+        )
     if args.command == "generate-vscode-glossary":
         return run_generate_vscode_glossary(
             root,
@@ -446,6 +472,31 @@ def run_generate_vscode_glossary(
     return 0
 
 
+def run_extract_context_groups(
+    root: Path,
+    language: str,
+    zed_root: str | None,
+    group_type: str,
+    output_dir: str | None,
+) -> int:
+    config = load_project_config(root)
+    checkout_path = resolve_zed_root(root, config, zed_root)
+    manifest = _read_json(root / "manifest" / "ui-strings.json")
+    translations = _read_json(root / "translations" / f"{language}.json")
+    output_path = (
+        _resolve_optional_workspace_path(root, output_dir)
+        or root / "reports" / "context-groups" / language
+    )
+    groups = build_context_groups(checkout_path, manifest, translations)
+    write_context_group_reports(output_path, groups, group_type=group_type)
+    print(
+        f"Extracted {len(groups.settings)} setting groups and "
+        f"{len(groups.connected_lines)} connected line groups for {language}: "
+        f"{_relative_to_root(root, output_path)}"
+    )
+    return 0
+
+
 def _write_prompt_glossaries(
     vscode_loc_path: Path,
     vscode_source_path: Path | None,
@@ -523,6 +574,13 @@ def _resolve_optional_workspace_path(root: Path, value: str | None) -> Path | No
     if not path.is_absolute():
         path = root / path
     return ensure_inside_workspace(root, path)
+
+
+def _relative_to_root(root: Path, path: Path) -> str:
+    try:
+        return path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def _write_json(path: Path, value: object) -> None:

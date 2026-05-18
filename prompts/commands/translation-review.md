@@ -10,8 +10,9 @@ MODEL_B: [MODEL_B]
 2. `prompts/translation/[LOCALE].md` — language-specific prompt. If missing, fall back to `prompts/translation/TEMPLATE.md`.
 3. `prompts/translation/glossary/<lang>.md` — the auto-generated glossary (uses a shorter code than the locale, e.g., `ko.md`, `ja.md`, `zh-cn.md`, `pt-br.md`). This is the baseline terminology.
 4. `manifest/ui-strings.json` — read `occurrences`, `kind`, and `call` for any ambiguous or short string.
-5. `.cache/zed/<version>-clean-extract/...` — open ONLY the source files referenced by `occurrences` for entries you cannot disambiguate from the manifest alone.
-6. VS Code language-pack hints if surfaced through `vscode_references` — treat as memory hints, not mandatory replacements.
+5. `reports/context-groups/[LOCALE]/` if it already exists — use grouped setting title/description and connected-line reports to review sibling consistency and multi-line flow.
+6. `.cache/zed/<version>-clean-extract/...` — open ONLY the source files referenced by `occurrences` for entries you cannot disambiguate from the manifest or context-group reports alone.
+7. VS Code language-pack hints if surfaced through `vscode_references` — treat as memory hints, not mandatory replacements.
 
 ## Inputs (must already exist; do not regenerate)
 - `translations/[LOCALE].[MODEL_A].json`
@@ -32,7 +33,8 @@ MODEL_B: [MODEL_B]
    - Escape sequences (`\n`, `\t`, `\r`, `\\`)
 4. Do NOT translate internal-ID-shaped values (kebab-case/snake_case that resembles code, config keys, URIs, routes, test fixtures). If a model wrongly translated such an entry, set the merged value to `null` (the validator and downstream tooling treat `null` as "ignore"). Match how existing accepted entries for this language handle these cases.
 5. The language prompt's DISAMBIGUATION RULES override either model's choice when they conflict. Glossary is the baseline, not a hard override — source context wins.
-6. Output must be valid JSON: no trailing commas, no comments, no markdown fences. Keys identical to the source strings.
+6. When entries belong to a setting title/description pair or a connected multi-line group, judge the group together so title wording, description wording, and line flow agree.
+7. Output must be valid JSON: no trailing commas, no comments, no markdown fences. Keys identical to the source strings.
 
 ## Forbidden
 - Do NOT commit, stage, push, branch, or create worktrees.

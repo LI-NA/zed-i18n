@@ -89,6 +89,21 @@ class CliTests(unittest.TestCase):
         self.assertEqual(merge_args.language, "ko-KR")
         self.assertEqual(merge_args.results_dir, "reports/translation/ko-KR/results")
         self.assertEqual(merge_args.output, "translations/ko-KR.model-a.json")
+        context_group_args = parser.parse_args(
+            [
+                "extract-context-groups",
+                "--language",
+                "ko-KR",
+                "--group-type",
+                "settings",
+                "--output-dir",
+                "reports/context-groups/ko-KR",
+            ]
+        )
+        self.assertEqual(context_group_args.command, "extract-context-groups")
+        self.assertEqual(context_group_args.language, "ko-KR")
+        self.assertEqual(context_group_args.group_type, "settings")
+        self.assertEqual(context_group_args.output_dir, "reports/context-groups/ko-KR")
         glossary_args = parser.parse_args(
             [
                 "generate-vscode-glossary",

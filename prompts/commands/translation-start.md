@@ -26,7 +26,7 @@ Before any translation work, ground yourself in the repository:
 2. Read `AGENTS.md` end-to-end (if it exists).
 3. Read `README.md` end-to-end.
 4. Read `prompts/translation/<TARGET_LANG>.md` — the target-language style guide, glossary, and preservation rules. Every sub-agent MUST receive this file later. If this file does not exist, treat it as an anomaly stop.
-5. Skim `tools/zed_i18n/translation_pipeline.py` to confirm the `prepare-translation` and `merge-translation` CLI flags match what this prompt assumes. If flags have diverged, treat it as an anomaly stop.
+5. Skim `tools/zed_i18n/translation_pipeline.py` to confirm the `prepare-translation` and `merge-translation` CLI flags match what this prompt assumes, and that batch entries may carry `context_group` review context. If flags have diverged, treat it as an anomaly stop.
 6. Confirm these paths exist:
    - `manifest/ui-strings.json` — accepted translation targets
    - `.cache/zed/<zed-version>-clean-extract` — clean Zed checkout used as source
@@ -72,13 +72,15 @@ uv run zed-i18n prepare-translation \
 
 If `.cache/vscode-loc` exists, `prepare-translation` automatically adds optional `vscode_references` translation-memory hints to matching entries. `.cache/vscode-upstream` improves English source recovery for those hints. Missing VS Code reference checkouts are normal and are NOT an anomaly.
 
+`prepare-translation` also keeps grouped setting title/description strings and connected multi-line strings batch-atomic when possible. Individual batch entries may include `context_group`; use it to translate sibling UI labels/descriptions and split lines consistently, but the result JSON must still contain only the exact source keys listed in that batch's `entries`.
+
 ### 3. Dispatch sub-agents
 
 For each generated `reports/translation-runs/<TARGET_LANG>/<MODEL_SLUG>/prompts/batch-XXX.md`:
 
 - Spawn one sub-agent (respecting the 25-cap and ramp-up rule).
 - Give it the single batch prompt file AND `prompts/translation/<TARGET_LANG>.md`.
-- Tell it: follow the batch prompt verbatim, and write its result JSON ONLY to the `output.result_file` path declared inside that batch prompt. It must not touch anything else.
+- Tell it: follow the batch prompt verbatim, use any `context_group` data as read-only sibling/flow context, and write its result JSON ONLY to the `output.result_file` path declared inside that batch prompt. It must not touch anything else.
 
 Re-dispatch any sub-agent whose batch fails or produces an invalid result file. Continue until every batch has a valid result on disk.
 
@@ -124,6 +126,7 @@ Output a summary block for this model:
 - Sub-agents MUST NOT modify batch files, prompt files, the manifest, or any existing translation file.
 - Sub-agents MUST write only their assigned `results/batch-XXX.json`.
 - JSON keys in result files MUST equal the source string byte-for-byte — no whitespace fixes, no Unicode folding, no normalization.
+- `context_group` sibling strings are context, not permission to add extra result keys unless those source strings also appear in the batch `entries`.
 - If a string is ambiguous, looks like an internal ID/enum, or cannot be confidently translated, return `null`. Do not guess.
 - Preserve all placeholders, code spans, URLs, file paths, config keys, and action IDs verbatim.
 
