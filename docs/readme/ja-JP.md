@@ -2,7 +2,7 @@
   <h1>Zed-i18n</h1>
   <p><strong>Zed エディターを手軽にお使いの言語へ翻訳できます。</strong></p>
 
-  [![Zed v1.2.7](https://img.shields.io/badge/Zed-v1.2.7-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.2.7)
+  [![Zed v1.3.5](https://img.shields.io/badge/Zed-v1.3.5-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.3.5)
   [![Python ≥3.12](https://img.shields.io/badge/Python-≥3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
   [![Source: MIT](https://img.shields.io/badge/Source-MIT-brightgreen)](../../LICENSE-MIT)
   [![Release: GPL-3.0](https://img.shields.io/badge/Release-GPL--3.0-orange)](../../LICENSE)
@@ -75,9 +75,9 @@ uv sync
 
 ```powershell
 uv run zed-i18n fetch-zed
-uv run zed-i18n extract --zed-root .cache/zed/v1.2.7-clean-extract
-uv run zed-i18n audit-candidates --zed-root .cache/zed/v1.2.7-clean-extract
-uv run zed-i18n prepare-translation --language ko-KR --zed-root .cache/zed/v1.2.7-clean-extract
+uv run zed-i18n extract --zed-root .cache/zed/v1.3.5-clean-extract
+uv run zed-i18n audit-candidates --zed-root .cache/zed/v1.3.5-clean-extract
+uv run zed-i18n prepare-translation --language ko-KR --zed-root .cache/zed/v1.3.5-clean-extract
 uv run zed-i18n merge-translation --language ko-KR
 uv run zed-i18n validate --language ko-KR
 uv run zed-i18n apply --language ko-KR
@@ -116,7 +116,7 @@ Windows では [Visual Studio Build Tools](https://visualstudio.microsoft.com/do
 ```powershell
 $env:CARGO_TARGET_DIR = (Resolve-Path .cache\zed\target).Path
 $env:CARGO_INCREMENTAL = "1"
-cd .cache\zed\v1.2.7
+cd .cache\zed\v1.3.5
 cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 ```
 
