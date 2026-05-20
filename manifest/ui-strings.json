@@ -7144,11 +7144,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 341303,
+        "end_byte": 341396,
         "file": "crates/project/src/git_store.rs",
         "kind": "shared_string",
-        "line": 8895,
-        "start_byte": 341289
+        "line": 8896,
+        "start_byte": 341382
       }
     ],
     "status": "ignored"
@@ -10878,11 +10878,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 43856,
+        "end_byte": 43929,
         "file": "crates/fs/src/fs.rs",
         "kind": "shared_string",
-        "line": 1315,
-        "start_byte": 43844
+        "line": 1316,
+        "start_byte": 43917
       }
     ],
     "status": "accepted"
@@ -66051,11 +66051,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 341541,
+        "end_byte": 341634,
         "file": "crates/project/src/git_store.rs",
         "kind": "shared_string",
-        "line": 8898,
-        "start_byte": 341526
+        "line": 8899,
+        "start_byte": 341619
       }
     ],
     "status": "ignored"
@@ -66064,11 +66064,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 341638,
+        "end_byte": 341731,
         "file": "crates/project/src/git_store.rs",
         "kind": "shared_string",
-        "line": 8899,
-        "start_byte": 341605
+        "line": 8900,
+        "start_byte": 341698
       }
     ],
     "status": "ignored"
@@ -91083,11 +91083,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 341391,
+        "end_byte": 341484,
         "file": "crates/project/src/git_store.rs",
         "kind": "shared_string",
-        "line": 8896,
-        "start_byte": 341372
+        "line": 8897,
+        "start_byte": 341465
       }
     ],
     "status": "ignored"
