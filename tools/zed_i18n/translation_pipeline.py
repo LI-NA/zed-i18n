@@ -167,6 +167,29 @@ def prepare_translation_batches(
             }
         )
 
+    agent_workflow = [
+        "Give each prompt_file to one translation agent.",
+        "Each agent returns only JSON using the original source strings as keys.",
+        "Save each agent JSON response to the matching result_file.",
+    ]
+    if options.missing_only:
+        agent_workflow.extend(
+            [
+                "Collect only generated batch entry keys into a new-key-only review artifact.",
+                "Run partial validation against the generated batch source set.",
+            ]
+        )
+    else:
+        agent_workflow.extend(
+            [
+                f"Run zed-i18n merge-translation --language {language} "
+                f"--results-dir {_relative_to_root(root, result_dir)} "
+                "--output <translation-output.json>.",
+                f"Run zed-i18n validate --language {language} only after intentionally "
+                f"updating translations/{language}.json.",
+            ]
+        )
+
     plan = {
         "language": language,
         "source_count": len(sources),
@@ -175,14 +198,7 @@ def prepare_translation_batches(
         "context_lines": options.context_lines,
         "prompt_path": _relative_to_root(root, prompt_used),
         "batches": plan_batches,
-        "agent_workflow": [
-            "Give each prompt_file to one translation agent.",
-            "Each agent returns only JSON using the original source strings as keys.",
-            "Save each agent JSON response to the matching result_file.",
-            f"Run zed-i18n merge-translation --language {language} "
-            f"--results-dir {_relative_to_root(root, result_dir)}.",
-            f"Run zed-i18n validate --language {language}.",
-        ],
+        "agent_workflow": agent_workflow,
     }
     _write_json(output_dir / "plan.json", plan)
     return PrepareTranslationReport(

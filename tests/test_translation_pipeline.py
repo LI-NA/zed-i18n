@@ -104,6 +104,9 @@ class TranslationPipelineTests(unittest.TestCase):
         plan = self._read_json(self.root / "reports" / "translation" / "ko-KR" / "plan.json")
         self.assertEqual(plan["language"], "ko-KR")
         self.assertEqual(plan["source_count"], 1)
+        agent_workflow = "\n".join(plan["agent_workflow"])
+        self.assertNotIn("merge-translation", agent_workflow)
+        self.assertIn("partial validation", agent_workflow)
         batch_path = self.root / plan["batches"][0]["batch_file"]
         prompt_path = self.root / plan["batches"][0]["prompt_file"]
         batch = self._read_json(batch_path)
@@ -114,6 +117,23 @@ class TranslationPipelineTests(unittest.TestCase):
         prompt = prompt_path.read_text(encoding="utf-8")
         self.assertIn("Base ko-KR prompt", prompt)
         self.assertIn("Rate Limit Reached", prompt)
+
+        prepare_translation_batches(
+            root=self.root,
+            language="ko-KR",
+            zed_root=self.zed_root,
+            options=PrepareTranslationOptions(
+                missing_only=False,
+                output_dir=self.root / "reports" / "translation-all" / "ko-KR",
+            ),
+        )
+
+        all_plan = self._read_json(
+            self.root / "reports" / "translation-all" / "ko-KR" / "plan.json"
+        )
+        all_agent_workflow = "\n".join(all_plan["agent_workflow"])
+        self.assertIn("merge-translation", all_agent_workflow)
+        self.assertIn("--output <translation-output.json>", all_agent_workflow)
 
     def test_prepare_translation_batches_keeps_setting_group_atomic_and_includes_sibling_context(self) -> None:
         self._write_json(
