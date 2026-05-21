@@ -583,26 +583,27 @@ function create_dmg_with_retry() {
     local source_directory=$1
     local file_path=$2
     local create_output=""
+    local rc=0
 
     for attempt in 1 2 3; do
         rm -f "${source_directory}/Applications" || true
         rm -f "$file_path" || true
         ln -s /Applications "${source_directory}/Applications"
 
-        create_output="$(hdiutil create -volname Zed -srcfolder "${source_directory}" -ov -format UDZO "${file_path}" 2>&1)"
-        local rc=$?
-        if [[ "$rc" -eq 0 ]]; then
+        if create_output="$(hdiutil create -volname Zed -srcfolder "${source_directory}" -ov -format UDZO "${file_path}" 2>&1)"; then
             printf "%s\n" "$create_output"
             return 0
+        else
+            rc=$?
         fi
 
         printf "%s\n" "$create_output" >&2
         cleanup_dmg_create_retry_state "$source_directory" "$file_path"
-        if [[ "$create_output" != *"hdiutil: create failed - Resource busy"* || "$attempt" = "3" ]]; then
+        if [[ "$attempt" = "3" ]]; then
             return "$rc"
         fi
 
-        echo "Detected retryable hdiutil create failure: Resource busy"
+        echo "Detected retryable hdiutil create failure"
         sleep 10
         echo "Retrying hdiutil create after cleanup (attempt $((attempt + 1)) of 3)"
     done

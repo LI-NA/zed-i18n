@@ -891,9 +891,8 @@ function sign_app_binaries() {
             patched,
         )
         self.assertIn("for attempt in 1 2 3; do", patched)
-        self.assertIn('create_output="$(hdiutil create', patched)
-        self.assertIn('local rc=$?\n        if [[ "$rc" -eq 0 ]]; then', patched)
-        self.assertIn('hdiutil: create failed - Resource busy', patched)
+        self.assertIn("hdiutil create", patched)
+        self.assertNotIn("Resource busy", patched)
         self.assertIn('rm -f "${source_directory}/Applications"', patched)
         self.assertIn('rm -f "${source_directory}/Applications" || true', patched)
         self.assertIn('ln -s /Applications "${source_directory}/Applications"', patched)
