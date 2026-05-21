@@ -973,6 +973,304 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(by_source["Add regex pattern…"].call, "with_placeholder")
         self.assertEqual(by_source["Raw Input:"].call, "input_output_header")
 
+    def test_extracts_project_picker_headers(self) -> None:
+        source = "\n".join(
+            [
+                "fn update_matches(&mut self) {",
+                '    entries.push(ProjectPickerEntry::Header("This Window".into()));',
+                '    entries.push(ProjectPickerEntry::Header("Recent Projects".into()));',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/recent_projects/src/recent_projects.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"This Window", "Recent Projects"})
+        self.assertEqual(by_source["This Window"].kind, "project_picker_header")
+
+    def test_extracts_search_option_tooltip_labels(self) -> None:
+        source = "\n".join(
+            [
+                "impl SearchOption {",
+                "    pub fn label(&self) -> &'static str {",
+                "        match self {",
+                '            SearchOption::WholeWord => "Match Whole Words",',
+                '            SearchOption::CaseSensitive => "Match Case Sensitivity",',
+                '            SearchOption::Regex => "Use Regular Expressions",',
+                "        }",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/search/src/search.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Match Whole Words",
+                "Match Case Sensitivity",
+                "Use Regular Expressions",
+            },
+        )
+        self.assertEqual(by_source["Match Whole Words"].call, "SearchOption.label")
+
+    def test_extracts_platform_reveal_in_file_manager_labels(self) -> None:
+        source = "\n".join(
+            [
+                "pub fn reveal_in_file_manager_label(is_remote: bool) -> &'static str {",
+                '    if cfg!(target_os = "macos") && !is_remote {',
+                '        "Reveal in Finder"',
+                '    } else if cfg!(target_os = "windows") && !is_remote {',
+                '        "Reveal in File Explorer"',
+                "    } else {",
+                '        "Reveal in File Manager"',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/ui/src/utils.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Reveal in Finder",
+                "Reveal in File Explorer",
+                "Reveal in File Manager",
+            },
+        )
+        self.assertEqual(
+            by_source["Reveal in File Explorer"].call,
+            "reveal_in_file_manager_label",
+        )
+
+    def test_extracts_workspace_pane_tab_tooltips(self) -> None:
+        source = "\n".join(
+            [
+                "fn render_tab() {",
+                '    end_slot_tooltip_text = "Unpin Tab";',
+                '    end_slot_tooltip_text = "Close Tab";',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/workspace/src/pane.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Unpin Tab", "Close Tab"})
+        self.assertEqual(by_source["Close Tab"].kind, "tab_tooltip")
+
+    def test_extracts_tool_permission_tool_info_strings(self) -> None:
+        source = "\n".join(
+            [
+                'const HARDCODED_RULES_DESCRIPTION: &str =',
+                '    "`rm -rf` commands are always blocked";',
+                'const SETTINGS_DISCLAIMER: &str = "Note: custom tool permissions only apply to the Zed native agent.";',
+                "const TOOLS: &[ToolInfo] = &[",
+                "    ToolInfo {",
+                '        id: "terminal",',
+                '        name: "Terminal",',
+                '        description: "Commands executed in the terminal",',
+                '        regex_explanation: "Patterns are matched against each command in the input.",',
+                "    },",
+                "];",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "`rm -rf` commands are always blocked",
+                "Note: custom tool permissions only apply to the Zed native agent.",
+                "Terminal",
+                "Commands executed in the terminal",
+                "Patterns are matched against each command in the input.",
+            },
+        )
+        self.assertEqual(by_source["Terminal"].kind, "tool_permission_tool_name")
+        self.assertEqual(
+            by_source["Patterns are matched against each command in the input."].call,
+            "ToolInfo.regex_explanation",
+        )
+
+    def test_extracts_tool_permission_rule_section_strings(self) -> None:
+        source = "\n".join(
+            [
+                'parts.push("1 rule".to_string());',
+                'parts.push(format!("{} rules", rule_count));',
+                'parts.push(format!("{} invalid", invalid_count));',
+                "render_rule_section(",
+                '    "terminal",',
+                '    "Always Deny",',
+                '    "If any of these regexes match, the tool action will be denied.",',
+                "    ToolPermissionMode::Deny,",
+                ");",
+                'ToolPermissionMode::Deny => ("Always Deny", Color::Error),',
+                '"always_deny" => "Always Deny",',
+                'Some(',
+                '    "A pattern with that name already exists in this rule list."',
+                '        .to_string(),',
+                ')',
+                'format!("Invalid regex: {err}. Pattern saved but will block this tool until fixed or removed.")',
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "1 rule",
+                "{} rules",
+                "{} invalid",
+                "Always Deny",
+                "If any of these regexes match, the tool action will be denied.",
+                "A pattern with that name already exists in this rule list.",
+                "Invalid regex: {err}. Pattern saved but will block this tool until fixed or removed.",
+            },
+        )
+        always_deny_kinds = {
+            occurrence.kind for occurrence in occurrences if occurrence.source == "Always Deny"
+        }
+        self.assertIn("tool_permission_rule_section_title", always_deny_kinds)
+        self.assertIn("tool_permission_rule_type_label", always_deny_kinds)
+        self.assertEqual(
+            by_source["If any of these regexes match, the tool action will be denied."].kind,
+            "tool_permission_rule_section_description",
+        )
+
+    def test_extracts_settings_enum_variant_dropdown_labels(self) -> None:
+        source = "\n".join(
+            [
+                "#[derive(",
+                "    Clone,",
+                "    strum::VariantArray,",
+                "    strum::VariantNames,",
+                ")]",
+                "pub enum ThinkingBlockDisplay {",
+                "    Auto,",
+                "    Preview,",
+                "    AlwaysExpanded,",
+                '    #[strum(serialize = "Custom Label")]',
+                "    CustomLabel,",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_content/src/agent.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {"Auto", "Preview", "Always Expanded", "Custom Label"},
+        )
+        self.assertEqual(by_source["Always Expanded"].kind, "settings_enum_variant_label")
+        self.assertEqual(by_source["Custom Label"].line, 10)
+
+    def test_extracts_settings_enum_labels_with_zed_dropdown_title_case(self) -> None:
+        source = "\n".join(
+            [
+                "#[derive(",
+                "    strum::VariantArray,",
+                "    strum::VariantNames,",
+                ")]",
+                "pub enum EditPredictionPromptFormatContent {",
+                "    Zeta2_1,",
+                "    CodeGemma,",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_content/src/language.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"Zeta2 1", "Code Gemma"},
+        )
+
+    def test_extracts_settings_enum_discriminant_dropdown_labels(self) -> None:
+        source = "\n".join(
+            [
+                "#[derive(",
+                "    Clone,",
+                "    strum::EnumDiscriminants,",
+                ")]",
+                "#[strum_discriminants(derive(strum::VariantArray, strum::VariantNames))]",
+                "pub enum AutosaveSetting {",
+                "    Off,",
+                "    AfterDelay { milliseconds: DelayMs },",
+                '    #[strum_discriminants(strum(serialize = "On Window Change"))]',
+                "    OnWindowChange,",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_content/src/workspace.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Off", "After Delay", "On Window Change"})
+        self.assertEqual(by_source["After Delay"].kind, "settings_enum_discriminant_label")
+        self.assertEqual(by_source["On Window Change"].line, 9)
+
+    def test_extracts_tool_permission_display_labels(self) -> None:
+        source = "\n".join(
+            [
+                "impl std::fmt::Display for ToolPermissionMode {",
+                "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {",
+                "        match self {",
+                '            ToolPermissionMode::Allow => write!(f, "Allow"),',
+                '            ToolPermissionMode::Deny => write!(f, "Deny"),',
+                '            ToolPermissionMode::Confirm => write!(f, "Confirm"),',
+                "        }",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_content/src/agent.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Allow", "Deny", "Confirm"})
+        self.assertEqual(by_source["Confirm"].call, "ToolPermissionMode.display")
+
     def test_extracts_agent_message_editor_placeholder(self) -> None:
         source = "\n".join(
             [
@@ -1511,6 +1809,48 @@ class ExtractTests(unittest.TestCase):
                 "Enter commit message",
             },
         )
+
+    def test_extracts_git_panel_tab_labels_passed_to_local_closure(self) -> None:
+        source = "\n".join(
+            [
+                "impl GitPanel {",
+                "    fn render_tab_bar(&self, cx: &mut Context<Self>) -> impl IntoElement {",
+                "        let tab = |id: ElementId,",
+                "                   active: bool,",
+                "                   show_changes: bool,",
+                "                   label: SharedString,",
+                "                   set_active_tab: GitPanelTab| {",
+                "            h_flex().child(Label::new(label))",
+                "        };",
+                "        h_flex()",
+                "            .child(tab(",
+                '                ElementId::Name("changes-tab".into()),',
+                "                active_tab == GitPanelTab::Changes,",
+                "                true,",
+                '                "Changes".into(),',
+                "                GitPanelTab::Changes,",
+                "            ))",
+                "            .child(tab(",
+                '                ElementId::Name("history-tab".into()),',
+                "                active_tab != GitPanelTab::Changes,",
+                "                false,",
+                '                "History".into(),',
+                "                GitPanelTab::History,",
+                "            ));",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/git_panel.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Changes", "History"})
+        self.assertEqual(by_source["Changes"].call, "git_panel_tab")
+        self.assertEqual(by_source["History"].kind, "tab_title")
 
     def test_extracts_git_panel_macro_embedded_labels(self) -> None:
         source = "\n".join(

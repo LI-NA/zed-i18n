@@ -3,7 +3,12 @@ import shutil
 import unittest
 from pathlib import Path
 
-from tools.zed_i18n.context_groups import build_context_groups, write_context_group_reports
+from tools.zed_i18n.context_groups import (
+    build_context_groups,
+    context_groups_by_source,
+    source_batches_for_context_groups,
+    write_context_group_reports,
+)
 
 
 class ContextGroupTests(unittest.TestCase):
@@ -133,6 +138,834 @@ class ContextGroupTests(unittest.TestCase):
         )
         self.assertEqual([entry["line"] for entry in group["entries"]], [1, 2])
 
+    def test_builds_setting_enum_group_from_dropdown_variant_labels(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/agent.rs",
+            "\n".join(
+                [
+                    "pub enum ThinkingBlockDisplay {",
+                    "    Auto,",
+                    "    Preview,",
+                    "    AlwaysExpanded,",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Auto": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/agent.rs",
+                        2,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Preview": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/agent.rs",
+                        3,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Always Expanded": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/agent.rs",
+                        4,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={"Auto": "자동"},
+        )
+
+        self.assertEqual(len(groups.settings), 1)
+        group = groups.settings[0]
+        self.assertEqual(group["subtype"], "settings_enum")
+        self.assertEqual(group["context_key"], "ThinkingBlockDisplay")
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in group["entries"]],
+            [
+                ("option", "Auto"),
+                ("option", "Preview"),
+                ("option", "Always Expanded"),
+            ],
+        )
+        self.assertEqual(group["entries"][0]["current_translation"], "자동")
+
+    def test_builds_setting_groups_with_dropdown_options(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/theme.rs",
+            "\n".join(
+                [
+                    "pub struct ThemeSettingsContent {",
+                    "    pub buffer_line_height: Option<BufferLineHeight>,",
+                    "}",
+                    "pub enum BufferLineHeight {",
+                    "    Comfortable,",
+                    "    Standard,",
+                    "}",
+                ]
+            ),
+        )
+        self._write_source(
+            "crates/settings_content/src/workspace.rs",
+            "\n".join(
+                [
+                    "pub struct ProjectPanelSettingsContent {",
+                    "    pub entry_spacing: Option<ProjectPanelEntrySpacing>,",
+                    "}",
+                    "pub enum ProjectPanelEntrySpacing {",
+                    "    Comfortable,",
+                    "    Standard,",
+                    "}",
+                ]
+            ),
+        )
+        self._write_source(
+            "crates/settings_ui/src/page_data.rs",
+            "\n".join(
+                [
+                    "fn page() {",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Line Height",',
+                    '        description: "Line height for editor text.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("buffer_line_height$"),',
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "    settings::BufferLineHeightDiscriminants::Custom => vec![SettingItem {",
+                    '        title: "Custom Line Height",',
+                    '        description: "Custom line height value (must be at least 1.0).",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("buffer_line_height"),',
+                    "            pick: |settings_content| match settings_content.theme.buffer_line_height.as_ref()? {",
+                    "                settings::BufferLineHeight::Custom(line_height) => Some(line_height),",
+                    "                _ => None,",
+                    "            },",
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Entry Spacing",',
+                    '        description: "Spacing between worktree entries in the project panel.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("project_panel.entry_spacing"),',
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Line Height": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        3,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Line height for editor text.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        4,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Entry Spacing": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        23,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Spacing between worktree entries in the project panel.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        24,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Custom Line Height": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        11,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Custom line height value (must be at least 1.0).": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        12,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Comfortable": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        5,
+                        "strum::EnumDiscriminants",
+                        "settings_enum_discriminant_label",
+                    ),
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        5,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    ),
+                ],
+            },
+            "Standard": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        6,
+                        "strum::EnumDiscriminants",
+                        "settings_enum_discriminant_label",
+                    ),
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        6,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    ),
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={"Line Height": "줄 높이"},
+        )
+
+        setting_groups = {
+            group["context_key"]: group
+            for group in groups.settings
+            if group.get("subtype") == "setting_with_options"
+        }
+        self.assertEqual(set(setting_groups), {"buffer_line_height$", "project_panel.entry_spacing"})
+        custom_group = next(
+            group
+            for group in groups.settings
+            if group.get("context_key") == "buffer_line_height"
+        )
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in custom_group["entries"]],
+            [
+                ("title", "Custom Line Height"),
+                ("description", "Custom line height value (must be at least 1.0)."),
+            ],
+        )
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in setting_groups["buffer_line_height$"]["entries"]],
+            [
+                ("title", "Line Height"),
+                ("description", "Line height for editor text."),
+                ("option", "Comfortable"),
+                ("option", "Standard"),
+            ],
+        )
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in setting_groups["project_panel.entry_spacing"]["entries"]],
+            [
+                ("title", "Entry Spacing"),
+                ("description", "Spacing between worktree entries in the project panel."),
+                ("option", "Comfortable"),
+                ("option", "Standard"),
+            ],
+        )
+
+        contexts = context_groups_by_source(groups, {"Comfortable"})
+        self.assertEqual(contexts["Comfortable"]["type"], "related_context_groups")
+        self.assertEqual(len(contexts["Comfortable"]["groups"]), 2)
+
+        batches = source_batches_for_context_groups(
+            ["Comfortable", "Standard"],
+            manifest,
+            groups,
+            batch_size=40,
+        )
+        self.assertEqual([source for batch in batches for source in batch], ["Comfortable", "Standard"])
+
+    def test_builds_setting_group_options_from_full_json_path_when_field_name_is_ambiguous(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/editor.rs",
+            "\n".join(
+                [
+                    "pub struct EditorSettingsContent {",
+                    "    pub minimap: Option<MinimapContent>,",
+                    "    pub indent_guides: Option<IndentGuidesSettingsContent>,",
+                    "}",
+                    "pub struct MinimapContent {",
+                    "    pub show: Option<ShowMinimap>,",
+                    "}",
+                    "pub struct IndentGuidesSettingsContent {",
+                    "    pub show: Option<ShowIndentGuides>,",
+                    "}",
+                    "pub enum ShowMinimap {",
+                    "    Auto,",
+                    "    Always,",
+                    "    Never,",
+                    "}",
+                    "pub enum ShowIndentGuides {",
+                    "    Always,",
+                    "    Never,",
+                    "}",
+                ]
+            ),
+        )
+        self._write_source(
+            "crates/settings_ui/src/page_data.rs",
+            "\n".join(
+                [
+                    "fn page() {",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Show Minimap",',
+                    '        description: "When to show the minimap in the editor.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("minimap.show"),',
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Show Minimap": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        3,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "When to show the minimap in the editor.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        4,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Auto": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/editor.rs",
+                        12,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Always": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/editor.rs",
+                        13,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    ),
+                    self._occurrence(
+                        "crates/settings_content/src/editor.rs",
+                        17,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    ),
+                ],
+            },
+            "Never": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/editor.rs",
+                        14,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    ),
+                    self._occurrence(
+                        "crates/settings_content/src/editor.rs",
+                        18,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    ),
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={},
+        )
+
+        group = next(group for group in groups.settings if group.get("context_key") == "minimap.show")
+        self.assertEqual(group["subtype"], "setting_with_options")
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in group["entries"]],
+            [
+                ("title", "Show Minimap"),
+                ("description", "When to show the minimap in the editor."),
+                ("option", "Auto"),
+                ("option", "Always"),
+                ("option", "Never"),
+            ],
+        )
+
+    def test_does_not_link_dropdown_options_when_pick_path_disagrees_with_json_path(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/workspace.rs",
+            "\n".join(
+                [
+                    "pub struct CollaborationPanelSettingsContent {",
+                    "    pub dock: Option<DockPosition>,",
+                    "    pub default_width: Option<Pixels>,",
+                    "}",
+                    "pub enum DockPosition {",
+                    "    Left,",
+                    "    Bottom,",
+                    "    Right,",
+                    "}",
+                ]
+            ),
+        )
+        self._write_source(
+            "crates/settings_ui/src/page_data.rs",
+            "\n".join(
+                [
+                    "fn page() {",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Collaboration Panel Dock",',
+                    '        description: "Where to dock the collaboration panel.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("collaboration_panel.dock"),',
+                    "            pick: |settings_content| {",
+                    "                settings_content.collaboration_panel.as_ref()?.dock.as_ref()",
+                    "            },",
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Collaboration Panel Default Width",',
+                    '        description: "Default width of the collaboration panel in pixels.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("collaboration_panel.dock"),',
+                    "            pick: |settings_content| {",
+                    "                settings_content.collaboration_panel.as_ref()?.default_width.as_ref()",
+                    "            },",
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Collaboration Panel Dock": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        3,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Where to dock the collaboration panel.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        4,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Collaboration Panel Default Width": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        14,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Default width of the collaboration panel in pixels.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        15,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Left": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        6,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Bottom": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        7,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Right": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        8,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={},
+        )
+
+        by_title = {
+            next(entry["source"] for entry in group["entries"] if entry["role"] == "title"): group
+            for group in groups.settings
+            if any(entry["role"] == "title" for entry in group["entries"])
+        }
+        self.assertEqual(by_title["Collaboration Panel Dock"]["subtype"], "setting_with_options")
+        self.assertEqual(
+            [entry["source"] for entry in by_title["Collaboration Panel Dock"]["entries"] if entry["role"] == "option"],
+            ["Left", "Bottom", "Right"],
+        )
+        self.assertEqual(by_title["Collaboration Panel Default Width"]["subtype"], "setting")
+        self.assertEqual(
+            [entry["source"] for entry in by_title["Collaboration Panel Default Width"]["entries"]],
+            [
+                "Collaboration Panel Default Width",
+                "Default width of the collaboration panel in pixels.",
+            ],
+        )
+
+    def test_builds_dynamic_child_setting_group_with_its_own_dropdown_options(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/theme.rs",
+            "\n".join(
+                [
+                    "pub struct ThemeSettingsContent {",
+                    "    pub theme: Option<ThemeSelection>,",
+                    "}",
+                    "pub enum ThemeSelection {",
+                    "    Static(ThemeName),",
+                    "    Dynamic {",
+                    "        mode: ThemeAppearanceMode,",
+                    "    },",
+                    "}",
+                    "pub enum ThemeAppearanceMode {",
+                    "    Light,",
+                    "    Dark,",
+                    "    System,",
+                    "}",
+                    "pub struct EditPredictionSettingsContent {",
+                    "    pub mode: Option<EditPredictionsMode>,",
+                    "}",
+                    "pub enum EditPredictionsMode {",
+                    "    Subtle,",
+                    "    Eager,",
+                    "}",
+                ]
+            ),
+        )
+        self._write_source(
+            "crates/settings_ui/src/page_data.rs",
+            "\n".join(
+                [
+                    "fn page() {",
+                    "    settings::ThemeSelectionDiscriminants::Dynamic => vec![SettingItem {",
+                    '        title: "Mode",',
+                    '        description: "Choose whether to use the selected light or dark theme or to follow your OS appearance configuration.",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("theme.mode"),',
+                    "            pick: |settings_content| match settings_content.theme.theme.as_ref()? {",
+                    "                settings::ThemeSelection::Dynamic { mode, .. } => Some(mode),",
+                    "                _ => None,",
+                    "            },",
+                    "        }),",
+                    "        metadata: None,",
+                    "    }];",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Mode": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        3,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Choose whether to use the selected light or dark theme or to follow your OS appearance configuration.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        4,
+                        "SettingItem.description",
+                        "setting_description",
+                    )
+                ],
+            },
+            "Light": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        11,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Dark": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        12,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "System": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        13,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Subtle": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        19,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Eager": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/theme.rs",
+                        20,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={},
+        )
+
+        group = next(group for group in groups.settings if group.get("context_key") == "theme.mode")
+        self.assertEqual(group["subtype"], "setting_with_options")
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in group["entries"]],
+            [
+                ("title", "Mode"),
+                (
+                    "description",
+                    "Choose whether to use the selected light or dark theme or to follow your OS appearance configuration.",
+                ),
+                ("option", "Light"),
+                ("option", "Dark"),
+                ("option", "System"),
+            ],
+        )
+
+    def test_builds_title_only_setting_group_when_dropdown_has_no_static_description(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/workspace.rs",
+            "\n".join(
+                [
+                    "pub struct LanguageSettingsContent {",
+                    "    pub semantic_tokens: Option<SemanticTokens>,",
+                    "}",
+                    "pub enum SemanticTokens {",
+                    "    Off,",
+                    "    Combined,",
+                    "    Full,",
+                    "}",
+                ]
+            ),
+        )
+        self._write_source(
+            "crates/settings_ui/src/page_data.rs",
+            "\n".join(
+                [
+                    "fn page() {",
+                    "    SettingsPageItem::SettingItem(SettingItem {",
+                    '        title: "Semantic Tokens",',
+                    "        field: Box::new(SettingField {",
+                    '            json_path: Some("languages.$(language).semantic_tokens"),',
+                    "        }),",
+                    "        metadata: None,",
+                    "    });",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Semantic Tokens": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_ui/src/page_data.rs",
+                        3,
+                        "SettingItem.title",
+                        "setting_title",
+                    )
+                ],
+            },
+            "Off": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        5,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Combined": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        6,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Full": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/workspace.rs",
+                        7,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={},
+        )
+
+        group = next(group for group in groups.settings if group.get("context_key") == "languages.$(language).semantic_tokens")
+        self.assertEqual(group["subtype"], "setting_with_options")
+        self.assertEqual(
+            [(entry["role"], entry["source"]) for entry in group["entries"]],
+            [
+                ("title", "Semantic Tokens"),
+                ("option", "Off"),
+                ("option", "Combined"),
+                ("option", "Full"),
+            ],
+        )
+
     def test_writes_settings_and_connected_line_review_reports(self) -> None:
         groups = build_context_groups(
             zed_root=self.zed_root,
@@ -201,7 +1034,7 @@ class ContextGroupTests(unittest.TestCase):
 
     def _write_source(self, relative_path: str, text: str) -> None:
         path = self.zed_root / relative_path
-        path.parent.mkdir(parents=True)
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text + "\n", encoding="utf-8")
 
     def _occurrence(self, file: str, line: int, call: str, kind: str) -> dict[str, object]:

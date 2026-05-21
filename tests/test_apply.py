@@ -279,6 +279,229 @@ class ApplyTests(unittest.TestCase):
             source_path.read_text(encoding="utf-8"),
         )
 
+    def test_applies_translation_to_generated_strum_variant_label(self) -> None:
+        source_path = self.root / "crates" / "settings_content" / "src" / "agent.rs"
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text(
+            "pub enum ThinkingBlockDisplay {\n"
+            "    #[default]\n"
+            "    AlwaysExpanded,\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        manifest = {
+            "Always Expanded": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/agent.rs",
+                        "line": 3,
+                        "call": "strum::VariantNames",
+                        "kind": "settings_enum_variant_label",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(self.root, manifest, {"Always Expanded": "항상 펼침"})
+
+        self.assertTrue(report.ok)
+        self.assertIn(
+            '    #[strum(serialize = "항상 펼침")]\n    AlwaysExpanded,',
+            source_path.read_text(encoding="utf-8"),
+        )
+
+    def test_disables_settings_dropdown_title_case_for_generated_strum_labels(self) -> None:
+        source_path = self.root / "crates" / "settings_content" / "src" / "agent.rs"
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text(
+            "pub enum ThinkingBlockDisplay {\n"
+            "    AlwaysExpanded,\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        settings_ui_path = self.root / "crates" / "settings_ui" / "src" / "settings_ui.rs"
+        settings_ui_path.parent.mkdir(parents=True)
+        settings_ui_path.write_text(
+            "fn render_text_field(\n"
+            "    metadata: Option<&SettingsFieldMetadata>,\n"
+            ") {\n"
+            "    let _ = metadata;\n"
+            "}\n\n"
+            "fn render_dropdown<T>(\n"
+            "    field: &'static SettingField<T>,\n"
+            "    file: SettingsUiFile,\n"
+            "    metadata: Option<&SettingsFieldMetadata>,\n"
+            "    _window: &mut Window,\n"
+            "    cx: &mut App,\n"
+            ") -> AnyElement\n"
+            "where\n"
+            "    T: strum::VariantArray + strum::VariantNames + Copy + PartialEq + Send + Sync + 'static,\n"
+            "{\n"
+            "    let variants = || -> &'static [T] { <T as strum::VariantArray>::VARIANTS };\n"
+            "    let labels = || -> &'static [&'static str] { <T as strum::VariantNames>::VARIANTS };\n"
+            "    let should_do_titlecase = metadata\n"
+            "        .and_then(|metadata| metadata.should_do_titlecase)\n"
+            "        .unwrap_or(true);\n"
+            "    EnumVariantDropdown::new(\"dropdown\", current_value, variants(), labels(), {})\n"
+            "        .tab_index(0)\n"
+            "        .title_case(should_do_titlecase)\n"
+            "        .into_any_element()\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        manifest = {
+            "Always Expanded": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/agent.rs",
+                        "line": 2,
+                        "call": "strum::VariantNames",
+                        "kind": "settings_enum_variant_label",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(self.root, manifest, {"Always Expanded": "항상 펼침"})
+
+        self.assertTrue(report.ok)
+        settings_ui = settings_ui_path.read_text(encoding="utf-8")
+        self.assertIn("fn render_text_field(\n    metadata: Option<&SettingsFieldMetadata>,", settings_ui)
+        self.assertIn("    _metadata: Option<&SettingsFieldMetadata>,", settings_ui)
+        self.assertEqual(settings_ui.count("    _metadata: Option<&SettingsFieldMetadata>,"), 1)
+        self.assertIn("    let should_do_titlecase = false;", settings_ui)
+        self.assertIn("        .title_case(should_do_titlecase)", settings_ui)
+        self.assertNotIn("metadata.should_do_titlecase", settings_ui)
+
+    def test_reapplying_generated_strum_variant_label_updates_existing_attribute(self) -> None:
+        source_path = self.root / "crates" / "settings_content" / "src" / "agent.rs"
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text(
+            "pub enum ThinkingBlockDisplay {\n"
+            "    Auto,\n"
+            "    AlwaysExpanded,\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        manifest = {
+            "Always Expanded": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/agent.rs",
+                        "line": 3,
+                        "call": "strum::VariantNames",
+                        "kind": "settings_enum_variant_label",
+                    }
+                ],
+            }
+        }
+
+        self.assertTrue(
+            apply_translations(self.root, manifest, {"Always Expanded": "항상 펼침"}).ok
+        )
+        self.assertTrue(
+            apply_translations(self.root, manifest, {"Always Expanded": "항상 확장"}).ok
+        )
+
+        text = source_path.read_text(encoding="utf-8")
+        self.assertEqual(text.count("#[strum(serialize"), 1)
+        self.assertIn('    #[strum(serialize = "항상 확장")]\n', text)
+
+    def test_applies_translation_to_generated_strum_discriminant_label(self) -> None:
+        source_path = self.root / "crates" / "settings_content" / "src" / "workspace.rs"
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text(
+            "pub enum AutosaveSetting {\n"
+            "    AfterDelay { milliseconds: DelayMs },\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        manifest = {
+            "After Delay": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/workspace.rs",
+                        "line": 2,
+                        "call": "strum::EnumDiscriminants",
+                        "kind": "settings_enum_discriminant_label",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(self.root, manifest, {"After Delay": "지연 후"})
+
+        self.assertTrue(report.ok)
+        self.assertIn(
+            '    #[strum_discriminants(strum(serialize = "지연 후"))]\n'
+            "    AfterDelay { milliseconds: DelayMs },",
+            source_path.read_text(encoding="utf-8"),
+        )
+
+    def test_reapplying_shifted_generated_strum_labels_does_not_duplicate_attributes(
+        self,
+    ) -> None:
+        source_path = self.root / "crates" / "settings_content" / "src" / "agent.rs"
+        source_path.parent.mkdir(parents=True)
+        source_path.write_text(
+            "pub enum ThinkingBlockDisplay {\n"
+            "    Auto,\n"
+            "    AlwaysExpanded,\n"
+            "    AlwaysCollapsed,\n"
+            "}\n",
+            encoding="utf-8",
+        )
+        manifest = {
+            "Auto": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/agent.rs",
+                        "line": 2,
+                        "call": "strum::VariantNames",
+                        "kind": "settings_enum_variant_label",
+                    }
+                ],
+            },
+            "Always Expanded": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/agent.rs",
+                        "line": 3,
+                        "call": "strum::VariantNames",
+                        "kind": "settings_enum_variant_label",
+                    }
+                ],
+            },
+            "Always Collapsed": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "crates/settings_content/src/agent.rs",
+                        "line": 4,
+                        "call": "strum::VariantNames",
+                        "kind": "settings_enum_variant_label",
+                    }
+                ],
+            },
+        }
+        translations = {
+            "Auto": "자동",
+            "Always Expanded": "항상 펼침",
+            "Always Collapsed": "항상 접힘",
+        }
+
+        self.assertTrue(apply_translations(self.root, manifest, translations).ok)
+        self.assertTrue(apply_translations(self.root, manifest, translations).ok)
+
+        text = source_path.read_text(encoding="utf-8")
+        self.assertEqual(text.count("#[strum(serialize"), 3)
+
     def test_applies_translation_to_multiline_string_literal(self) -> None:
         source_path = self.root / "main.rs"
         source_path.write_text(

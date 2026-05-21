@@ -63,6 +63,7 @@ CALL_RULES: dict[str, tuple[int, str, str]] = {
     "SharedString::new": (0, "shared_string", "SharedString::new"),
     "SharedString::new_static": (0, "shared_string", "SharedString::new_static"),
     "SectionHeader::new": (0, "section_header", "SectionHeader::new"),
+    "ProjectPickerEntry::Header": (0, "project_picker_header", "ProjectPickerEntry::Header"),
     "SettingsSectionHeader::new": (0, "settings_section_header", "SettingsSectionHeader::new"),
     "SettingsPageItem::SectionHeader": (
         0,
@@ -177,6 +178,7 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
 
     occurrences.extend(_extract_action_doc_comments(source, relative_path))
     occurrences.extend(_extract_line_candidates(source, relative_path))
+    occurrences.extend(_extract_settings_enum_variant_labels(source, relative_path))
     return _dedupe_occurrences(occurrences)
 
 
@@ -393,6 +395,14 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
         rule = ("inline_prompt_tooltip", f"GenerationMode.{method_name}")
     if rule is None and _is_keymap_editor_path(relative_path) and method_name == "render_no_matches_hint":
         rule = ("empty_state", "render_no_matches_hint")
+    if rule is None and _is_search_path(relative_path) and method_name == "label":
+        rule = ("search_option_label", "SearchOption.label")
+    if (
+        rule is None
+        and _is_ui_utils_path(relative_path)
+        and method_name == "reveal_in_file_manager_label"
+    ):
+        rule = ("platform_action_label", "reveal_in_file_manager_label")
     if (
         rule is None
         and _is_git_worktree_picker_path(relative_path)
@@ -415,6 +425,8 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
         literal = _node_text(source_bytes, literal_node)
         source = parse_rust_string_literal(literal)
         if source == "":
+            continue
+        if call_name == "reveal_in_file_manager_label" and not source.startswith("Reveal in "):
             continue
         occurrences.append(
             StringOccurrence(
@@ -738,6 +750,244 @@ def _extract_line_candidates(source: str, relative_path: str) -> list[StringOccu
     return candidates
 
 
+def _extract_settings_enum_variant_labels(source: str, relative_path: str) -> list[StringOccurrence]:
+    if not _is_settings_content_path(relative_path):
+        return []
+
+    lines = source.splitlines(keepends=True)
+    byte_offsets: list[int] = []
+    byte_offset = 0
+    for line in lines:
+        byte_offsets.append(byte_offset)
+        byte_offset += len(line.encode("utf-8"))
+
+    occurrences: list[StringOccurrence] = []
+    pending_item_attrs: list[tuple[int, str]] = []
+    collecting_item_attr = False
+    in_enum = False
+    enum_depth = 0
+    enum_mode: str | None = None
+    pending_variant_attrs: list[tuple[int, str]] = []
+    collecting_variant_attr = False
+
+    for line_index, line in enumerate(lines, start=1):
+        stripped = line.strip()
+
+        if not in_enum:
+            if collecting_item_attr:
+                pending_item_attrs.append((line_index, line))
+                if "]" in line:
+                    collecting_item_attr = False
+                continue
+            if stripped.startswith("#["):
+                pending_item_attrs.append((line_index, line))
+                collecting_item_attr = "]" not in line
+                continue
+
+            enum_match = re.search(r"\bpub(?:\([^)]*\))?\s+enum\s+\w+\s*\{", line)
+            if enum_match is not None:
+                attrs = "".join(attr_line for _, attr_line in pending_item_attrs)
+                if "strum_discriminants" in attrs and "VariantNames" in attrs:
+                    in_enum = True
+                    enum_mode = "discriminant"
+                    enum_depth = _brace_delta(line)
+                    pending_variant_attrs = []
+                    collecting_variant_attr = False
+                elif "strum::VariantNames" in attrs:
+                    in_enum = True
+                    enum_mode = "direct"
+                    enum_depth = _brace_delta(line)
+                    pending_variant_attrs = []
+                    collecting_variant_attr = False
+                pending_item_attrs = []
+                continue
+
+            if stripped and not stripped.startswith("///"):
+                pending_item_attrs = []
+            continue
+
+        if collecting_variant_attr:
+            pending_variant_attrs.append((line_index, line))
+            if "]" in line:
+                collecting_variant_attr = False
+            enum_depth += _brace_delta(line)
+            continue
+
+        if enum_depth == 1:
+            if stripped.startswith("#[") or stripped.startswith("///"):
+                pending_variant_attrs.append((line_index, line))
+                collecting_variant_attr = stripped.startswith("#[") and "]" not in line
+                enum_depth += _brace_delta(line)
+                continue
+            if not stripped:
+                enum_depth += _brace_delta(line)
+                continue
+
+            variant_match = re.match(r"\s*([A-Z][A-Za-z0-9_]*)\b", line)
+            if variant_match is not None:
+                occurrence = _settings_enum_variant_occurrence(
+                    relative_path,
+                    line,
+                    line_index,
+                    byte_offsets[line_index - 1],
+                    variant_match,
+                    pending_variant_attrs,
+                    enum_mode,
+                    byte_offsets,
+                )
+                if occurrence is not None:
+                    occurrences.append(occurrence)
+                pending_variant_attrs = []
+            elif not stripped.startswith("//"):
+                pending_variant_attrs = []
+
+        enum_depth += _brace_delta(line)
+        if enum_depth <= 0:
+            in_enum = False
+            enum_mode = None
+            pending_variant_attrs = []
+            collecting_variant_attr = False
+
+    return occurrences
+
+
+def _settings_enum_variant_occurrence(
+    relative_path: str,
+    line: str,
+    line_index: int,
+    line_byte_offset: int,
+    variant_match: re.Match[str],
+    pending_attrs: list[tuple[int, str]],
+    enum_mode: str | None,
+    byte_offsets: list[int],
+) -> StringOccurrence | None:
+    if enum_mode not in {"direct", "discriminant"}:
+        return None
+
+    explicit = _explicit_strum_variant_label(pending_attrs, enum_mode, byte_offsets)
+    if explicit is not None:
+        source, attr_line, start_byte, end_byte = explicit
+        return StringOccurrence(
+            source=source,
+            file=relative_path,
+            line=attr_line,
+            call=_strum_variant_call(enum_mode),
+            kind=_strum_variant_kind(enum_mode),
+            start_byte=start_byte,
+            end_byte=end_byte,
+        )
+
+    variant_name = variant_match.group(1)
+    source = _title_case_identifier(variant_name)
+    start_byte = line_byte_offset + len(line[: variant_match.start(1)].encode("utf-8"))
+    end_byte = line_byte_offset + len(line[: variant_match.end(1)].encode("utf-8"))
+    return StringOccurrence(
+        source=source,
+        file=relative_path,
+        line=line_index,
+        call=_strum_variant_call(enum_mode),
+        kind=_strum_variant_kind(enum_mode),
+        start_byte=start_byte,
+        end_byte=end_byte,
+    )
+
+
+def _explicit_strum_variant_label(
+    pending_attrs: list[tuple[int, str]],
+    enum_mode: str,
+    byte_offsets: list[int],
+) -> tuple[str, int, int, int] | None:
+    for line_index, line in pending_attrs:
+        if enum_mode == "direct" and "strum(" not in line:
+            continue
+        if enum_mode == "direct" and "strum_discriminants" in line:
+            continue
+        if enum_mode == "discriminant" and "strum_discriminants" not in line:
+            continue
+        match = re.search(r'serialize\s*=\s*("(?:\\.|[^"\\])*")', line)
+        if match is None:
+            continue
+        source = parse_rust_string_literal(match.group(1))
+        start_byte = byte_offsets[line_index - 1] + len(line[: match.start(1)].encode("utf-8"))
+        end_byte = byte_offsets[line_index - 1] + len(line[: match.end(1)].encode("utf-8"))
+        return source, line_index, start_byte, end_byte
+    return None
+
+
+def _strum_variant_call(enum_mode: str) -> str:
+    if enum_mode == "discriminant":
+        return "strum::EnumDiscriminants"
+    return "strum::VariantNames"
+
+
+def _strum_variant_kind(enum_mode: str) -> str:
+    if enum_mode == "discriminant":
+        return "settings_enum_discriminant_label"
+    return "settings_enum_variant_label"
+
+
+def _title_case_identifier(identifier: str) -> str:
+    return " ".join(_capitalize_title_word(word) for word in _heck_title_words(identifier))
+
+
+def _heck_title_words(identifier: str) -> list[str]:
+    words: list[str] = []
+    for segment in _alphanumeric_segments(identifier):
+        start = 0
+        mode = "boundary"
+        chars = list(segment)
+        for index, char in enumerate(chars):
+            if index + 1 >= len(chars):
+                if start < len(segment):
+                    words.append(segment[start:])
+                break
+
+            next_char = chars[index + 1]
+            next_mode = (
+                "lowercase"
+                if char.islower()
+                else "uppercase"
+                if char.isupper()
+                else mode
+            )
+            if next_mode == "lowercase" and next_char.isupper():
+                words.append(segment[start : index + 1])
+                start = index + 1
+                mode = "boundary"
+            elif mode == "uppercase" and char.isupper() and next_char.islower():
+                if start < index:
+                    words.append(segment[start:index])
+                start = index
+                mode = "boundary"
+            else:
+                mode = next_mode
+    return words
+
+
+def _alphanumeric_segments(identifier: str) -> list[str]:
+    segments: list[str] = []
+    current: list[str] = []
+    for char in identifier:
+        if char.isalnum():
+            current.append(char)
+        elif current:
+            segments.append("".join(current))
+            current = []
+    if current:
+        segments.append("".join(current))
+    return segments
+
+
+def _capitalize_title_word(word: str) -> str:
+    if not word:
+        return word
+    return word[0].upper() + word[1:].lower()
+
+
+def _brace_delta(line: str) -> int:
+    return line.count("{") - line.count("}")
+
+
 def _extract_action_doc_comments(source: str, relative_path: str) -> list[StringOccurrence]:
     candidates: list[StringOccurrence] = []
     byte_offset = 0
@@ -864,6 +1114,8 @@ def _line_patterns_for_path(
     in_announcement_bullets: bool,
 ) -> tuple[LinePattern, ...]:
     patterns: list[LinePattern] = list(LINE_PATTERNS)
+    if _is_tool_permissions_setup_path(relative_path):
+        patterns.extend(TOOL_PERMISSION_SETUP_LINE_PATTERNS)
     if _is_settings_ui_path(relative_path):
         patterns.extend(SETTINGS_UI_LINE_PATTERNS)
     if _is_settings_ui_root_path(relative_path):
@@ -923,6 +1175,8 @@ def _line_patterns_for_path(
 
 def _pending_multiline_pattern_for_line(line: str, relative_path: str) -> LinePattern | None:
     starts = list(MULTILINE_CALL_STARTS)
+    if _is_tool_permissions_setup_path(relative_path):
+        starts.extend(TOOL_PERMISSION_SETUP_MULTILINE_STARTS)
     if _is_copilot_sign_in_path(relative_path):
         starts.extend(COPILOT_SIGN_IN_MULTILINE_STARTS)
     if _is_rust_language_path(relative_path):
@@ -944,6 +1198,10 @@ def _pending_multiline_pattern_for_line(line: str, relative_path: str) -> LinePa
 
 def _is_settings_ui_path(relative_path: str) -> bool:
     return relative_path.startswith("crates/settings_ui/src/")
+
+
+def _is_tool_permissions_setup_path(relative_path: str) -> bool:
+    return relative_path == "crates/settings_ui/src/pages/tool_permissions_setup.rs"
 
 
 def _is_settings_ui_root_path(relative_path: str) -> bool:
@@ -983,6 +1241,14 @@ def _is_app_menus_path(relative_path: str) -> bool:
 
 def _is_workspace_pane_path(relative_path: str) -> bool:
     return relative_path == "crates/workspace/src/pane.rs"
+
+
+def _is_search_path(relative_path: str) -> bool:
+    return relative_path == "crates/search/src/search.rs"
+
+
+def _is_ui_utils_path(relative_path: str) -> bool:
+    return relative_path == "crates/ui/src/utils.rs"
 
 
 def _is_agent_entry_view_state_path(relative_path: str) -> bool:
@@ -1345,6 +1611,113 @@ SETTINGS_UI_LINE_PATTERNS: tuple[LinePattern, ...] = (
     ),
 )
 
+TOOL_PERMISSION_SETUP_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\bconst\s+SETTINGS_DISCLAIMER:\s*&str\s*=\s*("(?:\\.|[^"\\])*")'),
+        "SETTINGS_DISCLAIMER",
+        "tool_permissions_note",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bname:\s*("(?:\\.|[^"\\])*"),'),
+        "ToolInfo.name",
+        "tool_permission_tool_name",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bdescription:\s*("(?:\\.|[^"\\])*"),'),
+        "ToolInfo.description",
+        "tool_permission_tool_description",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bregex_explanation:\s*("(?:\\.|[^"\\])*"),'),
+        "ToolInfo.regex_explanation",
+        "tool_permission_regex_explanation",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bparts\.push\(\s*("1 rule")\.to_string\(\)\s*\)'),
+        "tool_permissions_summary",
+        "tool_permissions_summary",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bparts\.push\(\s*format!\(\s*("(?:(?:\{\} rules)|(?:\{\} invalid))")'),
+        "tool_permissions_summary",
+        "tool_permissions_summary",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("(?:Always Deny|Always Allow|Always Confirm)")\s*,\s*$'),
+        "render_rule_section",
+        "tool_permission_rule_section_title",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("If any of these regexes match, (?:the tool action will be denied\.|the action will be approved—unless an Always Confirm or Always Deny matches\.|a confirmation will be shown unless an Always Deny regex matches\.)")\s*,\s*$'
+        ),
+        "render_rule_section",
+        "tool_permission_rule_section_description",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'\bToolPermissionMode::[A-Za-z0-9_]+\s*=>\s*\(\s*("(?:Always Deny|Always Allow|Always Confirm)")\s*,'
+        ),
+        "tool_permission_rule_type_label",
+        "tool_permission_rule_type_label",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'"always_(?:allow|deny|confirm)"\s*=>\s*("(?:Always Deny|Always Allow|Always Confirm)")'
+        ),
+        "tool_permission_invalid_rule_type_label",
+        "tool_permission_rule_type_label",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'\bSome\(\s*("A pattern with that name already exists in this rule list\.")'
+        ),
+        "tool_permissions_validation",
+        "tool_permissions_validation",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("A pattern with that name already exists in this rule list\.")\s*$'
+        ),
+        "tool_permissions_validation",
+        "tool_permissions_validation",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("Invalid regex: \{err\}\. Pattern saved but will block this tool until fixed or removed\.")\s*$'
+        ),
+        "tool_permissions_validation",
+        "tool_permissions_validation",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bformat!\(\s*("(?:Denied: \{\}|Reason: \{\}|Invalid regex: \{err\}\. Pattern saved but will block this tool until fixed or removed\.)")'),
+        "tool_permissions_format",
+        "tool_permissions_message",
+        1,
+    ),
+)
+
+TOOL_PERMISSION_SETUP_MULTILINE_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
+    (
+        re.compile(r"^\s*const\s+HARDCODED_RULES_DESCRIPTION:\s*&str\s*=\s*$"),
+        "HARDCODED_RULES_DESCRIPTION",
+        "tool_permissions_security_note",
+    ),
+)
+
 SETTINGS_UI_ROOT_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
         re.compile(r'\bSettingsUiFile::User\s*=>\s*Some\(\s*("(?:\\.|[^"\\])*")\.to_string\(\)\s*\)'),
@@ -1361,6 +1734,12 @@ SETTINGS_CONTENT_LINE_PATTERNS: tuple[LinePattern, ...] = (
         "rust_doc_comment",
         1,
         rust_literal=False,
+    ),
+    LinePattern(
+        re.compile(r'\bToolPermissionMode::[A-Za-z0-9_]+\s*=>\s*write!\(\s*f,\s*("(?:\\.|[^"\\])*")\s*\)'),
+        "ToolPermissionMode.display",
+        "tool_permission_mode_label",
+        1,
     ),
 )
 
@@ -1440,6 +1819,12 @@ WORKSPACE_PANE_LINE_PATTERNS: tuple[LinePattern, ...] = (
         "action_description",
         1,
     ),
+    LinePattern(
+        re.compile(r'\bend_slot_tooltip_text\s*=\s*("(?:\\.|[^"\\])*")'),
+        "end_slot_tooltip_text",
+        "tab_tooltip",
+        1,
+    ),
 )
 
 
@@ -1492,6 +1877,12 @@ GIT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'("(?:Remove co-authored-by|Add co-authored-by)"),\s*IconName::'),
         "git_panel_coauthor_tooltip",
         "tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("(?:Changes|History)")\.into\(\),\s*$'),
+        "git_panel_tab",
+        "tab_title",
         1,
     ),
 )

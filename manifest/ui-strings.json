@@ -2276,6 +2276,19 @@
     ],
     "status": "accepted"
   },
+  "1 rule": {
+    "occurrences": [
+      {
+        "call": "tool_permissions_summary",
+        "end_byte": 8143,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_summary",
+        "line": 235,
+        "start_byte": 8135
+      }
+    ],
+    "status": "accepted"
+  },
   "1 telemetry log entry failed to parse": {
     "occurrences": [
       {
@@ -3139,6 +3152,19 @@
         "kind": "shared_string",
         "line": 1415,
         "start_byte": 51678
+      }
+    ],
+    "status": "accepted"
+  },
+  "A pattern with that name already exists in this rule list.": {
+    "occurrences": [
+      {
+        "call": "tool_permissions_validation",
+        "end_byte": 36957,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_validation",
+        "line": 1008,
+        "start_byte": 36897
       }
     ],
     "status": "accepted"
@@ -4272,6 +4298,19 @@
     ],
     "status": "accepted"
   },
+  "Active Editor": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28525,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1023,
+        "start_byte": 28513
+      }
+    ],
+    "status": "accepted"
+  },
   "Active Encoding Button": {
     "occurrences": [
       {
@@ -5002,6 +5041,19 @@
     ],
     "status": "accepted"
   },
+  "Add to Existing Window": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12847,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 405,
+        "start_byte": 12823
+      }
+    ],
+    "status": "accepted"
+  },
   "Add to Favorites": {
     "occurrences": [
       {
@@ -5330,6 +5382,19 @@
     ],
     "status": "accepted"
   },
+  "After Delay": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 16606,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 545,
+        "start_byte": 16596
+      }
+    ],
+    "status": "accepted"
+  },
   "Agent": {
     "occurrences": [
       {
@@ -5610,6 +5675,54 @@
         "kind": "button",
         "line": 1797,
         "start_byte": 72829
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18769,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 592,
+        "start_byte": 18766
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 21607,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 721,
+        "start_byte": 21604
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22749,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 651,
+        "start_byte": 22746
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24128,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 770,
+        "start_byte": 24125
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24975,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 821,
+        "start_byte": 24972
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9379,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 260,
+        "start_byte": 9376
       }
     ],
     "status": "accepted"
@@ -5623,6 +5736,19 @@
         "kind": "label",
         "line": 2811,
         "start_byte": 105527
+      }
+    ],
+    "status": "accepted"
+  },
+  "All Editors": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28440,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1020,
+        "start_byte": 28430
       }
     ],
     "status": "accepted"
@@ -5649,6 +5775,19 @@
         "kind": "section_description",
         "line": 577,
         "start_byte": 23162
+      }
+    ],
+    "status": "accepted"
+  },
+  "All Screens": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12949,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 355,
+        "start_byte": 12939
       }
     ],
     "status": "accepted"
@@ -5701,6 +5840,14 @@
         "kind": "button",
         "line": 6907,
         "start_byte": 286972
+      },
+      {
+        "call": "ToolPermissionMode.display",
+        "end_byte": 24625,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "tool_permission_mode_label",
+        "line": 690,
+        "start_byte": 24618
       },
       {
         "call": "entry",
@@ -5854,6 +6001,32 @@
     ],
     "status": "accepted"
   },
+  "Also search files ignored by configuration": {
+    "occurrences": [
+      {
+        "call": "SearchOption.label",
+        "end_byte": 3109,
+        "file": "crates/search/src/search.rs",
+        "kind": "search_option_label",
+        "line": 102,
+        "start_byte": 3065
+      }
+    ],
+    "status": "accepted"
+  },
+  "Alt": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22223,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 750,
+        "start_byte": 22220
+      }
+    ],
+    "status": "accepted"
+  },
   "Alternate Scroll": {
     "occurrences": [
       {
@@ -5928,6 +6101,209 @@
         "kind": "label",
         "line": 50,
         "start_byte": 1502
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13273,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 377,
+        "start_byte": 13267
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19180,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 612,
+        "start_byte": 19174
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20453,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 667,
+        "start_byte": 20447
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28004,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 994,
+        "start_byte": 27998
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27071,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 911,
+        "start_byte": 27065
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31752,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1081,
+        "start_byte": 31746
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 9692,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 248,
+        "start_byte": 9686
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11394,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 311,
+        "start_byte": 11388
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9036,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 235,
+        "start_byte": 9030
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always Allow": {
+    "occurrences": [
+      {
+        "call": "render_rule_section",
+        "end_byte": 14327,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_section_title",
+        "line": 405,
+        "start_byte": 14313
+      },
+      {
+        "call": "tool_permission_rule_type_label",
+        "end_byte": 25074,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_type_label",
+        "line": 688,
+        "start_byte": 25060
+      },
+      {
+        "call": "tool_permission_invalid_rule_type_label",
+        "end_byte": 29899,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_type_label",
+        "line": 836,
+        "start_byte": 29885
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always Collapsed": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 1747,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 71,
+        "start_byte": 1732
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always Confirm": {
+    "occurrences": [
+      {
+        "call": "render_rule_section",
+        "end_byte": 14785,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_section_title",
+        "line": 414,
+        "start_byte": 14769
+      },
+      {
+        "call": "tool_permission_rule_type_label",
+        "end_byte": 24995,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_type_label",
+        "line": 687,
+        "start_byte": 24979
+      },
+      {
+        "call": "tool_permission_invalid_rule_type_label",
+        "end_byte": 30017,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_type_label",
+        "line": 838,
+        "start_byte": 30001
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always Deny": {
+    "occurrences": [
+      {
+        "call": "render_rule_section",
+        "end_byte": 13920,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_section_title",
+        "line": 396,
+        "start_byte": 13907
+      },
+      {
+        "call": "tool_permission_rule_type_label",
+        "end_byte": 24914,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_type_label",
+        "line": 686,
+        "start_byte": 24901
+      },
+      {
+        "call": "tool_permission_invalid_rule_type_label",
+        "end_byte": 29955,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_type_label",
+        "line": 837,
+        "start_byte": 29942
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always Expanded": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 1669,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 69,
+        "start_byte": 1655
+      }
+    ],
+    "status": "accepted"
+  },
+  "Always Home": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 9467,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 244,
+        "start_byte": 9457
       }
     ],
     "status": "accepted"
@@ -6492,6 +6868,19 @@
         "kind": "setting_description",
         "line": 339,
         "start_byte": 13993
+      }
+    ],
+    "status": "accepted"
+  },
+  "Anywhere": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23803,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 692,
+        "start_byte": 23795
       }
     ],
     "status": "accepted"
@@ -7203,6 +7592,35 @@
     ],
     "status": "accepted"
   },
+  "Auto": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 1357,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 63,
+        "start_byte": 1353
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27959,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 992,
+        "start_byte": 27955
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11287,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 307,
+        "start_byte": 11283
+      }
+    ],
+    "status": "accepted"
+  },
   "Auto Fold Directories": {
     "occurrences": [
       {
@@ -7664,6 +8082,19 @@
     ],
     "status": "accepted"
   },
+  "Background": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18335,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 567,
+        "start_byte": 18325
+      }
+    ],
+    "status": "accepted"
+  },
   "Background Color. Used for grounded surfaces like a panel or tab.": {
     "occurrences": [
       {
@@ -8083,6 +8514,27 @@
     ],
     "status": "accepted"
   },
+  "Bar": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23236,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 802,
+        "start_byte": 23233
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27569,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 935,
+        "start_byte": 27566
+      }
+    ],
+    "status": "accepted"
+  },
   "Base Keymap": {
     "occurrences": [
       {
@@ -8354,6 +8806,19 @@
     ],
     "status": "accepted"
   },
+  "Binary": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 32937,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1130,
+        "start_byte": 32931
+      }
+    ],
+    "status": "accepted"
+  },
   "Black ANSI terminal color.": {
     "occurrences": [
       {
@@ -8363,6 +8828,27 @@
         "kind": "rust_doc_comment",
         "line": 901,
         "start_byte": 32219
+      }
+    ],
+    "status": "accepted"
+  },
+  "Block": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23302,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 804,
+        "start_byte": 23297
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27631,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 937,
+        "start_byte": 27626
       }
     ],
     "status": "accepted"
@@ -8406,6 +8892,19 @@
     ],
     "status": "ignored"
   },
+  "Bold": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10261,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 310,
+        "start_byte": 10257
+      }
+    ],
+    "status": "accepted"
+  },
   "Bold Folder Labels": {
     "occurrences": [
       {
@@ -8431,6 +8930,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Border": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18270,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 565,
+        "start_byte": 18264
+      }
+    ],
+    "status": "accepted"
   },
   "Border Color. Used for the border that shows where a dragged element will be dropped.": {
     "occurrences": [
@@ -8565,6 +9077,30 @@
   "Bottom": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 25258,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 891,
+        "start_byte": 25252
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19322,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 622,
+        "start_byte": 19316
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 16000,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 508,
+        "start_byte": 15994
+      },
+      {
         "call": "DockPosition.label",
         "end_byte": 11080,
         "file": "crates/workspace/src/dock.rs",
@@ -8584,6 +9120,32 @@
         "kind": "setting_title",
         "line": 4354,
         "start_byte": 196771
+      }
+    ],
+    "status": "accepted"
+  },
+  "Boundary": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23040,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 658,
+        "start_byte": 23032
+      }
+    ],
+    "status": "accepted"
+  },
+  "Bounded": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12176,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 392,
+        "start_byte": 12169
       }
     ],
     "status": "accepted"
@@ -9777,6 +10339,14 @@
         "kind": "dropdown_label",
         "line": 18,
         "start_byte": 651
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24362,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 856,
+        "start_byte": 24356
       }
     ],
     "status": "accepted"
@@ -9928,6 +10498,19 @@
         "kind": "tooltip",
         "line": 859,
         "start_byte": 32559
+      }
+    ],
+    "status": "accepted"
+  },
+  "Changes": {
+    "occurrences": [
+      {
+        "call": "git_panel_tab",
+        "end_byte": 179886,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "tab_title",
+        "line": 4970,
+        "start_byte": 179877
       }
     ],
     "status": "accepted"
@@ -10885,6 +11468,19 @@
     ],
     "status": "ignored"
   },
+  "Client": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11493,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 348,
+        "start_byte": 11487
+      }
+    ],
+    "status": "accepted"
+  },
   "Clipboard does not contain text": {
     "occurrences": [
       {
@@ -11255,6 +11851,14 @@
         "kind": "context_menu_entry",
         "line": 289,
         "start_byte": 10891
+      },
+      {
+        "call": "end_slot_tooltip_text",
+        "end_byte": 105499,
+        "file": "crates/workspace/src/pane.rs",
+        "kind": "tab_tooltip",
+        "line": 3002,
+        "start_byte": 105488
       }
     ],
     "status": "accepted"
@@ -11294,6 +11898,14 @@
         "kind": "button",
         "line": 194,
         "start_byte": 6462
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12050,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 372,
+        "start_byte": 12039
       },
       {
         "call": "MenuItem::action",
@@ -11618,6 +12230,19 @@
     ],
     "status": "accepted"
   },
+  "Cmd Or Ctrl": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22282,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 752,
+        "start_byte": 22273
+      }
+    ],
+    "status": "accepted"
+  },
   "Code Actions": {
     "occurrences": [
       {
@@ -11665,6 +12290,19 @@
     ],
     "status": "accepted"
   },
+  "Code Gemma": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6977,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 198,
+        "start_byte": 6968
+      }
+    ],
+    "status": "accepted"
+  },
   "Code Lens": {
     "occurrences": [
       {
@@ -11682,6 +12320,32 @@
         "kind": "context_menu_entry",
         "line": 413,
         "start_byte": 19818
+      }
+    ],
+    "status": "accepted"
+  },
+  "Code Llama": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6918,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 194,
+        "start_byte": 6909
+      }
+    ],
+    "status": "accepted"
+  },
+  "Codestral": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6992,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 199,
+        "start_byte": 6983
       }
     ],
     "status": "accepted"
@@ -12170,6 +12834,40 @@
     ],
     "status": "accepted"
   },
+  "Combined": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27922,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 943,
+        "start_byte": 27914
+      }
+    ],
+    "status": "accepted"
+  },
+  "Comfortable": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 13204,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 441,
+        "start_byte": 13193
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24327,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 814,
+        "start_byte": 24316
+      }
+    ],
+    "status": "accepted"
+  },
   "Comfortable spacing of entries.": {
     "occurrences": [
       {
@@ -12212,10 +12910,10 @@
   "Commands executed in the terminal": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 1104,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 26,
         "start_byte": 1069
       }
@@ -13054,6 +13752,14 @@
         "start_byte": 58625
       },
       {
+        "call": "ToolPermissionMode.display",
+        "end_byte": 24749,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "tool_permission_mode_label",
+        "line": 692,
+        "start_byte": 24740
+      },
+      {
         "call": "entry",
         "end_byte": 40532,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
@@ -13517,6 +14223,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Contained": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10904,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 322,
+        "start_byte": 10895
+      }
+    ],
+    "status": "accepted"
   },
   "Contained between the left and right docks": {
     "occurrences": [
@@ -15293,6 +16012,14 @@
         "start_byte": 45157
       },
       {
+        "call": "ToolInfo.name",
+        "end_byte": 1991,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 49,
+        "start_byte": 1980
+      },
+      {
         "call": "entry",
         "end_byte": 121346,
         "file": "crates/workspace/src/pane.rs",
@@ -15754,6 +16481,19 @@
         "kind": "headline",
         "line": 1002,
         "start_byte": 35408
+      }
+    ],
+    "status": "accepted"
+  },
+  "Create Directory": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 2557,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 61,
+        "start_byte": 2539
       }
     ],
     "status": "accepted"
@@ -16311,6 +17051,32 @@
     ],
     "status": "accepted"
   },
+  "Current File Directory": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 9080,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 236,
+        "start_byte": 9060
+      }
+    ],
+    "status": "accepted"
+  },
+  "Current Folders": {
+    "occurrences": [
+      {
+        "call": "ProjectPickerEntry::Header",
+        "end_byte": 36632,
+        "file": "crates/recent_projects/src/recent_projects.rs",
+        "kind": "project_picker_header",
+        "line": 1037,
+        "start_byte": 36615
+      }
+    ],
+    "status": "accepted"
+  },
   "Current Line Highlight": {
     "occurrences": [
       {
@@ -16328,6 +17094,19 @@
         "kind": "setting_title",
         "line": 2400,
         "start_byte": 110955
+      }
+    ],
+    "status": "accepted"
+  },
+  "Current Project Directory": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 9233,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 239,
+        "start_byte": 9210
       }
     ],
     "status": "accepted"
@@ -16771,6 +17550,22 @@
   },
   "Custom": {
     "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 13347,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 445,
+        "start_byte": 13341
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 978,
+        "file": "crates/settings_content/src/title_bar.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 31,
+        "start_byte": 972
+      },
       {
         "call": "ContextMenuEntry::new",
         "end_byte": 56134,
@@ -17283,6 +18078,14 @@
         "kind": "shared_string",
         "line": 71,
         "start_byte": 2777
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11135,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 349,
+        "start_byte": 11131
       }
     ],
     "status": "accepted"
@@ -17603,6 +18406,19 @@
     ],
     "status": "accepted"
   },
+  "Decimal": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 33010,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1132,
+        "start_byte": 33003
+      }
+    ],
+    "status": "accepted"
+  },
   "Decline": {
     "occurrences": [
       {
@@ -17776,6 +18592,19 @@
     ],
     "status": "accepted"
   },
+  "Deepseek Coder": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6952,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 196,
+        "start_byte": 6939
+      }
+    ],
+    "status": "accepted"
+  },
   "Default": {
     "occurrences": [
       {
@@ -17793,6 +18622,22 @@
         "kind": "filter_label",
         "line": 1645,
         "start_byte": 60478
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9927,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 307,
+        "start_byte": 9920
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25291,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 863,
+        "start_byte": 25284
       },
       {
         "call": "Button::new",
@@ -22694,6 +23539,19 @@
     ],
     "status": "accepted"
   },
+  "Delete Path": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 1782,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 43,
+        "start_byte": 1769
+      }
+    ],
+    "status": "accepted"
+  },
   "Delete Pattern": {
     "occurrences": [
       {
@@ -23228,6 +24086,14 @@
         "start_byte": 288598
       },
       {
+        "call": "ToolPermissionMode.display",
+        "end_byte": 24684,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "tool_permission_mode_label",
+        "line": 691,
+        "start_byte": 24678
+      },
+      {
         "call": "entry",
         "end_byte": 40889,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
@@ -23388,6 +24254,19 @@
         "kind": "action_description",
         "line": 36,
         "start_byte": 1017
+      }
+    ],
+    "status": "accepted"
+  },
+  "Detect": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31364,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 930,
+        "start_byte": 31356
       }
     ],
     "status": "accepted"
@@ -23977,6 +24856,19 @@
     ],
     "status": "accepted"
   },
+  "Directories First": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24727,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 837,
+        "start_byte": 24711
+      }
+    ],
+    "status": "accepted"
+  },
   "Directory": {
     "occurrences": [
       {
@@ -23993,10 +24885,10 @@
   "Directory creation": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 2600,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 62,
         "start_byte": 2580
       }
@@ -24187,6 +25079,46 @@
   },
   "Disabled": {
     "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10986,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 287,
+        "start_byte": 10978
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 29369,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 864,
+        "start_byte": 29361
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 38066,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1127,
+        "start_byte": 38058
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 38638,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1154,
+        "start_byte": 38630
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 15804,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 510,
+        "start_byte": 15796
+      },
       {
         "call": "Button::new",
         "end_byte": 18023,
@@ -25402,6 +26334,19 @@
     ],
     "status": "accepted"
   },
+  "Down": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17309,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 579,
+        "start_byte": 17305
+      }
+    ],
+    "status": "accepted"
+  },
   "Download": {
     "occurrences": [
       {
@@ -25878,6 +26823,27 @@
     ],
     "status": "accepted"
   },
+  "Dynamic": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 9072,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 271,
+        "start_byte": 9065
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 10309,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 313,
+        "start_byte": 10302
+      }
+    ],
+    "status": "accepted"
+  },
   "E.g. for editors, selections, folds and scroll positions are restored, if the same file is closed and, later, opened again in the same pane.": {
     "occurrences": [
       {
@@ -26004,6 +26970,14 @@
         "kind": "context_menu_entry",
         "line": 771,
         "start_byte": 33148
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10698,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 338,
+        "start_byte": 10693
       }
     ],
     "status": "accepted"
@@ -26114,6 +27088,19 @@
         "kind": "setting_title",
         "line": 8760,
         "start_byte": 397919
+      }
+    ],
+    "status": "accepted"
+  },
+  "Edit File": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 1342,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 31,
+        "start_byte": 1331
       }
     ],
     "status": "accepted"
@@ -26675,6 +27662,19 @@
     ],
     "status": "accepted"
   },
+  "Editor Width": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12021,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 389,
+        "start_byte": 12010
+      }
+    ],
+    "status": "accepted"
+  },
   "Edits": {
     "occurrences": [
       {
@@ -26822,6 +27822,19 @@
         "kind": "label",
         "line": 116,
         "start_byte": 3394
+      }
+    ],
+    "status": "accepted"
+  },
+  "Empty Tab": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13427,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 431,
+        "start_byte": 13419
       }
     ],
     "status": "accepted"
@@ -27193,6 +28206,30 @@
   "Enabled": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 10999,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 288,
+        "start_byte": 10992
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 29099,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 858,
+        "start_byte": 29092
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 15790,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 509,
+        "start_byte": 15783
+      },
+      {
         "call": "SettingItem.title",
         "end_byte": 85973,
         "file": "crates/settings_ui/src/page_data.rs",
@@ -27349,6 +28386,32 @@
         "kind": "action_description",
         "line": 19,
         "start_byte": 398
+      }
+    ],
+    "status": "accepted"
+  },
+  "Enforce CRLF": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31985,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 944,
+        "start_byte": 31971
+      }
+    ],
+    "status": "accepted"
+  },
+  "Enforce LF": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31857,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 941,
+        "start_byte": 31845
       }
     ],
     "status": "accepted"
@@ -27611,6 +28674,22 @@
   "Error": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 21852,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 727,
+        "start_byte": 21847
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24086,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 766,
+        "start_byte": 24081
+      },
+      {
         "call": "Button::new",
         "end_byte": 16654,
         "file": "crates/ui/src/components/button/button.rs",
@@ -27619,7 +28698,7 @@
         "start_byte": 16647
       }
     ],
-    "status": "ignored"
+    "status": "accepted"
   },
   "Error Creating Dev Container:": {
     "occurrences": [
@@ -27703,6 +28782,19 @@
         "kind": "label",
         "line": 894,
         "start_byte": 32953
+      }
+    ],
+    "status": "accepted"
+  },
+  "Errors": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9370,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 259,
+        "start_byte": 9364
       }
     ],
     "status": "accepted"
@@ -29343,6 +30435,19 @@
     ],
     "status": "accepted"
   },
+  "Fallback": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 29213,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 861,
+        "start_byte": 29205
+      }
+    ],
+    "status": "accepted"
+  },
   "Fallback Branch Name": {
     "occurrences": [
       {
@@ -29540,6 +30645,14 @@
         "kind": "context_menu_action",
         "line": 896,
         "start_byte": 30449
+      },
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 2759,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 67,
+        "start_byte": 2752
       }
     ],
     "status": "accepted"
@@ -29724,6 +30837,32 @@
     ],
     "status": "accepted"
   },
+  "File Name First": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20750,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 656,
+        "start_byte": 20737
+      }
+    ],
+    "status": "accepted"
+  },
+  "File Path First": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20798,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 658,
+        "start_byte": 20785
+      }
+    ],
+    "status": "accepted"
+  },
   "File Scan": {
     "occurrences": [
       {
@@ -29805,10 +30944,10 @@
   "File and directory copying": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 2042,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 50,
         "start_byte": 2014
       }
@@ -29818,10 +30957,10 @@
   "File and directory deletion": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 1834,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 44,
         "start_byte": 1805
       }
@@ -29831,10 +30970,10 @@
   "File and directory moves/renames": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 2321,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 56,
         "start_byte": 2287
       }
@@ -29844,10 +30983,10 @@
   "File creation and overwrite operations": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 1616,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 38,
         "start_byte": 1576
       }
@@ -29857,10 +30996,10 @@
   "File editing operations": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 1390,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 32,
         "start_byte": 1365
       }
@@ -29889,6 +31028,19 @@
         "kind": "context_menu_entry",
         "line": 4187,
         "start_byte": 168025
+      }
+    ],
+    "status": "accepted"
+  },
+  "Files First": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24840,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 841,
+        "start_byte": 24830
       }
     ],
     "status": "accepted"
@@ -30214,6 +31366,14 @@
         "start_byte": 10157
       },
       {
+        "call": "strum::VariantNames",
+        "end_byte": 23899,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 832,
+        "start_byte": 23882
+      },
+      {
         "call": "MenuItem::action",
         "end_byte": 11332,
         "file": "crates/zed/src/zed/app_menus.rs",
@@ -30419,6 +31579,19 @@
     ],
     "status": "accepted"
   },
+  "First Project Directory": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 9379,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 242,
+        "start_byte": 9358
+      }
+    ],
+    "status": "accepted"
+  },
   "First Tab": {
     "occurrences": [
       {
@@ -30532,6 +31705,19 @@
         "kind": "button",
         "line": 3305,
         "start_byte": 129524
+      }
+    ],
+    "status": "accepted"
+  },
+  "Fixed": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 38147,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1130,
+        "start_byte": 38142
       }
     ],
     "status": "accepted"
@@ -32485,6 +33671,43 @@
     ],
     "status": "accepted"
   },
+  "Full": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20870,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 690,
+        "start_byte": 20866
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25473,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 850,
+        "start_byte": 25469
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10960,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 324,
+        "start_byte": 10956
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28013,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 945,
+        "start_byte": 28009
+      }
+    ],
+    "status": "accepted"
+  },
   "GNOME-style layout string like \"close:minimize,maximize\".": {
     "occurrences": [
       {
@@ -33003,6 +34226,19 @@
         "kind": "rust_doc_comment",
         "line": 67,
         "start_byte": 2811
+      }
+    ],
+    "status": "accepted"
+  },
+  "Glm": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 7001,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 200,
+        "start_byte": 6998
       }
     ],
     "status": "accepted"
@@ -34129,6 +35365,19 @@
     ],
     "status": "accepted"
   },
+  "Grayscale": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19126,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 661,
+        "start_byte": 19117
+      }
+    ],
+    "status": "accepted"
+  },
   "Green ANSI terminal color.": {
     "occurrences": [
       {
@@ -34192,6 +35441,14 @@
   "Gutter": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 18684,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 588,
+        "start_byte": 18678
+      },
+      {
         "call": "SettingsPageItem::SectionHeader",
         "end_byte": 91103,
         "file": "crates/settings_ui/src/page_data.rs",
@@ -34239,10 +35496,10 @@
   "HTTP requests to URLs": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 2805,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 68,
         "start_byte": 2782
       }
@@ -34494,6 +35751,19 @@
     ],
     "status": "accepted"
   },
+  "Hidden": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9074,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 238,
+        "start_byte": 9068
+      }
+    ],
+    "status": "accepted"
+  },
   "Hidden Files": {
     "occurrences": [
       {
@@ -34509,6 +35779,14 @@
   },
   "Hide": {
     "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18296,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 564,
+        "start_byte": 18292
+      },
       {
         "call": "Tooltip::text",
         "end_byte": 6688,
@@ -34851,6 +36129,40 @@
     ],
     "status": "accepted"
   },
+  "Hint": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24119,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 769,
+        "start_byte": 24115
+      }
+    ],
+    "status": "accepted"
+  },
+  "History": {
+    "occurrences": [
+      {
+        "call": "git_panel_tab",
+        "end_byte": 180204,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "tab_title",
+        "line": 4978,
+        "start_byte": 180195
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9659,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 279,
+        "start_byte": 9652
+      }
+    ],
+    "status": "accepted"
+  },
   "Hit enter to search. For more options:": {
     "occurrences": [
       {
@@ -34915,6 +36227,27 @@
         "kind": "tooltip_meta",
         "line": 386,
         "start_byte": 12820
+      }
+    ],
+    "status": "accepted"
+  },
+  "Hollow": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23441,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 808,
+        "start_byte": 23435
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27711,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 941,
+        "start_byte": 27705
       }
     ],
     "status": "accepted"
@@ -35032,6 +36365,27 @@
         "kind": "setting_title",
         "line": 4587,
         "start_byte": 206860
+      }
+    ],
+    "status": "accepted"
+  },
+  "Hover": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20387,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 664,
+        "start_byte": 20382
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9062,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 237,
+        "start_byte": 9057
       }
     ],
     "status": "accepted"
@@ -35647,6 +37001,19 @@
     ],
     "status": "ignored"
   },
+  "Icon": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22468,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 738,
+        "start_byte": 22464
+      }
+    ],
+    "status": "accepted"
+  },
   "Icon Color": {
     "occurrences": [
       {
@@ -35716,6 +37083,45 @@
         "kind": "rust_doc_comment",
         "line": 194,
         "start_byte": 8242
+      }
+    ],
+    "status": "accepted"
+  },
+  "If any of these regexes match, a confirmation will be shown unless an Always Deny regex matches.": {
+    "occurrences": [
+      {
+        "call": "render_rule_section",
+        "end_byte": 14905,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_section_description",
+        "line": 415,
+        "start_byte": 14807
+      }
+    ],
+    "status": "accepted"
+  },
+  "If any of these regexes match, the action will be approved—unless an Always Confirm or Always Deny matches.": {
+    "occurrences": [
+      {
+        "call": "render_rule_section",
+        "end_byte": 14460,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_section_description",
+        "line": 406,
+        "start_byte": 14349
+      }
+    ],
+    "status": "accepted"
+  },
+  "If any of these regexes match, the tool action will be denied.": {
+    "occurrences": [
+      {
+        "call": "render_rule_section",
+        "end_byte": 14006,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_rule_section_description",
+        "line": 397,
+        "start_byte": 13942
       }
     ],
     "status": "accepted"
@@ -36233,6 +37639,19 @@
     ],
     "status": "accepted"
   },
+  "In Comments": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23683,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 688,
+        "start_byte": 23673
+      }
+    ],
+    "status": "accepted"
+  },
   "In Queue": {
     "occurrences": [
       {
@@ -36242,6 +37661,19 @@
         "kind": "tooltip",
         "line": 3406,
         "start_byte": 132455
+      }
+    ],
+    "status": "accepted"
+  },
+  "In Selections": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23754,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 690,
+        "start_byte": 23742
       }
     ],
     "status": "accepted"
@@ -36483,6 +37915,27 @@
     ],
     "status": "accepted"
   },
+  "Indent Aware": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 38222,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1132,
+        "start_byte": 38211
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 38713,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1156,
+        "start_byte": 38702
+      }
+    ],
+    "status": "accepted"
+  },
   "Indent Guides": {
     "occurrences": [
       {
@@ -36539,6 +37992,19 @@
         "kind": "settings_section_header",
         "line": 7871,
         "start_byte": 354615
+      }
+    ],
+    "status": "accepted"
+  },
+  "Indexed": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25031,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 823,
+        "start_byte": 25024
       }
     ],
     "status": "accepted"
@@ -36712,6 +38178,32 @@
     ],
     "status": "accepted"
   },
+  "Infer": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6869,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 190,
+        "start_byte": 6864
+      }
+    ],
+    "status": "accepted"
+  },
+  "Info": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24109,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 768,
+        "start_byte": 24105
+      }
+    ],
+    "status": "accepted"
+  },
   "Info status": {
     "occurrences": [
       {
@@ -36724,6 +38216,32 @@
       }
     ],
     "status": "ignored"
+  },
+  "Information": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 21704,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 723,
+        "start_byte": 21693
+      }
+    ],
+    "status": "accepted"
+  },
+  "Inherit": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27531,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 933,
+        "start_byte": 27524
+      }
+    ],
+    "status": "accepted"
   },
   "Inherit cursor shape from the editor's base cursor_shape setting.": {
     "occurrences": [
@@ -36790,6 +38308,19 @@
     ],
     "status": "accepted"
   },
+  "Inlay": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18213,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 563,
+        "start_byte": 18208
+      }
+    ],
+    "status": "accepted"
+  },
   "Inlay Hints": {
     "occurrences": [
       {
@@ -36820,6 +38351,19 @@
         "kind": "rust_doc_comment",
         "line": 550,
         "start_byte": 18819
+      }
+    ],
+    "status": "accepted"
+  },
+  "Inline": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25186,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 889,
+        "start_byte": 25180
       }
     ],
     "status": "accepted"
@@ -36990,6 +38534,27 @@
         "kind": "label",
         "line": 794,
         "start_byte": 30444
+      }
+    ],
+    "status": "accepted"
+  },
+  "Insert": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28255,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 830,
+        "start_byte": 28249
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 26689,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 889,
+        "start_byte": 26683
       }
     ],
     "status": "accepted"
@@ -37625,6 +39190,19 @@
     ],
     "status": "accepted"
   },
+  "Instruction": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19056,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 603,
+        "start_byte": 19045
+      }
+    ],
+    "status": "accepted"
+  },
   "Instrumentation": {
     "occurrences": [
       {
@@ -37844,6 +39422,27 @@
     ],
     "status": "accepted"
   },
+  "Invalid regex: {err}. Pattern saved but will block this tool until fixed or removed.": {
+    "occurrences": [
+      {
+        "call": "tool_permissions_validation",
+        "end_byte": 37295,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_validation",
+        "line": 1014,
+        "start_byte": 37209
+      },
+      {
+        "call": "tool_permissions_validation",
+        "end_byte": 38845,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_validation",
+        "line": 1056,
+        "start_byte": 38759
+      }
+    ],
+    "status": "accepted"
+  },
   "Invalid user settings file\n{error}": {
     "occurrences": [
       {
@@ -37952,6 +39551,19 @@
         "kind": "tooltip_meta",
         "line": 168,
         "start_byte": 5861
+      }
+    ],
+    "status": "accepted"
+  },
+  "Italic": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10567,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 331,
+        "start_byte": 10561
       }
     ],
     "status": "accepted"
@@ -38291,6 +39903,19 @@
         "kind": "setting_title",
         "line": 6736,
         "start_byte": 306649
+      }
+    ],
+    "status": "accepted"
+  },
+  "Keep Window Open": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12123,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 374,
+        "start_byte": 12109
       }
     ],
     "status": "accepted"
@@ -38766,6 +40391,19 @@
     ],
     "status": "accepted"
   },
+  "Label Color": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22484,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 739,
+        "start_byte": 22474
+      }
+    ],
+    "status": "accepted"
+  },
   "Language Servers": {
     "occurrences": [
       {
@@ -38860,6 +40498,19 @@
     ],
     "status": "accepted"
   },
+  "Large": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25451,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 848,
+        "start_byte": 25446
+      }
+    ],
+    "status": "accepted"
+  },
   "Large Headline": {
     "occurrences": [
       {
@@ -38907,6 +40558,19 @@
     ],
     "status": "accepted"
   },
+  "Last Session": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13595,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 436,
+        "start_byte": 13584
+      }
+    ],
+    "status": "accepted"
+  },
   "Last Tab": {
     "occurrences": [
       {
@@ -38919,6 +40583,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Last Workspace": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13498,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 433,
+        "start_byte": 13485
+      }
+    ],
+    "status": "accepted"
   },
   "Last entry": {
     "occurrences": [
@@ -39020,6 +40697,19 @@
         "kind": "tooltip",
         "line": 702,
         "start_byte": 28692
+      }
+    ],
+    "status": "accepted"
+  },
+  "Launchpad": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13669,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 438,
+        "start_byte": 13660
       }
     ],
     "status": "accepted"
@@ -39287,6 +40977,62 @@
   "Left": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 662,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 31,
+        "start_byte": 658
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11307,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 309,
+        "start_byte": 11303
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19310,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 621,
+        "start_byte": 19306
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31481,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1062,
+        "start_byte": 31477
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 15988,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 507,
+        "start_byte": 15984
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 8747,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 215,
+        "start_byte": 8743
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17577,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 597,
+        "start_byte": 17573
+      },
+      {
         "call": "Label::new",
         "end_byte": 32297,
         "file": "crates/ui/src/components/button/button_like.rs",
@@ -39301,6 +41047,58 @@
         "kind": "dock_position_label",
         "line": 329,
         "start_byte": 11036
+      }
+    ],
+    "status": "accepted"
+  },
+  "Left Aligned": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11046,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 326,
+        "start_byte": 11035
+      }
+    ],
+    "status": "accepted"
+  },
+  "Left Neighbour": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9693,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 281,
+        "start_byte": 9680
+      }
+    ],
+    "status": "accepted"
+  },
+  "Left Only": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 21139,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 697,
+        "start_byte": 21131
+      }
+    ],
+    "status": "accepted"
+  },
+  "Left Open": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20973,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 693,
+        "start_byte": 20965
       }
     ],
     "status": "accepted"
@@ -39340,6 +41138,14 @@
         "kind": "shared_string",
         "line": 70,
         "start_byte": 2714
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11084,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 346,
+        "start_byte": 11079
       }
     ],
     "status": "accepted"
@@ -39392,6 +41198,27 @@
         "kind": "setting_title",
         "line": 5938,
         "start_byte": 266242
+      }
+    ],
+    "status": "accepted"
+  },
+  "Line": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18728,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 590,
+        "start_byte": 18724
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18954,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 601,
+        "start_byte": 18950
       }
     ],
     "status": "accepted"
@@ -39688,10 +41515,10 @@
   "Loading agent skill instructions": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 3206,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 80,
         "start_byte": 3172
       }
@@ -40057,6 +41884,19 @@
     ],
     "status": "accepted"
   },
+  "Lower": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25645,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 869,
+        "start_byte": 25640
+      }
+    ],
+    "status": "accepted"
+  },
   "Lowercase names are grouped before uppercase names, with case-insensitive": {
     "occurrences": [
       {
@@ -40269,6 +42109,32 @@
         "kind": "shared_string",
         "line": 925,
         "start_byte": 32228
+      }
+    ],
+    "status": "accepted"
+  },
+  "Match Case Sensitivity": {
+    "occurrences": [
+      {
+        "call": "SearchOption.label",
+        "end_byte": 3019,
+        "file": "crates/search/src/search.rs",
+        "kind": "search_option_label",
+        "line": 101,
+        "start_byte": 2995
+      }
+    ],
+    "status": "accepted"
+  },
+  "Match Whole Words": {
+    "occurrences": [
+      {
+        "call": "SearchOption.label",
+        "end_byte": 2950,
+        "file": "crates/search/src/search.rs",
+        "kind": "search_option_label",
+        "line": 100,
+        "start_byte": 2931
       }
     ],
     "status": "accepted"
@@ -40788,6 +42654,14 @@
         "kind": "language_model_effort_label",
         "line": 50,
         "start_byte": 2185
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25440,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 847,
+        "start_byte": 25434
       }
     ],
     "status": "accepted"
@@ -40835,6 +42709,19 @@
         "kind": "shared_string",
         "line": 67,
         "start_byte": 2651
+      }
+    ],
+    "status": "accepted"
+  },
+  "Menu": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17487,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 525,
+        "start_byte": 17483
       }
     ],
     "status": "accepted"
@@ -41204,6 +43091,19 @@
     ],
     "status": "accepted"
   },
+  "Minimum": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24444,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 858,
+        "start_byte": 24437
+      }
+    ],
+    "status": "accepted"
+  },
   "Minimum APCA perceptual contrast for text over highlight backgrounds.": {
     "occurrences": [
       {
@@ -41406,6 +43306,19 @@
         "kind": "rust_doc_comment",
         "line": 838,
         "start_byte": 24737
+      }
+    ],
+    "status": "accepted"
+  },
+  "Mixed": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24781,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 839,
+        "start_byte": 24776
       }
     ],
     "status": "accepted"
@@ -41774,6 +43687,19 @@
         "kind": "context_menu_action",
         "line": 314,
         "start_byte": 14496
+      }
+    ],
+    "status": "accepted"
+  },
+  "Move Path": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 2264,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 55,
+        "start_byte": 2253
       }
     ],
     "status": "accepted"
@@ -43718,6 +45644,19 @@
     ],
     "status": "accepted"
   },
+  "Neighbour": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9674,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 280,
+        "start_byte": 9665
+      }
+    ],
+    "status": "accepted"
+  },
   "Network": {
     "occurrences": [
       {
@@ -43743,6 +45682,75 @@
         "kind": "settings_page_title",
         "line": 7828,
         "start_byte": 353282
+      }
+    ],
+    "status": "accepted"
+  },
+  "Never": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12960,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 356,
+        "start_byte": 12955
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13245,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 375,
+        "start_byte": 13240
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19314,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 616,
+        "start_byte": 19309
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28062,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 997,
+        "start_byte": 28057
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 2807,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 106,
+        "start_byte": 2802
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27029,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 909,
+        "start_byte": 27024
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31763,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1082,
+        "start_byte": 31758
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11439,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 313,
+        "start_byte": 11434
       }
     ],
     "status": "accepted"
@@ -44271,6 +46279,14 @@
         "kind": "prompt_answer",
         "line": 512,
         "start_byte": 18840
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10060,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 311,
+        "start_byte": 10058
       }
     ],
     "status": "accepted"
@@ -45309,6 +47325,19 @@
     ],
     "status": "ignored"
   },
+  "Non Utf8": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 15832,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 512,
+        "start_byte": 15825
+      }
+    ],
+    "status": "accepted"
+  },
   "Non-selectable item": {
     "occurrences": [
       {
@@ -45321,6 +47350,112 @@
       }
     ],
     "status": "ignored"
+  },
+  "None": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18120,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 560,
+        "start_byte": 18116
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18638,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 586,
+        "start_byte": 18634
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 21196,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 699,
+        "start_byte": 21192
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 21895,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 729,
+        "start_byte": 21891
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23805,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 829,
+        "start_byte": 23801
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25320,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 893,
+        "start_byte": 25316
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11377,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 364,
+        "start_byte": 11373
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11765,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 384,
+        "start_byte": 11761
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22704,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 649,
+        "start_byte": 22700
+      }
+    ],
+    "status": "accepted"
+  },
+  "Normal": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10251,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 309,
+        "start_byte": 10245
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10555,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 330,
+        "start_byte": 10549
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 26677,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 888,
+        "start_byte": 26671
+      }
+    ],
+    "status": "accepted"
   },
   "Normal Text": {
     "occurrences": [
@@ -45575,6 +47710,19 @@
     ],
     "status": "accepted"
   },
+  "Note: custom tool permissions only apply to the Zed native agent and don’t extend to external agents connected through the Agent Client Protocol (ACP).": {
+    "occurrences": [
+      {
+        "call": "SETTINGS_DISCLAIMER",
+        "end_byte": 910,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_note",
+        "line": 19,
+        "start_byte": 755
+      }
+    ],
+    "status": "accepted"
+  },
   "Notify When Agent Waiting": {
     "occurrences": [
       {
@@ -45657,6 +47805,115 @@
         "kind": "prompt_answer",
         "line": 80,
         "start_byte": 2676
+      }
+    ],
+    "status": "accepted"
+  },
+  "Off": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11609,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 330,
+        "start_byte": 11606
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17345,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 521,
+        "start_byte": 17342
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22683,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 774,
+        "start_byte": 22680
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 30900,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 909,
+        "start_byte": 30897
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24075,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 765,
+        "start_byte": 24072
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12284,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 360,
+        "start_byte": 12281
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12730,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 384,
+        "start_byte": 12727
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13630,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 421,
+        "start_byte": 13627
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 9358,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 258,
+        "start_byte": 9355
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 16534,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 543,
+        "start_byte": 16531
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27836,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 941,
+        "start_byte": 27833
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28815,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 979,
+        "start_byte": 28812
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 29571,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1010,
+        "start_byte": 29568
       }
     ],
     "status": "accepted"
@@ -45854,6 +48111,72 @@
     ],
     "status": "accepted"
   },
+  "On": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17424,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 523,
+        "start_byte": 17422
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 30844,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 907,
+        "start_byte": 30842
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12466,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 365,
+        "start_byte": 12464
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12721,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 383,
+        "start_byte": 12719
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28964,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 981,
+        "start_byte": 28962
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 29794,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1014,
+        "start_byte": 29792
+      }
+    ],
+    "status": "accepted"
+  },
+  "On Focus Change": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 16688,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 547,
+        "start_byte": 16675
+      }
+    ],
+    "status": "accepted"
+  },
   "On Last Window Closed": {
     "occurrences": [
       {
@@ -45863,6 +48186,58 @@
         "kind": "setting_title",
         "line": 156,
         "start_byte": 5674
+      }
+    ],
+    "status": "accepted"
+  },
+  "On Typing": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 2851,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 108,
+        "start_byte": 2843
+      }
+    ],
+    "status": "accepted"
+  },
+  "On Typing And Action": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 2958,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 111,
+        "start_byte": 2941
+      }
+    ],
+    "status": "accepted"
+  },
+  "On Window Change": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 16757,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 549,
+        "start_byte": 16743
+      }
+    ],
+    "status": "accepted"
+  },
+  "On Yank": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27133,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 913,
+        "start_byte": 27127
       }
     ],
     "status": "accepted"
@@ -45892,6 +48267,32 @@
       }
     ],
     "status": "ignored"
+  },
+  "One Match Per Line": {
+    "occurrences": [
+      {
+        "call": "SearchOption.label",
+        "end_byte": 3238,
+        "file": "crates/search/src/search.rs",
+        "kind": "search_option_label",
+        "line": 104,
+        "start_byte": 3218
+      }
+    ],
+    "status": "accepted"
+  },
+  "One Page": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22762,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 777,
+        "start_byte": 22755
+      }
+    ],
+    "status": "accepted"
   },
   "Online": {
     "occurrences": [
@@ -46121,6 +48522,14 @@
         "kind": "button",
         "line": 1775,
         "start_byte": 71516
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19978,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 641,
+        "start_byte": 19974
       },
       {
         "call": "Button::new",
@@ -46885,6 +49294,19 @@
         "kind": "label",
         "line": 1988,
         "start_byte": 75471
+      }
+    ],
+    "status": "accepted"
+  },
+  "Open a New Window": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13053,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 409,
+        "start_byte": 13034
       }
     ],
     "status": "accepted"
@@ -49859,6 +52281,131 @@
     ],
     "status": "accepted"
   },
+  "Patterns are matched against each command in the input. Commands chained with &&, ||, ;, or pipes are split and checked individually.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 1268,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 27,
+        "start_byte": 1133
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the URL being fetched.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 2887,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 69,
+        "start_byte": 2834
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the absolute path to the skill's SKILL.md file.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 3313,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 81,
+        "start_byte": 3235
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the directory path being created.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 2693,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 63,
+        "start_byte": 2629
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the file path being edited.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 1477,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 33,
+        "start_byte": 1419
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the file path being written.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 1704,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 39,
+        "start_byte": 1645
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the path being deleted.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 1917,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 45,
+        "start_byte": 1863
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched against the search query.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 3083,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 75,
+        "start_byte": 3035
+      }
+    ],
+    "status": "accepted"
+  },
+  "Patterns are matched independently against the source path and the destination path. Enter either path below to test.": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 2190,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 51,
+        "start_byte": 2071
+      },
+      {
+        "call": "ToolInfo.regex_explanation",
+        "end_byte": 2469,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_regex_explanation",
+        "line": 57,
+        "start_byte": 2350
+      }
+    ],
+    "status": "accepted"
+  },
   "Pause": {
     "occurrences": [
       {
@@ -50093,6 +52640,43 @@
     ],
     "status": "accepted"
   },
+  "Platform Default": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 838,
+        "file": "crates/settings_content/src/title_bar.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 27,
+        "start_byte": 823
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11985,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 370,
+        "start_byte": 11970
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18599,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 634,
+        "start_byte": 18584
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19004,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 657,
+        "start_byte": 18989
+      }
+    ],
+    "status": "accepted"
+  },
   "Play Sound When Agent Done": {
     "occurrences": [
       {
@@ -50322,6 +52906,32 @@
     ],
     "status": "accepted"
   },
+  "Prefer CRLF": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31734,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 938,
+        "start_byte": 31721
+      }
+    ],
+    "status": "accepted"
+  },
+  "Prefer LF": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31546,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 934,
+        "start_byte": 31535
+      }
+    ],
+    "status": "accepted"
+  },
   "Prefer LSP": {
     "occurrences": [
       {
@@ -50331,6 +52941,19 @@
         "kind": "setting_title",
         "line": 8890,
         "start_byte": 404127
+      }
+    ],
+    "status": "accepted"
+  },
+  "Prefer Line": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11950,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 387,
+        "start_byte": 11940
       }
     ],
     "status": "accepted"
@@ -50424,6 +53047,32 @@
     ],
     "status": "accepted"
   },
+  "Preserve": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24667,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 863,
+        "start_byte": 24659
+      }
+    ],
+    "status": "accepted"
+  },
+  "Preserve Indent": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11304,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 362,
+        "start_byte": 11290
+      }
+    ],
+    "status": "accepted"
+  },
   "Preserve the cursor's vertical position within the viewport, falling": {
     "occurrences": [
       {
@@ -50506,6 +53155,14 @@
         "kind": "label",
         "line": 6731,
         "start_byte": 247275
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 1564,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 67,
+        "start_byte": 1557
       }
     ],
     "status": "accepted"
@@ -50680,6 +53337,19 @@
     ],
     "status": "accepted"
   },
+  "Primary Screen": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12933,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 354,
+        "start_byte": 12920
+      }
+    ],
+    "status": "accepted"
+  },
   "Privacy": {
     "occurrences": [
       {
@@ -50796,6 +53466,14 @@
         "kind": "label",
         "line": 832,
         "start_byte": 34449
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 8287,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 208,
+        "start_byte": 8280
       },
       {
         "call": "settings_field_title",
@@ -51541,6 +54219,19 @@
     ],
     "status": "accepted"
   },
+  "Quit App": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18667,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 636,
+        "start_byte": 18660
+      }
+    ],
+    "status": "accepted"
+  },
   "Quit Zed": {
     "occurrences": [
       {
@@ -51576,6 +54267,19 @@
         "kind": "action_description",
         "line": 62,
         "start_byte": 2096
+      }
+    ],
+    "status": "accepted"
+  },
+  "Qwen": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6962,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 197,
+        "start_byte": 6958
       }
     ],
     "status": "accepted"
@@ -51910,6 +54614,22 @@
   },
   "Recent Projects": {
     "occurrences": [
+      {
+        "call": "ProjectPickerEntry::Header",
+        "end_byte": 49558,
+        "file": "crates/agent_ui/src/threads_archive_view.rs",
+        "kind": "project_picker_header",
+        "line": 1433,
+        "start_byte": 49541
+      },
+      {
+        "call": "ProjectPickerEntry::Header",
+        "end_byte": 37967,
+        "file": "crates/recent_projects/src/recent_projects.rs",
+        "kind": "project_picker_header",
+        "line": 1076,
+        "start_byte": 37950
+      },
       {
         "call": "Tooltip::for_action",
         "end_byte": 30874,
@@ -53493,6 +56213,14 @@
         "start_byte": 171475
       },
       {
+        "call": "strum::VariantNames",
+        "end_byte": 28381,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 832,
+        "start_byte": 28374
+      },
+      {
         "call": "prompt",
         "end_byte": 15881,
         "file": "crates/vim/src/command.rs",
@@ -53549,6 +56277,32 @@
         "kind": "tooltip",
         "line": 2425,
         "start_byte": 89727
+      }
+    ],
+    "status": "accepted"
+  },
+  "Replace Subsequence": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28553,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 835,
+        "start_byte": 28535
+      }
+    ],
+    "status": "accepted"
+  },
+  "Replace Suffix": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 28704,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 838,
+        "start_byte": 28691
       }
     ],
     "status": "accepted"
@@ -55199,6 +57953,45 @@
     ],
     "status": "accepted"
   },
+  "Reveal in File Explorer": {
+    "occurrences": [
+      {
+        "call": "reveal_in_file_manager_label",
+        "end_byte": 880,
+        "file": "crates/ui/src/utils.rs",
+        "kind": "platform_action_label",
+        "line": 32,
+        "start_byte": 855
+      }
+    ],
+    "status": "accepted"
+  },
+  "Reveal in File Manager": {
+    "occurrences": [
+      {
+        "call": "reveal_in_file_manager_label",
+        "end_byte": 926,
+        "file": "crates/ui/src/utils.rs",
+        "kind": "platform_action_label",
+        "line": 34,
+        "start_byte": 902
+      }
+    ],
+    "status": "accepted"
+  },
+  "Reveal in Finder": {
+    "occurrences": [
+      {
+        "call": "reveal_in_file_manager_label",
+        "end_byte": 788,
+        "file": "crates/ui/src/utils.rs",
+        "kind": "platform_action_label",
+        "line": 30,
+        "start_byte": 770
+      }
+    ],
+    "status": "accepted"
+  },
   "Reveals the Zed log file in the system file manager.": {
     "occurrences": [
       {
@@ -55434,6 +58227,62 @@
   "Right": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 724,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 33,
+        "start_byte": 719
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11318,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 310,
+        "start_byte": 11313
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19333,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 623,
+        "start_byte": 19328
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 31492,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 1063,
+        "start_byte": 31487
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 16011,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 509,
+        "start_byte": 16006
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 8773,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 217,
+        "start_byte": 8768
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17588,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 598,
+        "start_byte": 17583
+      },
+      {
         "call": "Label::new",
         "end_byte": 32606,
         "file": "crates/ui/src/components/button/button_like.rs",
@@ -55448,6 +58297,32 @@
         "kind": "dock_position_label",
         "line": 331,
         "start_byte": 11109
+      }
+    ],
+    "status": "accepted"
+  },
+  "Right Aligned": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11133,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 328,
+        "start_byte": 11121
+      }
+    ],
+    "status": "accepted"
+  },
+  "Right Open": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 21063,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 695,
+        "start_byte": 21054
       }
     ],
     "status": "accepted"
@@ -57211,6 +60086,19 @@
     ],
     "status": "accepted"
   },
+  "Search Backwards": {
+    "occurrences": [
+      {
+        "call": "SearchOption.label",
+        "end_byte": 3297,
+        "file": "crates/search/src/search.rs",
+        "kind": "search_option_label",
+        "line": 105,
+        "start_byte": 3279
+      }
+    ],
+    "status": "accepted"
+  },
   "Search Inside": {
     "occurrences": [
       {
@@ -57938,6 +60826,14 @@
         "kind": "button",
         "line": 1613,
         "start_byte": 56791
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19776,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 638,
+        "start_byte": 19770
       },
       {
         "call": "Button::new",
@@ -58791,6 +61687,22 @@
         "kind": "context_menu_entry",
         "line": 4263,
         "start_byte": 171754
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19263,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 614,
+        "start_byte": 19254
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 22654,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 647,
+        "start_byte": 22645
       },
       {
         "call": "Menu.name",
@@ -60140,6 +63052,19 @@
         "kind": "rust_doc_comment",
         "line": 41,
         "start_byte": 1171
+      }
+    ],
+    "status": "accepted"
+  },
+  "Server": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11600,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 350,
+        "start_byte": 11594
       }
     ],
     "status": "accepted"
@@ -64191,6 +67116,14 @@
         "kind": "agent_tool_title",
         "line": 157,
         "start_byte": 5841
+      },
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 3149,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 79,
+        "start_byte": 3142
       }
     ],
     "status": "accepted"
@@ -64230,6 +67163,19 @@
         "kind": "setting_title",
         "line": 3401,
         "start_byte": 153081
+      }
+    ],
+    "status": "accepted"
+  },
+  "Small": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25428,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 846,
+        "start_byte": 25423
       }
     ],
     "status": "accepted"
@@ -64306,6 +67252,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Smart": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25136,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 826,
+        "start_byte": 25131
+      }
+    ],
+    "status": "accepted"
   },
   "Snippet Sort Order": {
     "occurrences": [
@@ -64769,6 +67728,14 @@
         "kind": "shared_string",
         "line": 172,
         "start_byte": 7493
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25804,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 921,
+        "start_byte": 25799
       }
     ],
     "status": "accepted"
@@ -65295,6 +68262,19 @@
     ],
     "status": "accepted"
   },
+  "Staged Hollow": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20304,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 633,
+        "start_byte": 20292
+      }
+    ],
+    "status": "accepted"
+  },
   "Stages all changes in the repository.": {
     "occurrences": [
       {
@@ -65330,6 +68310,48 @@
         "kind": "action_description",
         "line": 36,
         "start_byte": 965
+      }
+    ],
+    "status": "accepted"
+  },
+  "Standard": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 13251,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 443,
+        "start_byte": 13243
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 925,
+        "file": "crates/settings_content/src/title_bar.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 29,
+        "start_byte": 917
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24382,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 816,
+        "start_byte": 24374
+      }
+    ],
+    "status": "accepted"
+  },
+  "Star Coder": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6933,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 195,
+        "start_byte": 6924
       }
     ],
     "status": "accepted"
@@ -65913,6 +68935,40 @@
         "kind": "action_description",
         "line": 61,
         "start_byte": 1959
+      }
+    ],
+    "status": "accepted"
+  },
+  "Statement": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18851,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 599,
+        "start_byte": 18842
+      }
+    ],
+    "status": "accepted"
+  },
+  "Static": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 8973,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 269,
+        "start_byte": 8967
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 10196,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 311,
+        "start_byte": 10190
       }
     ],
     "status": "accepted"
@@ -66623,6 +69679,19 @@
     ],
     "status": "accepted"
   },
+  "Subpixel": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 19073,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 659,
+        "start_byte": 19065
+      }
+    ],
+    "status": "accepted"
+  },
   "Subscribe on GitHub": {
     "occurrences": [
       {
@@ -66697,6 +69766,14 @@
         "kind": "context_menu_entry",
         "line": 789,
         "start_byte": 34115
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10554,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 334,
+        "start_byte": 10548
       },
       {
         "call": "Button::new",
@@ -67235,6 +70312,19 @@
     ],
     "status": "accepted"
   },
+  "Symbol": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11621,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 331,
+        "start_byte": 11615
+      }
+    ],
+    "status": "accepted"
+  },
   "Symbolic Link": {
     "occurrences": [
       {
@@ -67300,6 +70390,19 @@
     ],
     "status": "accepted"
   },
+  "Syntax Aware": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11156,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 359,
+        "start_byte": 11145
+      }
+    ],
+    "status": "accepted"
+  },
   "Syntax Tokens": {
     "occurrences": [
       {
@@ -67335,6 +70438,38 @@
         "kind": "shared_string",
         "line": 72,
         "start_byte": 2839
+      },
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 8224,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 206,
+        "start_byte": 8218
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11347,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 309,
+        "start_byte": 11341
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13590,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 419,
+        "start_byte": 13584
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11219,
+        "file": "crates/settings_content/src/theme.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 353,
+        "start_byte": 11213
       }
     ],
     "status": "accepted"
@@ -67627,6 +70762,14 @@
         "kind": "settings_page_title",
         "line": 6932,
         "start_byte": 314765
+      },
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 1046,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 25,
+        "start_byte": 1036
       }
     ],
     "status": "accepted"
@@ -67653,6 +70796,19 @@
         "kind": "setting_title",
         "line": 3622,
         "start_byte": 162989
+      }
+    ],
+    "status": "accepted"
+  },
+  "Terminal Controlled": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 12397,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 363,
+        "start_byte": 12379
       }
     ],
     "status": "accepted"
@@ -71374,6 +74530,27 @@
         "kind": "prompt_message",
         "line": 510,
         "start_byte": 18706
+      }
+    ],
+    "status": "accepted"
+  },
+  "This Window": {
+    "occurrences": [
+      {
+        "call": "ProjectPickerEntry::Header",
+        "end_byte": 48586,
+        "file": "crates/agent_ui/src/threads_archive_view.rs",
+        "kind": "project_picker_header",
+        "line": 1406,
+        "start_byte": 48573
+      },
+      {
+        "call": "ProjectPickerEntry::Header",
+        "end_byte": 37111,
+        "file": "crates/recent_projects/src/recent_projects.rs",
+        "kind": "project_picker_header",
+        "line": 1051,
+        "start_byte": 37098
       }
     ],
     "status": "accepted"
@@ -75228,6 +78405,22 @@
         "kind": "dropdown_label",
         "line": 17,
         "start_byte": 603
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24520,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 860,
+        "start_byte": 24517
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25093,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 886,
+        "start_byte": 25090
       }
     ],
     "status": "accepted"
@@ -75267,6 +78460,32 @@
         "kind": "git_section_title",
         "line": 329,
         "start_byte": 11059
+      }
+    ],
+    "status": "accepted"
+  },
+  "Tracked Files": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 18262,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 562,
+        "start_byte": 18250
+      }
+    ],
+    "status": "accepted"
+  },
+  "Trailing": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23117,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 660,
+        "start_byte": 23109
       }
     ],
     "status": "accepted"
@@ -75930,6 +79149,27 @@
     ],
     "status": "accepted"
   },
+  "Underline": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 23378,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 806,
+        "start_byte": 23369
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 27672,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 939,
+        "start_byte": 27663
+      }
+    ],
+    "status": "accepted"
+  },
   "Underline cursor.": {
     "occurrences": [
       {
@@ -76209,6 +79449,19 @@
     ],
     "status": "accepted"
   },
+  "Unicode": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25831,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 872,
+        "start_byte": 25824
+      }
+    ],
+    "status": "accepted"
+  },
   "Unified": {
     "occurrences": [
       {
@@ -76218,6 +79471,14 @@
         "kind": "tooltip",
         "line": 137,
         "start_byte": 5338
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25742,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 918,
+        "start_byte": 25735
       }
     ],
     "status": "accepted"
@@ -76514,6 +79775,14 @@
         "kind": "context_menu_entry",
         "line": 3219,
         "start_byte": 116968
+      },
+      {
+        "call": "end_slot_tooltip_text",
+        "end_byte": 104813,
+        "file": "crates/workspace/src/pane.rs",
+        "kind": "tab_tooltip",
+        "line": 2988,
+        "start_byte": 104802
       }
     ],
     "status": "accepted"
@@ -76719,6 +79988,19 @@
     ],
     "status": "accepted"
   },
+  "Unstaged Hollow": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 20402,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 635,
+        "start_byte": 20388
+      }
+    ],
+    "status": "accepted"
+  },
   "Unstages all changes in the repository.": {
     "occurrences": [
       {
@@ -76806,6 +80088,19 @@
         "kind": "label",
         "line": 171,
         "start_byte": 7463
+      }
+    ],
+    "status": "accepted"
+  },
+  "Up": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 17299,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 578,
+        "start_byte": 17297
       }
     ],
     "status": "accepted"
@@ -77051,6 +80346,19 @@
         "kind": "label",
         "line": 2250,
         "start_byte": 86074
+      }
+    ],
+    "status": "accepted"
+  },
+  "Upper": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25468,
+        "file": "crates/settings_content/src/workspace.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 866,
+        "start_byte": 25463
       }
     ],
     "status": "accepted"
@@ -77311,6 +80619,19 @@
         "kind": "setting_title",
         "line": 8296,
         "start_byte": 374959
+      }
+    ],
+    "status": "accepted"
+  },
+  "Use Regular Expressions": {
+    "occurrences": [
+      {
+        "call": "SearchOption.label",
+        "end_byte": 3171,
+        "file": "crates/search/src/search.rs",
+        "kind": "search_option_label",
+        "line": 103,
+        "start_byte": 3146
       }
     ],
     "status": "accepted"
@@ -78260,6 +81581,14 @@
   "Vertical Scroll Margin": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 22896,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 780,
+        "start_byte": 22876
+      },
+      {
         "call": "SettingItem.title",
         "end_byte": 78312,
         "file": "crates/settings_ui/src/page_data.rs",
@@ -79132,6 +82461,22 @@
   "Warning": {
     "occurrences": [
       {
+        "call": "strum::VariantNames",
+        "end_byte": 21784,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 725,
+        "start_byte": 21777
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 24099,
+        "file": "crates/settings_content/src/project.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 767,
+        "start_byte": 24092
+      },
+      {
         "call": "Button::new",
         "end_byte": 16984,
         "file": "crates/ui/src/components/button/button.rs",
@@ -79140,7 +82485,7 @@
         "start_byte": 16975
       }
     ],
-    "status": "ignored"
+    "status": "accepted"
   },
   "Warning status": {
     "occurrences": [
@@ -79207,13 +82552,26 @@
     ],
     "status": "accepted"
   },
+  "Web Search": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 2963,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 73,
+        "start_byte": 2951
+      }
+    ],
+    "status": "accepted"
+  },
   "Web search queries": {
     "occurrences": [
       {
-        "call": "settings_field_description",
+        "call": "ToolInfo.description",
         "end_byte": 3006,
         "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
-        "kind": "setting_description",
+        "kind": "tool_permission_tool_description",
         "line": 74,
         "start_byte": 2986
       }
@@ -79628,6 +82986,19 @@
         "kind": "setting_title",
         "line": 138,
         "start_byte": 4847
+      }
+    ],
+    "status": "accepted"
+  },
+  "When Hidden": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 13261,
+        "file": "crates/settings_content/src/agent.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 376,
+        "start_byte": 13251
       }
     ],
     "status": "accepted"
@@ -84605,6 +87976,19 @@
     ],
     "status": "accepted"
   },
+  "With Arguments": {
+    "occurrences": [
+      {
+        "call": "strum::EnumDiscriminants",
+        "end_byte": 8361,
+        "file": "crates/settings_content/src/terminal.rs",
+        "kind": "settings_enum_discriminant_label",
+        "line": 210,
+        "start_byte": 8348
+      }
+    ],
+    "status": "accepted"
+  },
   "Word Diff Enabled": {
     "occurrences": [
       {
@@ -84751,6 +88135,19 @@
     ],
     "status": "accepted"
   },
+  "Wrapped": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 11012,
+        "file": "crates/settings_content/src/editor.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 289,
+        "start_byte": 11005
+      }
+    ],
+    "status": "accepted"
+  },
   "Wrapping": {
     "occurrences": [
       {
@@ -84790,6 +88187,19 @@
     ],
     "status": "accepted"
   },
+  "Write File": {
+    "occurrences": [
+      {
+        "call": "ToolInfo.name",
+        "end_byte": 1553,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permission_tool_name",
+        "line": 37,
+        "start_byte": 1541
+      }
+    ],
+    "status": "accepted"
+  },
   "Write to Selected Memory Range": {
     "occurrences": [
       {
@@ -84799,6 +88209,19 @@
         "kind": "placeholder",
         "line": 403,
         "start_byte": 14420
+      }
+    ],
+    "status": "accepted"
+  },
+  "X Large": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 25463,
+        "file": "crates/settings_content/src/settings_content.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 849,
+        "start_byte": 25457
       }
     ],
     "status": "accepted"
@@ -84958,6 +88381,14 @@
         "kind": "prompt_answer",
         "line": 512,
         "start_byte": 18833
+      },
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 10006,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 309,
+        "start_byte": 10003
       }
     ],
     "status": "accepted"
@@ -85661,6 +89092,45 @@
     ],
     "status": "accepted"
   },
+  "Zeta": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6879,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 191,
+        "start_byte": 6875
+      }
+    ],
+    "status": "accepted"
+  },
+  "Zeta2": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6890,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 192,
+        "start_byte": 6885
+      }
+    ],
+    "status": "accepted"
+  },
+  "Zeta2 1": {
+    "occurrences": [
+      {
+        "call": "strum::VariantNames",
+        "end_byte": 6903,
+        "file": "crates/settings_content/src/language.rs",
+        "kind": "settings_enum_variant_label",
+        "line": 193,
+        "start_byte": 6896
+      }
+    ],
+    "status": "accepted"
+  },
   "Zoom": {
     "occurrences": [
       {
@@ -86242,6 +89712,19 @@
         "kind": "rust_doc_comment",
         "line": 678,
         "start_byte": 21012
+      }
+    ],
+    "status": "accepted"
+  },
+  "`rm -rf` commands are always blocked when run on `$HOME`, `~`, `.`, `..`, or `/`": {
+    "occurrences": [
+      {
+        "call": "HARDCODED_RULES_DESCRIPTION",
+        "end_byte": 719,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_security_note",
+        "line": 18,
+        "start_byte": 637
       }
     ],
     "status": "accepted"
@@ -87819,7 +91302,7 @@
         "start_byte": 61191
       }
     ],
-    "status": "ignored"
+    "status": "accepted"
   },
   "https://api.inceptionlabs.ai/v1/edit/completions": {
     "occurrences": [
@@ -92239,6 +95722,19 @@
     ],
     "status": "accepted"
   },
+  "{} invalid": {
+    "occurrences": [
+      {
+        "call": "tool_permissions_summary",
+        "end_byte": 8338,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_summary",
+        "line": 241,
+        "start_byte": 8326
+      }
+    ],
+    "status": "accepted"
+  },
   "{} is in an unshared pane": {
     "occurrences": [
       {
@@ -92365,6 +95861,19 @@
         "kind": "description",
         "line": 8460,
         "start_byte": 350031
+      }
+    ],
+    "status": "accepted"
+  },
+  "{} rules": {
+    "occurrences": [
+      {
+        "call": "tool_permissions_summary",
+        "end_byte": 8224,
+        "file": "crates/settings_ui/src/pages/tool_permissions_setup.rs",
+        "kind": "tool_permissions_summary",
+        "line": 237,
+        "start_byte": 8214
       }
     ],
     "status": "accepted"

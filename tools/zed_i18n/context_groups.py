@@ -20,6 +20,11 @@ SETTING_ROLES = {
     "switch_description": "description",
 }
 
+SETTING_ENUM_LABEL_KINDS = {
+    "settings_enum_variant_label",
+    "settings_enum_discriminant_label",
+}
+
 SETTING_BLOCK_PATTERNS: tuple[tuple[str, re.Pattern[str], str, str], ...] = (
     ("setting", re.compile(r"\bSettingItem\s*\{"), "{", "}"),
     ("settings_action", re.compile(r"\bActionLink\s*\{"), "{", "}"),
@@ -63,11 +68,18 @@ def source_batches_for_context_groups(
     items: list[tuple[tuple[str, int, str], list[str]]] = []
 
     for group in _sorted_groups(groups.all_groups()):
-        group_sources = [
-            entry["source"]
-            for entry in group.get("entries", [])
-            if entry.get("source") in target_sources
-        ]
+        group_sources = []
+        seen_in_group: set[str] = set()
+        for entry in group.get("entries", []):
+            source = entry.get("source")
+            if (
+                isinstance(source, str)
+                and source in target_sources
+                and source not in consumed
+                and source not in seen_in_group
+            ):
+                group_sources.append(source)
+                seen_in_group.add(source)
         if not group_sources:
             continue
         items.append((_group_sort_key(group), group_sources))
@@ -98,14 +110,17 @@ def context_groups_by_source(
     target_sources: Iterable[str],
 ) -> dict[str, dict[str, Any]]:
     target_set = set(target_sources)
-    contexts: dict[str, dict[str, Any]] = {}
+    contexts: dict[str, list[dict[str, Any]]] = {}
     for group in groups.all_groups():
         payload = _context_payload(group, target_set)
         for entry in group.get("entries", []):
             source = entry.get("source")
-            if isinstance(source, str):
-                contexts.setdefault(source, payload)
-    return contexts
+            if isinstance(source, str) and source in target_set:
+                contexts.setdefault(source, []).append(payload)
+    return {
+        source: payloads[0] if len(payloads) == 1 else _combined_context_payload(source, payloads)
+        for source, payloads in contexts.items()
+    }
 
 
 def preferred_occurrence_from_context(
@@ -114,14 +129,23 @@ def preferred_occurrence_from_context(
 ) -> dict[str, Any] | None:
     if not context_group:
         return None
+    child_groups = context_group.get("groups")
+    if isinstance(child_groups, list):
+        for child_group in child_groups:
+            if not isinstance(child_group, dict):
+                continue
+            occurrence = preferred_occurrence_from_context(child_group, source)
+            if occurrence is not None:
+                return occurrence
     file = context_group.get("file")
     for entry in context_group.get("entries", []):
         if entry.get("source") != source:
             continue
         line = entry.get("line")
-        if isinstance(file, str) and isinstance(line, int):
+        entry_file = entry.get("file") or file
+        if isinstance(entry_file, str) and isinstance(line, int):
             return {
-                "file": file,
+                "file": entry_file,
                 "line": line,
                 "kind": entry.get("kind", ""),
                 "call": entry.get("call", ""),
@@ -226,11 +250,105 @@ def _build_setting_groups(
             )
             group["entries"].append(_group_entry(occurrence, SETTING_ROLES[occurrence["kind"]]))
 
+    enum_groups = _build_setting_enum_groups(zed_root, occurrences)
+    enum_groups_by_name = {
+        group["context_key"]: group
+        for group in enum_groups
+        if isinstance(group.get("context_key"), str)
+    }
+    field_enum_types = _settings_field_enum_types(zed_root, set(enum_groups_by_name))
+    path_enum_types = _settings_path_enum_types(zed_root, set(enum_groups_by_name))
+    dynamic_discriminant_context_keys = {
+        context_key.removesuffix("$")
+        for group in groups.values()
+        if isinstance((context_key := group.get("context_key")), str)
+        and context_key.endswith("$")
+    }
+    linked_enum_names: set[str] = set()
+    result: list[dict[str, Any]] = []
+    for group in groups.values():
+        roles = {entry["role"] for entry in group["entries"]}
+        if "title" not in roles:
+            continue
+        source_path = zed_root / group["file"]
+        enum_names: list[str] = []
+        if source_path.exists():
+            lines = source_path.read_text(encoding="utf-8").splitlines()
+            enum_names = _enum_names_for_setting_block(
+                lines,
+                group["start_line"],
+                group["end_line"],
+                group.get("context_key"),
+                field_enum_types,
+                path_enum_types,
+                set(enum_groups_by_name),
+                skip_context_lookup=group.get("context_key") in dynamic_discriminant_context_keys,
+            )
+        if "description" not in roles and not enum_names:
+            continue
+        for enum_name in enum_names:
+            enum_group = enum_groups_by_name.get(enum_name)
+            if enum_group is None:
+                continue
+            group["entries"].extend(enum_group["entries"])
+            linked_enum_names.add(enum_name)
+        if enum_names:
+            group["subtype"] = "setting_with_options"
+            group["option_context_keys"] = enum_names
+        group["entries"] = _dedupe_and_sort_entries(group["entries"])
+        group["joined_source"] = _join_text(entry["source"] for entry in group["entries"])
+        group["joined_current_translation"] = _join_text(
+            entry.get("current_translation") for entry in group["entries"]
+        )
+        result.append(group)
+    result.extend(
+        group
+        for group in enum_groups
+        if group.get("context_key") not in linked_enum_names
+    )
+    return _sorted_groups(result)
+
+
+def _build_setting_enum_groups(
+    zed_root: Path,
+    occurrences: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    by_file: dict[str, list[dict[str, Any]]] = {}
+    for occurrence in occurrences:
+        if occurrence["kind"] in SETTING_ENUM_LABEL_KINDS:
+            by_file.setdefault(occurrence["file"], []).append(occurrence)
+
+    groups: dict[str, dict[str, Any]] = {}
+    for file, file_occurrences in by_file.items():
+        source_path = zed_root / file
+        if not source_path.exists():
+            continue
+        lines = source_path.read_text(encoding="utf-8").splitlines()
+        for occurrence in file_occurrences:
+            block = _setting_enum_block_for_line(lines, occurrence["line"])
+            if block is None:
+                continue
+            enum_name, start_line, end_line = block
+            group_id = f"settings_enum:{file}:{start_line}"
+            group = groups.setdefault(
+                group_id,
+                {
+                    "id": group_id,
+                    "type": "setting",
+                    "subtype": "settings_enum",
+                    "file": file,
+                    "start_line": start_line,
+                    "end_line": end_line,
+                    "context_key": enum_name,
+                    "entries": [],
+                },
+            )
+            group["entries"].append(_group_entry(occurrence, "option"))
+
     result: list[dict[str, Any]] = []
     for group in groups.values():
         group["entries"] = _dedupe_and_sort_entries(group["entries"])
-        roles = {entry["role"] for entry in group["entries"]}
-        if "title" not in roles or "description" not in roles:
+        if len(group["entries"]) < 2:
             continue
         group["joined_source"] = _join_text(entry["source"] for entry in group["entries"])
         group["joined_current_translation"] = _join_text(
@@ -311,6 +429,22 @@ def _setting_block_for_line(
     return None
 
 
+def _setting_enum_block_for_line(
+    lines: list[str],
+    line_number: int,
+) -> tuple[str, int, int] | None:
+    line_index = line_number - 1
+    for start_index in range(line_index, max(-1, line_index - 120), -1):
+        line = _without_string_literals(lines[start_index])
+        match = re.search(r"\bpub(?:\([^)]*\))?\s+enum\s+([A-Za-z0-9_]+)\s*\{", line)
+        if match is None:
+            continue
+        end_line = _delimited_block_end(lines, start_index, "{", "}")
+        if end_line is not None and start_index + 1 <= line_number <= end_line:
+            return match.group(1), start_index + 1, end_line
+    return None
+
+
 def _delimited_block_end(
     lines: list[str],
     start_index: int,
@@ -361,10 +495,244 @@ def _json_path_from_block(lines: list[str], start_line: int, end_line: int) -> s
     return match.group(1)
 
 
+def _settings_field_enum_types(zed_root: Path, enum_names: set[str]) -> dict[str, str]:
+    settings_content_root = zed_root / "crates" / "settings_content" / "src"
+    if not settings_content_root.exists():
+        return {}
+
+    candidates: dict[str, set[str]] = {}
+    for path in settings_content_root.rglob("*.rs"):
+        text = path.read_text(encoding="utf-8")
+        for match in _settings_field_pattern().finditer(text):
+            field_name = match.group(1)
+            enum_name = _normalize_settings_enum_name(match.group(2), enum_names)
+            if enum_name is None:
+                continue
+            candidates.setdefault(field_name, set()).add(enum_name)
+
+    return {
+        field_name: next(iter(types))
+        for field_name, types in candidates.items()
+        if len(types) == 1
+    }
+
+
+def _settings_path_enum_types(zed_root: Path, enum_names: set[str]) -> dict[str, str]:
+    struct_fields = _settings_struct_fields(zed_root)
+    enum_variant_fields = _settings_enum_variant_fields(zed_root)
+    candidates: dict[str, set[str]] = {}
+
+    def add_candidate(path_parts: list[str], type_name: str) -> None:
+        enum_name = _normalize_settings_enum_name(type_name, enum_names)
+        if enum_name is None:
+            return
+        candidates.setdefault(".".join(path_parts), set()).add(enum_name)
+
+    def walk(struct_name: str, prefix: list[str], seen: set[str]) -> None:
+        for field_name, type_name in struct_fields.get(struct_name, []):
+            path_parts = [*prefix, field_name]
+            add_candidate(path_parts, type_name)
+            if type_name in struct_fields and type_name not in seen:
+                walk(type_name, path_parts, {*seen, type_name})
+            for variant_field_name, variant_type_name in enum_variant_fields.get(type_name, []):
+                add_candidate([*path_parts, variant_field_name], variant_type_name)
+
+    for struct_name in struct_fields:
+        walk(struct_name, [], {struct_name})
+
+    return {
+        path: next(iter(types))
+        for path, types in candidates.items()
+        if len(types) == 1
+    }
+
+
+def _settings_struct_fields(zed_root: Path) -> dict[str, list[tuple[str, str]]]:
+    settings_content_root = zed_root / "crates" / "settings_content" / "src"
+    if not settings_content_root.exists():
+        return {}
+
+    structs: dict[str, list[tuple[str, str]]] = {}
+    struct_pattern = re.compile(r"\bpub\s+struct\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{")
+    field_pattern = _settings_field_pattern()
+    for path in settings_content_root.rglob("*.rs"):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for start_index, line in enumerate(lines):
+            match = struct_pattern.search(line)
+            if match is None:
+                continue
+            end_line = _delimited_block_end(lines, start_index, "{", "}")
+            if end_line is None:
+                continue
+            block = "\n".join(lines[start_index:end_line])
+            structs[match.group(1)] = [
+                (field_match.group(1), field_match.group(2))
+                for field_match in field_pattern.finditer(block)
+            ]
+    return structs
+
+
+def _settings_enum_variant_fields(zed_root: Path) -> dict[str, list[tuple[str, str]]]:
+    settings_content_root = zed_root / "crates" / "settings_content" / "src"
+    if not settings_content_root.exists():
+        return {}
+
+    enums: dict[str, list[tuple[str, str]]] = {}
+    enum_pattern = re.compile(r"\bpub\s+enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*\{")
+    variant_field_pattern = re.compile(
+        r"\b([A-Za-z_][A-Za-z0-9_]*)\s*:\s*"
+        r"(?:[A-Za-z_][A-Za-z0-9_]*::)*([A-Za-z_][A-Za-z0-9_]*)\s*,"
+    )
+    for path in settings_content_root.rglob("*.rs"):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for start_index, line in enumerate(lines):
+            match = enum_pattern.search(line)
+            if match is None:
+                continue
+            end_line = _delimited_block_end(lines, start_index, "{", "}")
+            if end_line is None:
+                continue
+            block = "\n".join(lines[start_index:end_line])
+            fields = [
+                (field_match.group(1), field_match.group(2))
+                for field_match in variant_field_pattern.finditer(block)
+            ]
+            if fields:
+                enums[match.group(1)] = fields
+    return enums
+
+
+def _settings_field_pattern() -> re.Pattern[str]:
+    return re.compile(
+        r"\bpub\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*"
+        r"(?:Option\s*<\s*)?"
+        r"(?:Vec\s*<\s*)?"
+        r"(?:[A-Za-z_][A-Za-z0-9_]*::)*([A-Za-z_][A-Za-z0-9_]*)"
+    )
+
+
+def _enum_names_for_setting_block(
+    lines: list[str],
+    start_line: int,
+    end_line: int,
+    context_key: object,
+    field_enum_types: dict[str, str],
+    path_enum_types: dict[str, str],
+    enum_names: set[str],
+    *,
+    skip_context_lookup: bool = False,
+) -> list[str]:
+    text = "\n".join(lines[start_line - 1 : end_line])
+    dynamic_variant_child = re.search(r"=>\s*vec!\s*\[\s*SettingItem\s*\{", text) is not None
+    names: list[str] = []
+
+    if not dynamic_variant_child:
+        for match in re.finditer(r"dynamic_variants::<settings::([A-Za-z_][A-Za-z0-9_]*)>", text):
+            enum_name = _normalize_settings_enum_name(match.group(1), enum_names)
+            if enum_name is not None and enum_name not in names:
+                names.append(enum_name)
+
+        for match in re.finditer(r"\bsettings::([A-Za-z_][A-Za-z0-9_]*Discriminants)\b", text):
+            enum_name = _normalize_settings_enum_name(match.group(1), enum_names)
+            if enum_name is not None and enum_name not in names:
+                names.append(enum_name)
+
+    path_key = _path_from_context_key(context_key)
+    pick_path = _pick_path_from_setting_block(text)
+    pick_field_name = _field_name_from_context_key(pick_path)
+    context_conflicts_with_pick = (
+        not dynamic_variant_child
+        and path_key is not None
+        and pick_field_name is not None
+        and _field_name_from_context_key(path_key) != pick_field_name
+    )
+    if pick_path is not None and not dynamic_variant_child:
+        enum_name = path_enum_types.get(pick_path)
+        if enum_name is None and pick_field_name is not None:
+            enum_name = field_enum_types.get(pick_field_name)
+        if enum_name is not None and enum_name not in names:
+            names.append(enum_name)
+
+    matched_path = False
+    if path_key is not None and not skip_context_lookup and not context_conflicts_with_pick:
+        enum_name = path_enum_types.get(path_key)
+        if enum_name is not None and enum_name not in names:
+            names.append(enum_name)
+            matched_path = True
+
+    field_name = _field_name_from_context_key(context_key)
+    if (
+        field_name is not None
+        and not skip_context_lookup
+        and not matched_path
+        and not context_conflicts_with_pick
+    ):
+        enum_name = field_enum_types.get(field_name)
+        if enum_name is not None and enum_name not in names:
+            names.append(enum_name)
+
+    return names
+
+
+def _pick_path_from_setting_block(text: str) -> str | None:
+    pick_index = text.find("pick:")
+    if pick_index < 0:
+        return None
+    write_index = text.find("write:", pick_index)
+    pick_text = text[pick_index : write_index if write_index >= 0 else len(text)]
+    paths = [
+        path
+        for match in re.finditer(
+            r"settings_content((?:\s*\.as_ref\(\)\?|\s*\.\s*[A-Za-z_][A-Za-z0-9_]*)*)",
+            pick_text,
+        )
+        if (path := _settings_content_path_from_chain(match.group(1))) is not None
+    ]
+    if not paths:
+        return None
+    return max(paths, key=lambda path: path.count("."))
+
+
+def _settings_content_path_from_chain(chain: str) -> str | None:
+    fields = [
+        field
+        for field in re.findall(r"\.\s*([A-Za-z_][A-Za-z0-9_]*)", chain)
+        if field != "as_ref"
+    ]
+    if not fields:
+        return None
+    return ".".join(fields)
+
+
+def _path_from_context_key(context_key: object) -> str | None:
+    if not isinstance(context_key, str) or not context_key:
+        return None
+    key = context_key.rstrip("$")
+    return key or None
+
+
+def _field_name_from_context_key(context_key: object) -> str | None:
+    key = _path_from_context_key(context_key)
+    if key is None:
+        return None
+    return key.rsplit(".", 1)[-1]
+
+
+def _normalize_settings_enum_name(name: str, enum_names: set[str]) -> str | None:
+    if name in enum_names:
+        return name
+    if name.endswith("Discriminants"):
+        base_name = name.removesuffix("Discriminants")
+        if base_name in enum_names:
+            return base_name
+    return None
+
+
 def _group_entry(occurrence: dict[str, Any], role: str) -> dict[str, Any]:
     entry = {
         "role": role,
         "source": occurrence["source"],
+        "file": occurrence["file"],
         "kind": occurrence["kind"],
         "call": occurrence["call"],
         "line": occurrence["line"],
@@ -377,10 +745,26 @@ def _group_entry(occurrence: dict[str, Any], role: str) -> dict[str, Any]:
 
 
 def _dedupe_and_sort_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    deduped: dict[tuple[str, str, int], dict[str, Any]] = {}
+    deduped: dict[tuple[str, str, str, int], dict[str, Any]] = {}
     for entry in entries:
-        deduped[(entry["source"], entry["role"], entry["line"])] = entry
-    return sorted(deduped.values(), key=lambda entry: (entry["line"], entry["start_byte"], entry["role"]))
+        deduped[(entry.get("file", ""), entry["source"], entry["role"], entry["line"])] = entry
+    role_order = {
+        "title": 0,
+        "description": 1,
+        "placeholder": 2,
+        "button": 3,
+        "option": 4,
+    }
+    return sorted(
+        deduped.values(),
+        key=lambda entry: (
+            role_order.get(entry["role"], 99),
+            entry.get("file", ""),
+            entry["line"],
+            entry["start_byte"],
+            entry["source"],
+        ),
+    )
 
 
 def _context_payload(group: dict[str, Any], target_sources: set[str]) -> dict[str, Any]:
@@ -397,6 +781,42 @@ def _context_payload(group: dict[str, Any], target_sources: set[str]) -> dict[st
         for entry in group.get("entries", [])
     ]
     return payload
+
+
+def _combined_context_payload(source: str, payloads: list[dict[str, Any]]) -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
+    seen_entries: set[tuple[str, str, str, int]] = set()
+    for payload in payloads:
+        for entry in payload.get("entries", []):
+            if not isinstance(entry, dict):
+                continue
+            key = (
+                str(entry.get("file", "")),
+                str(entry.get("source", "")),
+                str(entry.get("role", "")),
+                int(entry.get("line", 0) or 0),
+            )
+            if key in seen_entries:
+                continue
+            seen_entries.add(key)
+            entries.append(entry)
+    return {
+        "type": "related_context_groups",
+        "context_key": source,
+        "groups": payloads,
+        "entries": entries,
+        "joined_source": " | ".join(
+            payload.get("joined_source", "")
+            for payload in payloads
+            if isinstance(payload.get("joined_source"), str)
+        ),
+        "joined_current_translation": " | ".join(
+            payload.get("joined_current_translation", "")
+            for payload in payloads
+            if isinstance(payload.get("joined_current_translation"), str)
+            and payload.get("joined_current_translation")
+        ),
+    }
 
 
 def _sorted_groups(groups: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
