@@ -91,11 +91,11 @@
       },
       {
         "call": "ListBulletItem::new",
-        "end_byte": 15319,
+        "end_byte": 15757,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "list_bullet_item",
-        "line": 469,
-        "start_byte": 15317
+        "line": 482,
+        "start_byte": 15755
       },
       {
         "call": "ListBulletItem::new",
@@ -3147,11 +3147,11 @@
     "occurrences": [
       {
         "call": "SharedString::new_static",
-        "end_byte": 51780,
+        "end_byte": 51656,
         "file": "crates/languages/src/python.rs",
         "kind": "shared_string",
-        "line": 1415,
-        "start_byte": 51678
+        "line": 1410,
+        "start_byte": 51554
       }
     ],
     "status": "accepted"
@@ -3298,11 +3298,11 @@
     "occurrences": [
       {
         "call": "InputField::new",
-        "end_byte": 12528,
+        "end_byte": 12966,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "placeholder",
-        "line": 393,
-        "start_byte": 12517
+        "line": 406,
+        "start_byte": 12955
       }
     ],
     "status": "ignored"
@@ -3650,11 +3650,11 @@
     "occurrences": [
       {
         "call": "ConfiguredApiCard::new",
-        "end_byte": 14181,
+        "end_byte": 14619,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "configured_api_card_label",
-        "line": 442,
-        "start_byte": 14141
+        "line": 455,
+        "start_byte": 14579
       }
     ],
     "status": "accepted"
@@ -16724,11 +16724,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 15395,
+        "end_byte": 15833,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "label",
-        "line": 470,
-        "start_byte": 15371
+        "line": 483,
+        "start_byte": 15809
       },
       {
         "call": "Label::new",
@@ -35291,11 +35291,11 @@
     "occurrences": [
       {
         "call": "ButtonLink::new",
-        "end_byte": 15474,
+        "end_byte": 15912,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "button_link",
-        "line": 471,
-        "start_byte": 15453
+        "line": 484,
+        "start_byte": 15891
       }
     ],
     "status": "accepted"
@@ -41553,11 +41553,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 14650,
+        "end_byte": 15088,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "label",
-        "line": 456,
-        "start_byte": 14626
+        "line": 469,
+        "start_byte": 15064
       },
       {
         "call": "Label::new",
@@ -52065,11 +52065,11 @@
       },
       {
         "call": "ListBulletItem::new",
-        "end_byte": 15690,
+        "end_byte": 16128,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "list_bullet_item",
-        "line": 474,
-        "start_byte": 15625
+        "line": 487,
+        "start_byte": 16063
       },
       {
         "call": "ListBulletItem::new",
@@ -75812,11 +75812,11 @@
     "occurrences": [
       {
         "call": "tooltip_label",
-        "end_byte": 16530,
+        "end_byte": 16968,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "tooltip",
-        "line": 490,
-        "start_byte": 16404
+        "line": 503,
+        "start_byte": 16842
       }
     ],
     "status": "accepted"
@@ -76110,11 +76110,11 @@
       },
       {
         "call": "Label::new",
-        "end_byte": 14951,
+        "end_byte": 15389,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "label",
-        "line": 462,
-        "start_byte": 14891
+        "line": 475,
+        "start_byte": 15329
       }
     ],
     "status": "accepted"
@@ -82280,11 +82280,11 @@
     "occurrences": [
       {
         "call": "SharedString::new_static",
-        "end_byte": 51594,
+        "end_byte": 51470,
         "file": "crates/languages/src/python.rs",
         "kind": "shared_string",
-        "line": 1413,
-        "start_byte": 51573
+        "line": 1408,
+        "start_byte": 51449
       }
     ],
     "status": "accepted"
@@ -88589,11 +88589,11 @@
     "occurrences": [
       {
         "call": "Label::new",
-        "end_byte": 15962,
+        "end_byte": 16400,
         "file": "crates/language_models/src/provider/google.rs",
         "kind": "label",
-        "line": 480,
-        "start_byte": 15876
+        "line": 493,
+        "start_byte": 16314
       }
     ],
     "status": "accepted"
@@ -90040,11 +90040,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 80578,
+        "end_byte": 80454,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 2185,
-        "start_byte": 80555
+        "line": 2180,
+        "start_byte": 80431
       }
     ],
     "status": "ignored"
@@ -90053,11 +90053,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 81177,
+        "end_byte": 81053,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 2196,
-        "start_byte": 81140
+        "line": 2191,
+        "start_byte": 81016
       }
     ],
     "status": "ignored"
@@ -90806,11 +90806,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 69534,
+        "end_byte": 69410,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 1880,
-        "start_byte": 69521
+        "line": 1875,
+        "start_byte": 69397
       }
     ],
     "status": "ignored"
@@ -91568,11 +91568,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 69343,
+        "end_byte": 69219,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 1876,
-        "start_byte": 69337
+        "line": 1871,
+        "start_byte": 69213
       }
     ],
     "status": "ignored"
@@ -92268,11 +92268,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 69947,
+        "end_byte": 69823,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 1888,
-        "start_byte": 69936
+        "line": 1883,
+        "start_byte": 69812
       }
     ],
     "status": "ignored"
@@ -92435,11 +92435,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 69128,
+        "end_byte": 69004,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 1871,
-        "start_byte": 69119
+        "line": 1866,
+        "start_byte": 68995
       }
     ],
     "status": "ignored"
@@ -92539,11 +92539,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 89904,
+        "end_byte": 89656,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 2428,
-        "start_byte": 89892
+        "line": 2418,
+        "start_byte": 89644
       },
       {
         "call": "entry",
@@ -92599,11 +92599,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 69756,
+        "end_byte": 69632,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 1884,
-        "start_byte": 69744
+        "line": 1879,
+        "start_byte": 69620
       }
     ],
     "status": "ignored"
@@ -92628,11 +92628,11 @@
       },
       {
         "call": "SharedString::new_static",
-        "end_byte": 51884,
+        "end_byte": 51760,
         "file": "crates/languages/src/python.rs",
         "kind": "shared_string",
-        "line": 1417,
-        "start_byte": 51868
+        "line": 1412,
+        "start_byte": 51744
       }
     ],
     "status": "ignored"
@@ -92649,11 +92649,11 @@
       },
       {
         "call": "entry",
-        "end_byte": 79848,
+        "end_byte": 79724,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 2169,
-        "start_byte": 79840
+        "line": 2164,
+        "start_byte": 79716
       }
     ],
     "status": "ignored"
@@ -94134,11 +94134,11 @@
     "occurrences": [
       {
         "call": "entry",
-        "end_byte": 80796,
+        "end_byte": 80672,
         "file": "crates/languages/src/python.rs",
         "kind": "context_menu_entry",
-        "line": 2188,
-        "start_byte": 80778
+        "line": 2183,
+        "start_byte": 80654
       }
     ],
     "status": "ignored"
