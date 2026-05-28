@@ -605,6 +605,40 @@ class ApplyTests(unittest.TestCase):
         self.assertTrue(report.ok)
         self.assertIn('"새 스레드…"', source_path.read_text(encoding="utf-8"))
 
+    def test_preserves_rust_unicode_escapes_inside_format_strings(self) -> None:
+        source_path = self.root / "main.rs"
+        source_path.write_text(
+            'let message = format!("Available. Saved to {sep}\\u{2039}name\\u{203A}{sep}{file}.");\n',
+            encoding="utf-8",
+        )
+        source = "Available. Saved to {sep}\\u{2039}name\\u{203A}{sep}{file}."
+        manifest = {
+            source: {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "main.rs",
+                        "line": 1,
+                        "call": "format!",
+                        "kind": "format",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(
+            self.root,
+            manifest,
+            {
+                source: "사용 가능. {sep}\\u{2039}name\\u{203A}{sep}{file}에 저장됩니다.",
+            },
+        )
+
+        text = source_path.read_text(encoding="utf-8")
+        self.assertTrue(report.ok)
+        self.assertIn("\\u{2039}name\\u{203A}", text)
+        self.assertNotIn("\\\\u{2039}", text)
+
 
 if __name__ == "__main__":
     unittest.main()
