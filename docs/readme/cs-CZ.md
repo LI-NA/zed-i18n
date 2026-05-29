@@ -59,7 +59,31 @@ Nepoužívejte buildy z nedůvěryhodných zdrojů; tam, kde je to možné, si p
 
 U souborů, kterým důvěřujete, klikněte ve Finderu pravým tlačítkem a zvolte `Otevřít`, případně v Terminálu odstraňte karanténní atribut příkazem `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
 
-## Instalace
+## Instalace přes správce balíčků
+
+Na macOS lze aplikaci nainstalovat přes Homebrew cask.
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+Automaticky se nainstaluje jazyk odpovídající jazyku systému; pokud žádný neodpovídá, použije se `ko-KR`. Chcete-li zvolit konkrétní jazyk, použijte volbu `--language` nástroje Homebrew.
+
+```bash
+brew install --cask zed-i18n --language=cs-CZ
+```
+
+Na Windows přidejte Scoop bucket a poté nainstalujte požadovaný jazyk.
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-cs-CZ
+```
+
+Instalace přes Scoop nemohou využívat vlastní automatické aktualizace Zed; aktualizují se příkazem `scoop update`.
+
+## Nastavení vývojového prostředí
 
 Vyžaduje Python 3.12 nebo novější a [`uv`](https://docs.astral.sh/uv/).
 

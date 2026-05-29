@@ -59,7 +59,31 @@ Güvenilir olmayan kaynaklardan gelen derlemeleri kullanmaktan kaçının; mümk
 
 Yalnızca güvendiğiniz dosyalar için Finder'da sağ tıklayıp `Aç` seçeneğini kullanın ya da Terminal'de `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` komutuyla karantina özniteliğini kaldırın.
 
-## Kurulum
+## Paket Yöneticisiyle Kurulum
+
+macOS'ta Homebrew cask ile kurabilirsiniz.
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+Sistem diliyle eşleşen dil otomatik olarak kurulur; eşleşen bir dil yoksa `ko-KR` kurulur. Belirli bir dil seçmek için Homebrew'un `--language` seçeneğini kullanabilirsiniz.
+
+```bash
+brew install --cask zed-i18n --language=tr-TR
+```
+
+Windows'ta Scoop bucket'ını ekleyip ardından istediğiniz dili kurabilirsiniz.
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-tr-TR
+```
+
+Scoop ile yapılan kurulumlar Zed'in kendi otomatik güncellemesini kullanamaz; bunları `scoop update` ile güncelleyebilirsiniz.
+
+## Geliştirme Ortamı Kurulumu
 
 Python 3.12 veya üzeri ile [`uv`](https://docs.astral.sh/uv/) gereklidir.
 

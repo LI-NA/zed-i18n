@@ -59,7 +59,31 @@ Avoid using builds from untrusted sources; building from source can reduce that 
 
 For files you trust, right-click the app in Finder and choose `Open`, or remove the quarantine attribute from Terminal with `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`.
 
-## Installation
+## Install via Package Manager
+
+On macOS, you can install it with a Homebrew cask.
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+This automatically installs the language matching your system locale, falling back to `ko-KR` when there is no match. To pick a specific language, use Homebrew's `--language` option.
+
+```bash
+brew install --cask zed-i18n --language=ko-KR
+```
+
+On Windows, add the Scoop bucket and then install the language you want.
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-ko-KR
+```
+
+Scoop installs cannot use Zed's built-in auto-update; update them with `scoop update` instead.
+
+## Development Setup
 
 Requires Python 3.12 or later and [`uv`](https://docs.astral.sh/uv/).
 

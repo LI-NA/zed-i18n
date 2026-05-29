@@ -59,7 +59,31 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 Для файлов, которым вы доверяете, можно в Finder нажать правой кнопкой и выбрать `Открыть` либо удалить атрибут карантина командой `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` в терминале.
 
-## Установка
+## Установка через менеджер пакетов
+
+В macOS приложение можно установить через Homebrew cask.
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+Автоматически устанавливается язык, соответствующий языку системы, а при отсутствии совпадения используется `ko-KR`. Чтобы выбрать конкретный язык, воспользуйтесь параметром `--language` в Homebrew.
+
+```bash
+brew install --cask zed-i18n --language=ru-RU
+```
+
+В Windows добавьте Scoop bucket, а затем установите нужный язык.
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-ru-RU
+```
+
+Сборки, установленные через Scoop, не могут использовать встроенное автообновление Zed; их обновляют командой `scoop update`.
+
+## Настройка среды разработки
 
 Требуется Python 3.12 или новее и [`uv`](https://docs.astral.sh/uv/).
 

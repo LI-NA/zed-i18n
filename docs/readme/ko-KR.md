@@ -59,7 +59,31 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 신뢰하는 파일에 한해 Finder에서 우클릭 후 `열기`를 선택하거나, 터미널에서 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app`처럼 앱 경로를 지정해 격리 속성을 제거할 수 있습니다.
 
-## 설치
+## 패키지 매니저로 설치
+
+macOS에서는 Homebrew cask로 설치할 수 있습니다.
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+자동으로 시스템 언어와 일치하는 언어를 설치하며, 일치하는 언어가 없다면 `ko-KR`을 설치합니다. 특정 언어를 지정하려면 Homebrew의 `--language` 옵션을 사용할 수 있습니다.
+
+```bash
+brew install --cask zed-i18n --language=ko-KR
+```
+
+Windows에서는 Scoop bucket을 추가한 뒤 원하는 언어를 지정해서 설치하면 됩니다.
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-ko-KR
+```
+
+Scoop 설치본은 Zed 자체 자동 업데이트를 사용할 수 없으며, `scoop update`로 업데이트할 수 있습니다.
+
+## 개발 환경 설정
 
 Python 3.12 이상, [`uv`](https://docs.astral.sh/uv/) 필요.
 

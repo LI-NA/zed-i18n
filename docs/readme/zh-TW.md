@@ -59,7 +59,31 @@ cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR ·
 
 針對你信任的檔案，可在 Finder 中按右鍵選擇 `開啟`，或在終端機執行 `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` 移除隔離屬性。
 
-## 安裝
+## 透過套件管理器安裝
+
+在 macOS 上，你可以透過 Homebrew cask 安裝。
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+它會自動安裝與系統語言相符的語言；若沒有相符的語言，則會安裝 `ko-KR`。若要指定特定語言，可使用 Homebrew 的 `--language` 選項。
+
+```bash
+brew install --cask zed-i18n --language=zh-TW
+```
+
+在 Windows 上，新增 Scoop bucket 後，再指定想要的語言進行安裝。
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-zh-TW
+```
+
+透過 Scoop 安裝的版本無法使用 Zed 內建的自動更新，可使用 `scoop update` 進行更新。
+
+## 開發環境設定
 
 需要 Python 3.12 以上版本及 [`uv`](https://docs.astral.sh/uv/)。
 

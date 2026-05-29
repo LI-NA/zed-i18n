@@ -59,7 +59,31 @@ Builds aus nicht vertrauenswürdigen Quellen sind zu vermeiden; wo möglich, sol
 
 Bei vertrauenswürdigen Dateien lässt sich die App im Finder per Rechtsklick und `Öffnen` starten, oder das Quarantäne-Attribut kann im Terminal mit `xattr -dr com.apple.quarantine /path/to/Zed\ i18n.app` entfernt werden.
 
-## Installation
+## Installation über einen Paketmanager
+
+Unter macOS lässt sich die App über einen Homebrew-Cask installieren.
+
+```bash
+brew tap LI-NA/zed-i18n
+brew install --cask zed-i18n
+```
+
+Dabei wird automatisch die zur Systemsprache passende Sprache installiert; gibt es keine Übereinstimmung, wird `ko-KR` verwendet. Um eine bestimmte Sprache auszuwählen, dient Homebrews Option `--language`.
+
+```bash
+brew install --cask zed-i18n --language=de-DE
+```
+
+Unter Windows fügt man das Scoop-Bucket hinzu und installiert anschließend die gewünschte Sprache.
+
+```powershell
+scoop bucket add zed-i18n https://github.com/LI-NA/scoop-zed-i18n
+scoop install zed-i18n/zed-i18n-de-DE
+```
+
+Über Scoop installierte Builds können die integrierte Auto-Update-Funktion von Zed nicht nutzen; sie werden mit `scoop update` aktualisiert.
+
+## Entwicklungsumgebung einrichten
 
 Voraussetzungen: Python 3.12 oder neuer sowie [`uv`](https://docs.astral.sh/uv/).
 
