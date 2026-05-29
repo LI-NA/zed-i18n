@@ -13,6 +13,7 @@ from .audit import audit_repository
 from .config import load_project_config, zed_checkout_path, zed_clean_extract_checkout_path
 from .context_groups import build_context_groups, write_context_group_reports
 from .extract import extract_repository
+from .packaging import generate_packaging_files
 from .translation_pipeline import (
     PrepareTranslationOptions,
     cleanup_translation_workspace,
@@ -167,6 +168,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="Directory for generated prompt glossary files.",
     )
 
+    packaging_parser = subparsers.add_parser("generate-packaging")
+    packaging_parser.add_argument("--manifest", required=True, help="Release manifest.json path.")
+    packaging_parser.add_argument(
+        "--cask-out",
+        required=True,
+        help="Output path for Casks/zed-i18n.rb in the Homebrew tap checkout.",
+    )
+    packaging_parser.add_argument(
+        "--bucket-out",
+        required=True,
+        help="Output directory for Scoop bucket manifests.",
+    )
+    packaging_parser.add_argument(
+        "--require-all-translations",
+        action="store_true",
+        help="Require packaging assets for every locale in translations/*.json.",
+    )
+
     return parser
 
 
@@ -218,6 +237,14 @@ def main(argv: list[str] | None = None) -> int:
             args.prompt,
             args.output,
             args.prompt_glossary_output_dir,
+        )
+    if args.command == "generate-packaging":
+        return run_generate_packaging(
+            root,
+            args.manifest,
+            args.cask_out,
+            args.bucket_out,
+            require_all_translations=args.require_all_translations,
         )
 
     parser.error(f"unknown command: {args.command}")
@@ -472,6 +499,24 @@ def run_generate_vscode_glossary(
     return 0
 
 
+def run_generate_packaging(
+    root: Path,
+    manifest: str,
+    cask_out: str,
+    bucket_out: str,
+    *,
+    require_all_translations: bool = False,
+) -> int:
+    manifest_path = _resolve_workspace_path(root, manifest)
+    cask_path = _resolve_workspace_path(root, cask_out)
+    bucket_path = _resolve_workspace_path(root, bucket_out)
+    expected_locales = _translation_locale_names(root) if require_all_translations else None
+    generate_packaging_files(manifest_path, cask_path, bucket_path, expected_locales)
+    print(f"Generated Homebrew cask: {_relative_to_root(root, cask_path)}")
+    print(f"Generated Scoop bucket manifests: {_relative_to_root(root, bucket_path)}")
+    return 0
+
+
 def run_extract_context_groups(
     root: Path,
     language: str,
@@ -567,9 +612,26 @@ def _translation_sources(path: Path) -> set[str]:
     return sources
 
 
+def _translation_locale_names(root: Path) -> set[str]:
+    translations_dir = root / "translations"
+    if not translations_dir.exists():
+        raise ValueError("translations directory does not exist")
+    locales = {path.stem for path in translations_dir.glob("*.json")}
+    if not locales:
+        raise ValueError("translations directory has no locale JSON files")
+    return locales
+
+
 def _resolve_optional_workspace_path(root: Path, value: str | None) -> Path | None:
     if value is None:
         return None
+    path = Path(value)
+    if not path.is_absolute():
+        path = root / path
+    return ensure_inside_workspace(root, path)
+
+
+def _resolve_workspace_path(root: Path, value: str) -> Path:
     path = Path(value)
     if not path.is_absolute():
         path = root / path

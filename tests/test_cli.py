@@ -122,6 +122,23 @@ class CliTests(unittest.TestCase):
         self.assertEqual(glossary_args.vscode_loc_root, ".cache/vscode-loc")
         self.assertEqual(glossary_args.vscode_source_root, ".cache/vscode-upstream")
         self.assertEqual(glossary_args.output, "reports/vscode-glossary/ko-KR.md")
+        packaging_args = parser.parse_args(
+            [
+                "generate-packaging",
+                "--manifest",
+                "release-assets/manifest.json",
+                "--cask-out",
+                "packaging/homebrew/Casks/zed-i18n.rb",
+                "--bucket-out",
+                "packaging/scoop/bucket",
+                "--require-all-translations",
+            ]
+        )
+        self.assertEqual(packaging_args.command, "generate-packaging")
+        self.assertEqual(packaging_args.manifest, "release-assets/manifest.json")
+        self.assertEqual(packaging_args.cask_out, "packaging/homebrew/Casks/zed-i18n.rb")
+        self.assertEqual(packaging_args.bucket_out, "packaging/scoop/bucket")
+        self.assertTrue(packaging_args.require_all_translations)
         prompt_glossary_args = parser.parse_args(
             [
                 "generate-vscode-glossary",

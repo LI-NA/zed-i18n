@@ -1,0 +1,196 @@
+name: Update Packaging
+run-name: Update packaging for ${{ github.event.release.tag_name || inputs.release_tag }}
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Published zed-i18n release tag to package."
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-packaging-${{ github.event.release.tag_name || inputs.release_tag }}
+  cancel-in-progress: false
+
+env:
+  HOMEBREW_REPOSITORY: LI-NA/homebrew-zed-i18n
+  SCOOP_REPOSITORY: LI-NA/scoop-zed-i18n
+  RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+
+jobs:
+  update-packaging:
+    name: Update packaging repositories
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.release.prerelease == false &&
+          startsWith(github.event.release.tag_name, 'v') &&
+          contains(github.event.release.tag_name, '-i18n.')
+        )
+      }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Validate packaging token
+        env:
+          PACKAGING_REPOS_TOKEN: ${{ secrets.PACKAGING_REPOS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$PACKAGING_REPOS_TOKEN" ]]; then
+            echo "::error::PACKAGING_REPOS_TOKEN must have Contents: Read and write access to ${HOMEBREW_REPOSITORY} and ${SCOOP_REPOSITORY}."
+            exit 1
+          fi
+
+      - name: Download release metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-i18n\.[0-9]+$ ]]; then
+            echo "::error::Release tag must match v<zed-version>-i18n.<revision>: $RELEASE_TAG"
+            exit 1
+          fi
+          latest_tag="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)"
+          if [[ "$latest_tag" != "$RELEASE_TAG" ]]; then
+            echo "::error::Published release is not the repository latest release: $RELEASE_TAG != $latest_tag"
+            exit 1
+          fi
+          mkdir -p release-assets
+          gh release download "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --dir release-assets \
+            --pattern manifest.json \
+            --pattern SHA256SUMS.txt
+          gh release view "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --json assets \
+            --jq '.assets[].name' > release-assets/release-asset-names.txt
+
+      - name: Validate release metadata
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          release_dir = Path("release-assets")
+          manifest_path = release_dir / "manifest.json"
+          checksums_path = release_dir / "SHA256SUMS.txt"
+          release_assets_path = release_dir / "release-asset-names.txt"
+
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          if manifest.get("release_tag") != os.environ["RELEASE_TAG"]:
+              raise SystemExit(
+                  f"manifest release_tag mismatch: {manifest.get('release_tag')} != {os.environ['RELEASE_TAG']}"
+              )
+          if manifest.get("repository") != os.environ["GITHUB_REPOSITORY"]:
+              raise SystemExit(
+                  f"manifest repository mismatch: {manifest.get('repository')} != {os.environ['GITHUB_REPOSITORY']}"
+              )
+
+          assets = manifest.get("assets", [])
+          if manifest.get("asset_count") != len(assets):
+              raise SystemExit("manifest asset_count does not match assets length")
+
+          release_asset_names = set(release_assets_path.read_text(encoding="utf-8").splitlines())
+          checksum_by_name = {}
+          for line in checksums_path.read_text(encoding="utf-8").splitlines():
+              if not line.strip():
+                  continue
+              digest, name = line.split(None, 1)
+              checksum_by_name[name.strip()] = digest
+
+          for asset in assets:
+              name = asset["name"]
+              if name not in release_asset_names:
+                  raise SystemExit(f"release asset missing from published release: {name}")
+              if checksum_by_name.get(name) != asset.get("sha256"):
+                  raise SystemExit(f"checksum mismatch between manifest.json and SHA256SUMS.txt: {name}")
+          PY
+
+      - name: Checkout Homebrew tap
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ env.HOMEBREW_REPOSITORY }}
+          path: packaging/homebrew
+          token: ${{ secrets.PACKAGING_REPOS_TOKEN }}
+
+      - name: Checkout Scoop bucket
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ env.SCOOP_REPOSITORY }}
+          path: packaging/scoop
+          token: ${{ secrets.PACKAGING_REPOS_TOKEN }}
+
+      - name: Generate packaging files
+        run: |
+          set -euo pipefail
+          mkdir -p packaging/homebrew/Casks packaging/scoop/bucket
+          find packaging/scoop/bucket -maxdepth 1 -name 'zed-i18n-*.json' -delete
+          uv run zed-i18n generate-packaging \
+            --manifest release-assets/manifest.json \
+            --cask-out packaging/homebrew/Casks/zed-i18n.rb \
+            --bucket-out packaging/scoop/bucket \
+            --require-all-translations
+
+      - name: Validate generated packaging
+        run: |
+          set -euo pipefail
+          ruby -c packaging/homebrew/Casks/zed-i18n.rb
+          for manifest in packaging/scoop/bucket/*.json; do
+            python -m json.tool "$manifest" >/dev/null
+          done
+          git -C packaging/homebrew diff --check
+          git -C packaging/scoop diff --check
+
+      - name: Commit and push packaging repositories
+        run: |
+          set -euo pipefail
+
+          commit_if_changed() {
+            local repo_dir="$1"
+            local pathspec="$2"
+            local message="$3"
+
+            git -C "$repo_dir" config user.name "github-actions[bot]"
+            git -C "$repo_dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git -C "$repo_dir" add "$pathspec"
+
+            if git -C "$repo_dir" diff --cached --quiet; then
+              echo "No packaging changes in $repo_dir"
+              return
+            fi
+
+            git -C "$repo_dir" commit -m "$message"
+            git -C "$repo_dir" push
+          }
+
+          commit_if_changed \
+            packaging/homebrew \
+            Casks/zed-i18n.rb \
+            "Update zed-i18n Homebrew cask to ${RELEASE_TAG}"
+
+          commit_if_changed \
+            packaging/scoop \
+            bucket \
+            "Update zed-i18n Scoop bucket to ${RELEASE_TAG}"
