@@ -17,6 +17,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | Auswahl |
 | Cursor | Cursor |
 | Filter | Filter |
+| Language Server | Sprachserver |
 | Status Bar | Statusleiste |
 | Title Bar | Titelleiste |
 | Breadcrumbs | Breadcrumbs |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | Kontext |
 | Prompt | Eingabeaufforderung |
 | Model | Modell |
-| Agent | Agent |
 | Server | Server |
-| Provider | Anbieter |
 | Tool | Tool |
 | Tool Call | Toolaufruf |
 | Profile | Profil |

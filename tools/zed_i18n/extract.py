@@ -141,7 +141,9 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
 
         call = _node_text(source_bytes, function_node)
         arguments = list(arguments_node.named_children)
-        for argument_index, kind, call_name in _rules_for_call(call):
+        rules = list(_rules_for_call(call))
+        rules.extend(_contextual_rules_for_call(call, relative_path))
+        for argument_index, kind, call_name in rules:
             if argument_index >= len(arguments):
                 continue
 
@@ -324,8 +326,24 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
     return ()
 
 
+def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int, str, str], ...]:
+    canonical = _canonical_call(call)
+    if _is_announcement_path(relative_path) and _is_bullet_items_push_call(canonical):
+        return ((0, "announcement_bullet", "announcement_bullet"),)
+    if _is_skills_illustration_path(relative_path) and canonical == "skill_crease":
+        return (
+            (0, "skill_illustration_name", "skill_crease.name"),
+            (1, "skill_illustration_source", "skill_crease.source"),
+        )
+    return ()
+
+
 def _canonical_call(call: str) -> str:
     return call.strip()
+
+
+def _is_bullet_items_push_call(call: str) -> bool:
+    return re.sub(r"\s+", "", call) == "bullet_items.push"
 
 
 def _looks_like_context_menu_header_call(call: str) -> bool:
@@ -1219,6 +1237,10 @@ def _is_announcement_path(relative_path: str) -> bool:
     }
 
 
+def _is_skills_illustration_path(relative_path: str) -> bool:
+    return relative_path == "crates/ui/src/components/ai/skills_illustration.rs"
+
+
 def _is_title_bar_path(relative_path: str) -> bool:
     return relative_path == "crates/title_bar/src/title_bar.rs"
 
@@ -1760,6 +1782,12 @@ ANNOUNCEMENT_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'\bprimary_action_label:\s*("(?:\\.|[^"\\])*")(?:\.into\(\))?'),
         "announcement_primary_action",
         "announcement_primary_action",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bsecondary_action_label:\s*("(?:\\.|[^"\\])*")(?:\.into\(\))?'),
+        "announcement_secondary_action",
+        "announcement_secondary_action",
         1,
     ),
 )

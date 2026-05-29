@@ -73,6 +73,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `навык` / `навыки`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `агент` / `агенты`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `поставщик` / `поставщики`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Звонок` for voice/collaboration calls. `Вызов` for tool/function/API calls (e.g., Tool Call → `Вызов инструмента`).
@@ -90,7 +98,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Представление` for UI views and display modes (e.g., "Diff View" → `Представление различий`). `Просмотр` is acceptable for verbal/menu forms (e.g., "View" as a top-level menu).
 - **Diff**: `Различия` for the noun concept (e.g., "Show Diff" → `Показать различия`). Preserve `diff` only in code-like contexts.
 - **Issue / Problem**: `Проблема` for both GitHub/project tracker issues and diagnostics/errors (matches VS Code). Use `Задача` for tracker issues only when the Zed UI explicitly prefers it.
-- **Provider**: `Поставщик` for AI/model providers (matches VS Code). Do not translate Provider as `Провайдер`.
 - **Symbol**: keep as `Symbol` (per VS Code Russian convention — untranslated).
 - **Settings / Workspace / Window / Editor / File / Folder / Path**: follow the appended glossary — `Параметры` / `Рабочая область` / `Окно` / `редактор` / `файл` / `Папка` / `Путь`.
 - **Command Palette**: `Палитра команд`.

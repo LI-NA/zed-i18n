@@ -17,13 +17,14 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | Sélection |
 | Cursor | Curseur |
 | Filter | Filtrer |
+| Language Server | Serveur de langage |
 | Status Bar | Barre d'état |
 | Title Bar | Barre de titre |
 | Breadcrumbs | Barres de navigation |
 | Outline | Structure |
 | Snippet | Extrait |
 | Symbol | Symbole |
-| Preview | Aperçu |
+| Preview | Préversion |
 | Reference | Référence |
 | Branch | Branche |
 | Commit | Valider |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | contexte |
 | Prompt | requête |
 | Model | Modèle |
-| Agent | Assistant |
 | Server | Serveur |
-| Provider | Fournisseur |
 | Tool | Outil |
 | Tool Call | Appel d’outil |
 | Profile | Profil |

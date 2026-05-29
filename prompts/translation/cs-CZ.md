@@ -69,6 +69,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `dovednost` / `dovednosti`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `agent` / `agenti`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `poskytovatel` / `poskytovatelé`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `hovor` for voice/collaboration calls (Zed call/Live Share style). `volání` for tool/function/API calls (`Tool Call` → `Volání nástroje`).
@@ -87,7 +95,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Zobrazení` for UI views and display modes (e.g., "Diff View" → `Zobrazení rozdílů`). Avoid `Pohled` for named views.
 - **Diff**: `Rozdíl` for the noun concept (`Diff View` → `Zobrazení rozdílů`). Preserve the literal `diff` only inside backticks or in clearly code-like contexts.
 - **Issue / Problem**: `Problém` for both GitHub/project tracker issues and diagnostics, matching VS Code Czech (which uses `Problém` for both). When Zed UI labels them differently, keep `Problém` consistent and rely on `kind`/context for the user-visible distinction.
-- **Provider**: `Poskytovatel` for AI/model providers and configuration providers (matches VS Code).
 - **Workspace / Window**: `Pracovní prostor` for Workspace, `Okno` for Window. Do not collapse them into one term.
 - **Folder vs Directory**: `Složka` for Folder (UI-facing), `Adresář` for Directory (CLI/code-facing). Default to `Složka` in UI strings.
 - **Path**: `Cesta`. When followed by a placeholder, prefer `cesta {path}` (nominative) over forced declension.

@@ -17,13 +17,14 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | Výběr |
 | Cursor | Kurzor |
 | Filter | Filtrovat |
+| Language Server | Jazykový server |
 | Status Bar | Stavový řádek |
 | Title Bar | Záhlaví |
 | Breadcrumbs | Popis cesty |
 | Outline | Osnova |
 | Snippet | Fragment |
 | Symbol | Symbol |
-| Preview | Preview |
+| Preview | Náhled |
 | Reference | Odkaz |
 | Branch | Rozvětvit |
 | Commit | Potvrdit |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | kontext |
 | Prompt | výzva |
 | Model | Model |
-| Agent | Agent |
 | Server | Server |
-| Provider | Poskytovatel |
 | Tool | Nástroj |
 | Tool Call | Volání nástroje |
 | Profile | Profil |

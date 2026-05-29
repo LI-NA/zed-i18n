@@ -17,6 +17,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | 選取項目 |
 | Cursor | 資料指標 |
 | Filter | 篩選 |
+| Language Server | 語言伺服器 |
 | Status Bar | 狀態列 |
 | Title Bar | 標題列 |
 | Breadcrumbs | 階層連結 |
@@ -29,7 +30,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Commit | 提交 |
 | Stash | 隱藏 |
 | Patch | 修補檔 |
-| Rebase | 重訂基底 |
+| Rebase | 重定基底 |
 | Checkout | 簽出 |
 | Fetch | 擷取 |
 | Push | 推送 |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | 內容 |
 | Prompt | 提示 |
 | Model | 模型 |
-| Agent | Agent |
 | Server | 伺服器 |
-| Provider | 提供者 |
 | Tool | 工具 |
 | Tool Call | 工具呼叫 |
 | Profile | 設定檔 |

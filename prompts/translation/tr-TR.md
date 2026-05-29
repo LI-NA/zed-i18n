@@ -71,6 +71,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. VS Code Turkish conventions are the baseline for terminology.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `beceri` / `beceriler`. Inflect naturally while respecting vowel harmony. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `aracı` / `aracılar`. Inflect naturally while respecting vowel harmony. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `sağlayıcı` / `sağlayıcılar`. Inflect naturally while respecting vowel harmony. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Sesli görüşme` for voice/collaboration calls. `Çağrı` for tool/function/API calls (e.g., Tool Call -> Araç Çağrısı).
@@ -88,7 +96,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Görünüm` for UI views and display modes (e.g., "Diff View" -> "Fark Görünümü").
 - **Diff**: `Fark` for the noun concept (e.g., "View Diff" -> "Farkı görüntüle"). Preserve `diff` in code-like contexts.
 - **Issue / Problem**: `Sorun` for both GitHub/project tracker issues and diagnostics/errors (matches VS Code, which uses `Sorun` for both). Disambiguate via context only when truly ambiguous.
-- **Provider**: `Sağlayıcı` for AI/model providers and API/provider interfaces (matches VS Code).
 
 ## INPUT FORMAT
 

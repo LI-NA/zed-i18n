@@ -72,6 +72,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `スキル`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `エージェント`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `プロバイダー`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: 通話 for voice/collaboration calls, 呼び出し for tool/function/API calls.

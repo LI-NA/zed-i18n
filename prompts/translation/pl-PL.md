@@ -71,6 +71,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. VS Code Polish conventions are the baseline — follow them unless a Zed-specific disambiguation rule below requires otherwise.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `umiejętność` / `umiejętności`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `agent` / `agenci`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `dostawca` / `dostawcy`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Połączenie` for voice/collaboration calls. `Wywołanie` for tool/function/API calls (e.g., `Tool Call` → `Wywołanie narzędzia`).
@@ -88,7 +96,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Widok` for UI views and display modes (e.g., `Diff View` → `Widok różnic`).
 - **Diff**: `Różnice` for the noun concept (`Show Diff` → `Pokaż różnice`). Preserve `diff` in code-like contexts (commands, identifiers).
 - **Issue / Problem**: `Zgłoszenie` for GitHub/project tracker issues (the Zed-specific choice — note that VS Code uses `Problem` for both). `Problem` for diagnostics, errors, and generic problems.
-- **Provider**: `Dostawca` for AI/model providers (matches VS Code). Do NOT use `Operator` or `Usługodawca` in this context.
 
 ### VS Code pl-PL key terms (baseline)
 
@@ -107,7 +114,6 @@ Apply these consistently unless source context overrides:
 - Branch → `Gałąź`
 - Pull Request → `Żądanie ściągnięcia`
 - Repository → `Repozytorium`
-- Provider → `Dostawca`
 - Tool Call → `Wywołanie narzędzia`
 
 ## INPUT FORMAT

@@ -72,6 +72,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `compétence` / `compétences`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `agent` / `agents`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `fournisseur` / `fournisseurs`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Appel` for tool/function/API calls. For voice/collaboration calls, qualify by context (e.g., `Appel vocal`).
@@ -89,7 +97,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Vue` for UI views and display modes (e.g., "Diff View" → `Vue des différences`). NEVER use `Affichage` as a noun for named views.
 - **Diff**: `Différences` for the noun concept. Preserve `diff` in code-like contexts.
 - **Issue / Problem**: `Problème` for both GitHub/project tracker issues and diagnostics (matches VS Code). If the Zed UI clearly distinguishes a tracker issue from a diagnostic, document the convention and adapt accordingly.
-- **Provider**: `Fournisseur` for AI/model providers and generic providers (matches VS Code).
 
 ## INPUT FORMAT
 

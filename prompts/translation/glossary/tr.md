@@ -17,6 +17,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | Seçim |
 | Cursor | İmleç |
 | Filter | Filtre |
+| Language Server | Dil Sunucusu |
 | Status Bar | Durum Çubuğu |
 | Title Bar | Başlık Çubuğu |
 | Breadcrumbs | İçerik Haritaları |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | bağlam |
 | Prompt | istem |
 | Model | Model |
-| Agent | Aracı |
 | Server | Sunucu |
-| Provider | Sağlayıcı |
 | Tool | Araç |
 | Tool Call | Araç Çağrısı |
 | Profile | Profil |

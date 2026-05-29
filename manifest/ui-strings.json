@@ -41319,6 +41319,14 @@
         "kind": "button",
         "line": 151,
         "start_byte": 4764
+      },
+      {
+        "call": "announcement_secondary_action",
+        "end_byte": 1133,
+        "file": "crates/ui/src/components/notification/announcement_toast.rs",
+        "kind": "announcement_secondary_action",
+        "line": 28,
+        "start_byte": 1121
       }
     ],
     "status": "accepted"
@@ -55206,6 +55214,19 @@
     ],
     "status": "accepted"
   },
+  "Read Documentation": {
+    "occurrences": [
+      {
+        "call": "announcement_secondary_action",
+        "end_byte": 7984,
+        "file": "crates/auto_update_ui/src/auto_update_ui.rs",
+        "kind": "announcement_secondary_action",
+        "line": 232,
+        "start_byte": 7964
+      }
+    ],
+    "status": "accepted"
+  },
   "Read file": {
     "occurrences": [
       {
@@ -68027,6 +68048,19 @@
     ],
     "status": "accepted"
   },
+  "Skills live in {GLOBAL_SKILLS_DIR_DISPLAY}/<name>/SKILL.md": {
+    "occurrences": [
+      {
+        "call": "announcement_bullet",
+        "end_byte": 7316,
+        "file": "crates/auto_update_ui/src/auto_update_ui.rs",
+        "kind": "announcement_bullet",
+        "line": 219,
+        "start_byte": 7256
+      }
+    ],
+    "status": "accepted"
+  },
   "Skip": {
     "occurrences": [
       {
@@ -72378,6 +72412,19 @@
         "kind": "rust_doc_comment",
         "line": 127,
         "start_byte": 4386
+      }
+    ],
+    "status": "accepted"
+  },
+  "The Rules Library is making way for skills: your default rules are now in a global AGENTS.md, and your other rules have been converted to skills": {
+    "occurrences": [
+      {
+        "call": "announcement_bullet",
+        "end_byte": 7622,
+        "file": "crates/auto_update_ui/src/auto_update_ui.rs",
+        "kind": "announcement_bullet",
+        "line": 223,
+        "start_byte": 7476
       }
     ],
     "status": "accepted"
@@ -79896,6 +79943,19 @@
         "kind": "feature_upsell",
         "line": 1630,
         "start_byte": 64744
+      }
+    ],
+    "status": "accepted"
+  },
+  "Type / to manually invoke a skill": {
+    "occurrences": [
+      {
+        "call": "announcement_bullet",
+        "end_byte": 7388,
+        "file": "crates/auto_update_ui/src/auto_update_ui.rs",
+        "kind": "announcement_bullet",
+        "line": 220,
+        "start_byte": 7353
       }
     ],
     "status": "accepted"
@@ -91107,6 +91167,32 @@
     ],
     "status": "accepted"
   },
+  "borrow-checker-expert": {
+    "occurrences": [
+      {
+        "call": "skill_crease.name",
+        "end_byte": 1853,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_name",
+        "line": 55,
+        "start_byte": 1830
+      }
+    ],
+    "status": "ignored"
+  },
+  "brainstorming": {
+    "occurrences": [
+      {
+        "call": "skill_crease.name",
+        "end_byte": 1763,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_name",
+        "line": 54,
+        "start_byte": 1748
+      }
+    ],
+    "status": "ignored"
+  },
   "branch (typically main or master).": {
     "occurrences": [
       {
@@ -92185,6 +92271,19 @@
     ],
     "status": "accepted"
   },
+  "frontend-design": {
+    "occurrences": [
+      {
+        "call": "skill_crease.name",
+        "end_byte": 1590,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_name",
+        "line": 49,
+        "start_byte": 1573
+      }
+    ],
+    "status": "ignored"
+  },
   "git add --all": {
     "occurrences": [
       {
@@ -92310,6 +92409,35 @@
     ],
     "status": "accepted"
   },
+  "global": {
+    "occurrences": [
+      {
+        "call": "skill_crease.source",
+        "end_byte": 1607,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_source",
+        "line": 49,
+        "start_byte": 1599
+      },
+      {
+        "call": "skill_crease.source",
+        "end_byte": 1780,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_source",
+        "line": 54,
+        "start_byte": 1772
+      },
+      {
+        "call": "skill_crease.source",
+        "end_byte": 2042,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_source",
+        "line": 60,
+        "start_byte": 2034
+      }
+    ],
+    "status": "accepted"
+  },
   "go-debug-locator": {
     "occurrences": [
       {
@@ -92319,6 +92447,19 @@
         "kind": "shared_string",
         "line": 89,
         "start_byte": 2578
+      }
+    ],
+    "status": "ignored"
+  },
+  "grill-with-docs": {
+    "occurrences": [
+      {
+        "call": "skill_crease.name",
+        "end_byte": 2025,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_name",
+        "line": 60,
+        "start_byte": 2008
       }
     ],
     "status": "ignored"
@@ -92478,6 +92619,19 @@
       }
     ],
     "status": "accepted"
+  },
+  "img-gen": {
+    "occurrences": [
+      {
+        "call": "skill_crease.name",
+        "end_byte": 1506,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_name",
+        "line": 48,
+        "start_byte": 1497
+      }
+    ],
+    "status": "ignored"
   },
   "import-{id}": {
     "occurrences": [
@@ -94464,6 +94618,27 @@
     ],
     "status": "ignored"
   },
+  "studio": {
+    "occurrences": [
+      {
+        "call": "skill_crease.source",
+        "end_byte": 1523,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_source",
+        "line": 48,
+        "start_byte": 1515
+      },
+      {
+        "call": "skill_crease.source",
+        "end_byte": 2121,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_source",
+        "line": 61,
+        "start_byte": 2113
+      }
+    ],
+    "status": "ignored"
+  },
   "subagents": {
     "occurrences": [
       {
@@ -95601,6 +95776,19 @@
     ],
     "status": "accepted"
   },
+  "video-edit": {
+    "occurrences": [
+      {
+        "call": "skill_crease.name",
+        "end_byte": 2104,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_name",
+        "line": 61,
+        "start_byte": 2092
+      }
+    ],
+    "status": "ignored"
+  },
   "visiting the website": {
     "occurrences": [
       {
@@ -95955,6 +96143,14 @@
   },
   "zed": {
     "occurrences": [
+      {
+        "call": "skill_crease.source",
+        "end_byte": 1867,
+        "file": "crates/ui/src/components/ai/skills_illustration.rs",
+        "kind": "skill_illustration_source",
+        "line": 55,
+        "start_byte": 1862
+      },
       {
         "call": "Label::new",
         "end_byte": 3488,

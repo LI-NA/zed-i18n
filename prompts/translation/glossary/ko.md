@@ -17,6 +17,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | 선택 영역 |
 | Cursor | 커서 |
 | Filter | 필터 |
+| Language Server | 언어 서버 |
 | Status Bar | 상태 표시줄 |
 | Title Bar | 제목 표시줄 |
 | Breadcrumbs | 이동 경로 |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | 컨텍스트 |
 | Prompt | 프롬프트 |
 | Model | 모델 |
-| Agent | 에이전트 |
 | Server | 서버 |
-| Provider | 공급자 |
 | Tool | 도구 |
 | Tool Call | 도구 호출 |
 | Profile | 프로필 |

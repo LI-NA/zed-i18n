@@ -70,6 +70,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. The VS Code German pack is the established baseline — follow it unless a disambiguation rule or local Zed UI context requires a different choice.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `Skill` / `Skills`. Use natural German compounds with hyphens where needed. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `Agent` / `Agenten`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `Anbieter` / `Anbieter`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Anruf` for voice/collaboration calls. `Aufruf` for tool/function/API calls (e.g., Tool Call → `Toolaufruf`, Function Call → `Funktionsaufruf`).
@@ -86,7 +94,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Ansicht` for UI views and display modes (e.g., "Diff View" → `Diff-Ansicht`). NEVER use `Anzeige` as a noun for named views.
 - **Diff**: `Diff` (loanword) or `Vergleich` based on UI context — prefer `Diff` for short labels and named features (Diff View → `Diff-Ansicht`), `Vergleich` for descriptive prose. Preserve `diff` unchanged in code-like contexts.
 - **Issue / Problem**: VS Code uses `Problem` for both diagnostics and tracker entries — default to `Problem` for diagnostics, errors, and generic problems. Use `Issue` (loanword) only when the source unambiguously refers to a GitHub/project tracker entry and consistency with surrounding UI requires it.
-- **Provider**: `Anbieter` for AI/model providers and general API providers (matches VS Code). Do not use `Lieferant` or `Provider`.
 
 ## INPUT FORMAT
 

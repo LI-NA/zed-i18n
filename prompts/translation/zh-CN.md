@@ -69,6 +69,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `技能`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `智能体`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `提供商`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: 通话 for voice/collaboration calls, 调用 for tool/function/API calls.
@@ -84,7 +92,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **Extension**: 扩展 for software extensions (Zed extensions, browser extensions). 文件扩展名 for file name extensions (.rs, .json).
 - **Thread**: 会话 for AI/chat threads. 线程 only when referring to OS/programming threads.
 - **Issue / Problem**: 议题 for GitHub/project tracker issues. 问题 for diagnostics, errors, and generic problems.
-- **Provider**: 提供商 for AI/model providers. 提供程序 may be used only for API/provider interfaces when code context clearly requires it.
 
 ## INPUT FORMAT
 

@@ -17,13 +17,14 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Selection | 选择 |
 | Cursor | 光标 |
 | Filter | 筛选器 |
+| Language Server | 语言服务器 |
 | Status Bar | 状态栏 |
 | Title Bar | 标题栏 |
 | Breadcrumbs | 痕迹导航 |
 | Outline | 大纲 |
 | Snippet | 片段 |
 | Symbol | 符号 |
-| Preview | 预览版 |
+| Preview | 预览 |
 | Reference | 参考 |
 | Branch | 分支 |
 | Commit | 提交 |
@@ -46,9 +47,7 @@ Generated from VS Code language-pack exact, context-stable matches. Use as trans
 | Context | 上下文 |
 | Prompt | 提示 |
 | Model | 模型 |
-| Agent | 智能体 |
 | Server | 服务器 |
-| Provider | 提供商 |
 | Tool | 工具 |
 | Tool Call | 工具调用 |
 | Profile | 配置文件 |

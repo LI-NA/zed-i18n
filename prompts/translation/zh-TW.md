@@ -70,6 +70,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. Prefer the VS Code zh-TW (Taiwan) form when one is available.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `技能`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `代理`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `提供者`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: 通話 for voice/collaboration calls, 呼叫 for tool/function/API calls (note: zh-TW uses 呼叫 where zh-CN uses 调用).
@@ -87,7 +95,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: 檢視 for UI views and display modes (e.g., `Diff View` → `差異檢視`). NEVER use 視圖 (zh-CN form) or 表示.
 - **Diff**: 差異 for the noun concept (e.g., `Diff View` → `差異檢視`). Preserve `diff` in code-like contexts.
 - **Issue / Problem**: 問題 for both diagnostics/errors and GitHub/project tracker issues, matching VS Code zh-TW. 議題 may be acceptable for GitHub-specific tracker issues if the surrounding UI requires it, but prefer 問題 for consistency with VS Code.
-- **Provider**: 提供者 for AI/model providers (matches VS Code zh-TW). Do NOT use 提供商 (zh-CN form) or 提供程式.
 - **Save / Open / Close**: 儲存 / 開啟 / 關閉 (Taiwan); never 保存 / 打开 / 关闭 (Mainland).
 - **Search / Find**: 搜尋 / 尋找 (Taiwan); never 搜索 / 查找 (Mainland).
 - **Settings / Default**: 設定 / 預設 (Taiwan); never 设置 / 默认 (Mainland).

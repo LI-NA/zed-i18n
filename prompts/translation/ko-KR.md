@@ -68,6 +68,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `스킬`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `에이전트`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `프로바이더`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: 통화 for voice/collaboration calls, 호출 for tool/function/API calls.
@@ -84,7 +92,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: 보기 for UI views and display modes (e.g., "Diff View" -> "Diff 보기"). NEVER use 뷰.
 - **Issue / Problem**: 이슈 for GitHub/project tracker issues. 문제 for diagnostics, errors, and generic problems.
 - **Thread / Session / Chat**: 스레드 for conversation threads and programming threads. 세션 for session lifecycle/state. 채팅 for chat UI.
-- **Provider**: 프로바이더 for AI/model providers. 공급자 may be used only for API/provider interfaces when code context clearly requires it.
 
 ## INPUT FORMAT
 

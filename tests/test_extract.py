@@ -1957,6 +1957,14 @@ class ExtractTests(unittest.TestCase):
         source = "\n".join(
             [
                 "fn announcement() {",
+                "    let mut bullet_items: Vec<SharedString> = Vec::with_capacity(3);",
+                '    bullet_items.push(format!("Skills live in {GLOBAL_SKILLS_DIR_DISPLAY}/<name>/SKILL.md").into());',
+                '    bullet_items.push("Type / to manually invoke a skill".into());',
+                "    if migrated_anything {",
+                "        bullet_items.push(",
+                '            "The Rules Library is making way for skills: your default rules are now in a global AGENTS.md, and your other rules have been converted to skills".into(),',
+                "        );",
+                "    }",
                 "    Some(AnnouncementContent {",
                 '        heading: "Introducing Parallel Agents".into(),',
                 '        description: "Run multiple threads of your favorite agents simultaneously across projects.".into(),',
@@ -1964,6 +1972,7 @@ class ExtractTests(unittest.TestCase):
                 '            "Use your favorite agents in parallel".into(),',
                 "        ],",
                 '        primary_action_label: "Try Agentic Layout".into(),',
+                '        secondary_action_label: "Read Documentation".into(),',
                 "    });",
                 '    Self::new(IconName::Download, "Restart to Update");',
                 '    AnnouncementToast::new().heading("Introducing Parallel Agents");',
@@ -1981,11 +1990,59 @@ class ExtractTests(unittest.TestCase):
             {
                 "Introducing Parallel Agents",
                 "Run multiple threads of your favorite agents simultaneously across projects.",
+                "Skills live in {GLOBAL_SKILLS_DIR_DISPLAY}/<name>/SKILL.md",
+                "Type / to manually invoke a skill",
+                "The Rules Library is making way for skills: your default rules are now in a global AGENTS.md, and your other rules have been converted to skills",
                 "Use your favorite agents in parallel",
                 "Try Agentic Layout",
+                "Read Documentation",
                 "Restart to Update",
             },
         )
+
+    def test_extracts_skills_illustration_badge_literals(self) -> None:
+        source = "\n".join(
+            [
+                "fn render() {",
+                "    let skill_crease = |label: SharedString, source: SharedString| {",
+                "        h_flex()",
+                "            .child(Label::new(label))",
+                '            .child(Label::new(format!("({source})")));',
+                "    };",
+                "    div()",
+                '        .child(skill_crease("img-gen".into(), "studio".into()))',
+                '        .child(skill_crease("frontend-design".into(), "global".into()))',
+                '        .child(skill_crease("brainstorming".into(), "global".into()))',
+                '        .child(skill_crease("borrow-checker-expert".into(), "zed".into()))',
+                '        .child(skill_crease("grill-with-docs".into(), "global".into()))',
+                '        .child(skill_crease("video-edit".into(), "studio".into()));',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/ui/src/components/ai/skills_illustration.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "({source})",
+                "img-gen",
+                "studio",
+                "frontend-design",
+                "global",
+                "brainstorming",
+                "borrow-checker-expert",
+                "zed",
+                "grill-with-docs",
+                "video-edit",
+            },
+        )
+        self.assertEqual(by_source["img-gen"].kind, "skill_illustration_name")
+        self.assertEqual(by_source["global"].call, "skill_crease.source")
 
     def test_extracts_settings_content_doc_comments_used_as_ui_descriptions(self) -> None:
         source = "\n".join(

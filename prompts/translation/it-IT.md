@@ -70,6 +70,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. Italian VS Code conventions are the baseline; deviate when Zed UI context requires it.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `competenza` / `competenze`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `agente` / `agenti`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `provider` for both singular and plural. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Chiamata` for tool/function/API calls (`Tool Call` → `Chiamata strumento`). `Chiamata vocale` for voice/collaboration calls when context calls for it. NEVER translate as `Telefonata`.
@@ -87,7 +95,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Visualizzazione` for UI views and display modes (`Diff View` → `Visualizzazione differenze`). NEVER use `Vista` as a noun for named views.
 - **Diff**: `Differenze` for the noun concept (`Show Diff` → `Mostra differenze`). Preserve `diff` in code-like contexts (`git diff`, `diff` algorithm).
 - **Issue / Problem**: `Problema` for both GitHub/project tracker issues and diagnostics (matches VS Code Italian, where `Issue` and `Problem` are both rendered as `Problema`). Disambiguate by context only when needed (`GitHub Issue` may stay `Issue` if treated as proper noun in product UI).
-- **Provider**: `Provider` (loanword, matches VS Code Italian) for AI/model providers and provider interfaces. `Fornitore` is acceptable in prose but `Provider` is the established VS Code form — prefer it for consistency.
 
 ## INPUT FORMAT
 

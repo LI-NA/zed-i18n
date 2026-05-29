@@ -73,6 +73,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
 - Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
+## PROJECT GLOSSARY
+
+Use these manual project terms alongside the generated VS Code glossary.
+
+- **Skill / Skills** (Agent Skills feature): use `habilidad` / `habilidades`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
+- **Agent / Agents** (AI agent feature): use `agente` / `agentes`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
+- **Provider / Providers** (AI/model provider feature): use `proveedor` / `proveedores`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+
 ## DISAMBIGUATION RULES
 
 - **Call**: `Llamada` for tool/function/API calls. For voice/collaboration calls, use `Llamada` qualified by context (e.g., `Llamada de voz`, `Iniciar llamada`) when ambiguity is possible.
@@ -89,7 +97,6 @@ Use `null` as a review signal for strings that are not safe to translate.
 - **View**: `Vista` for UI views and display modes (e.g., `Diff View` → `Vista de diferencias`).
 - **Diff**: `Diferencias` for the concept (e.g., `Diff View` → `Vista de diferencias`). Preserve `diff` only in code-like contexts where the original token is a literal identifier.
 - **Issue / Problem**: `Incidencia` for GitHub/project tracker issues (per VS Code es-ES). `Problema` for diagnostics, errors, and generic problems.
-- **Provider**: `Proveedor` for AI/model providers and API providers (per VS Code es-ES).
 
 ## INPUT FORMAT
 
