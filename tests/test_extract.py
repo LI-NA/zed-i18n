@@ -2248,6 +2248,86 @@ class ExtractTests(unittest.TestCase):
             "initial_title",
         )
 
+    def test_extracts_fast_mode_confirmation_copy(self) -> None:
+        source = "\n".join(
+            [
+                "fn fast_mode_confirmation(&self, _cx: &App) -> Option<FastModeConfirmation> {",
+                "    Some(FastModeConfirmation {",
+                '        title: "Enable Fast Mode for OpenAI?".into(),',
+                '        message: "Fast mode sends requests using OpenAI priority.".into(),',
+                "    })",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/language_models/src/provider/open_ai.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Enable Fast Mode for OpenAI?",
+                "Fast mode sends requests using OpenAI priority.",
+            },
+        )
+        self.assertEqual(
+            by_source["Enable Fast Mode for OpenAI?"].call,
+            "FastModeConfirmation.title",
+        )
+        self.assertEqual(
+            by_source["Fast mode sends requests using OpenAI priority."].kind,
+            "fast_mode_confirmation_message",
+        )
+
+    def test_extracts_update_title_tool_helper_strings(self) -> None:
+        source = "\n".join(
+            [
+                "impl UpdateTitleTool {",
+                "    pub(crate) fn title_for_input(input: Result<UpdateTitleToolInput, serde_json::Value>) -> SharedString {",
+                "        let Ok(input) = input else {",
+                '            return "Update title".into();',
+                "        };",
+                '        format!("Update title: {title}").into()',
+                "    }",
+                "}",
+                "impl AgentTool for UpdateTitleTool {",
+                "    fn run(self: Arc<Self>) -> Task<Result<Self::Output, Self::Output>> {",
+                '        Ok("Session title updated".to_string())',
+                "    }",
+                "}",
+                "fn normalize_title(title: &str) -> Result<String, String> {",
+                '    let title = title.lines().next().unwrap_or("").trim();',
+                "    if title.is_empty() {",
+                '        return Err("Title cannot be empty".to_string());',
+                "    }",
+                "    Ok(title.to_string())",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/tools/update_title_tool.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Update title",
+                "Update title: {title}",
+                "Session title updated",
+                "Title cannot be empty",
+            },
+        )
+        self.assertNotIn("", by_source)
+        self.assertEqual(by_source["Update title"].call, "UpdateTitleTool.title_for_input")
+        self.assertEqual(by_source["Session title updated"].kind, "agent_tool_output")
+        self.assertEqual(by_source["Title cannot be empty"].kind, "agent_tool_error")
+
     def test_extracts_small_component_and_debugger_labels(self) -> None:
         source = "\n".join(
             [

@@ -89,6 +89,14 @@ STRUCT_FIELD_RULES: dict[tuple[str, str], tuple[str, str]] = {
     ),
     ("PathPromptOptions", "prompt"): ("path_prompt", "PathPromptOptions.prompt"),
     ("Content", "message"): ("content_message", "Content.message"),
+    ("FastModeConfirmation", "title"): (
+        "fast_mode_confirmation_title",
+        "FastModeConfirmation.title",
+    ),
+    ("FastModeConfirmation", "message"): (
+        "fast_mode_confirmation_message",
+        "FastModeConfirmation.message",
+    ),
 }
 
 UI_RETURN_METHODS: dict[str, tuple[str, str]] = {
@@ -396,6 +404,13 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
         rule = ("dock_position_label", "DockPosition.label")
     if rule is None and _is_agent_tool_path(relative_path) and method_name == "initial_title":
         rule = ("agent_tool_title", "initial_title")
+    if rule is None and _is_update_title_tool_path(relative_path):
+        if method_name == "title_for_input":
+            rule = ("agent_tool_title", "UpdateTitleTool.title_for_input")
+        elif method_name == "run":
+            rule = ("agent_tool_output", "UpdateTitleTool.run")
+        elif method_name == "normalize_title":
+            rule = ("agent_tool_error", "UpdateTitleTool.normalize_title")
     if rule is None and _is_git_panel_path(relative_path):
         if method_name == "title":
             rule = ("git_section_title", "GitHeaderEntry.title")
@@ -1279,6 +1294,10 @@ def _is_agent_entry_view_state_path(relative_path: str) -> bool:
 
 def _is_agent_tool_path(relative_path: str) -> bool:
     return relative_path.startswith("crates/agent/src/tools/")
+
+
+def _is_update_title_tool_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent/src/tools/update_title_tool.rs"
 
 
 def _is_debugger_dap_log_path(relative_path: str) -> bool:
