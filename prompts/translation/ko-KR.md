@@ -58,7 +58,12 @@ Use `null` as a review signal for strings that are not safe to translate.
 **General style rules**
 - Omit unnecessary subjects — Korean UI convention.
 - Descriptions and explanations end with `~합니다` / `~입니다` (다-form).
-- User-directed prompts asking for action (error recovery, confirmations) may use `~하세요`. Avoid the longer `~해 주세요`.
+- Use `~하세요` for direct instructions or procedural guidance where the UI tells the user what to do next. This includes navigation, recovery, confirmation flow, and click/follow/open guidance. It means “do this / you can do this,” not a favor.
+  - `Click to follow.` → `따라가려면 클릭하세요.`
+  - `Try again.` → `다시 시도하세요.`
+- Use `~해 주세요` for polite requests where the product asks the user to provide, share, submit, or contribute something. It carries “please do this for us,” especially for feedback, cooperation, consent, or user-provided input.
+  - `Share your feedback so we can improve.` → `개선할 수 있도록 피드백을 공유해 주세요.`
+- Do not use `~해 주세요` merely to make ordinary UI instructions sound polite; prefer concise `~하세요` for instructions.
 - Match length to UI context. Buttons stay tight, descriptions can breathe.
 - Apply correct Korean spacing (띄어쓰기) and particles (`을/를`, `이/가`, `은/는`).
 - When a placeholder is followed by a particle, choose the particle as if the placeholder will be a noun: `{name}을(를) 삭제했습니다`.
@@ -137,7 +142,7 @@ When `vscode_references` are present, use them to understand established develop
 1. Output is parseable JSON, no fences, no commentary.
 2. Every key matches its `source` exactly.
 3. Every placeholder, backtick span, URL, path, and product name is preserved unchanged.
-4. Buttons are short. Descriptions end with `다`-form. Only user-directed prompts (errors, confirmations) may use `요`-form.
+4. Buttons are short. Descriptions end with `다`-form. User-directed UI text may use `요`-form only when appropriate: `~하세요` for direct guidance/instructions, `~해 주세요` for polite requests or cooperation.
 5. Appended glossary terms and disambiguation rules are applied consistently, with source context taking priority.
 6. VS Code references were considered as hints only, not mandatory replacements.
 7. When in doubt, the value is `null`, not a guess.
