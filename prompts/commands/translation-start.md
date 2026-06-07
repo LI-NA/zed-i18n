@@ -72,7 +72,7 @@ uv run zed-i18n prepare-translation \
 
 If `.cache/vscode-loc` exists, `prepare-translation` automatically adds optional `vscode_references` translation-memory hints to matching entries. `.cache/vscode-upstream` improves English source recovery for those hints. Missing VS Code reference checkouts are normal and are NOT an anomaly.
 
-`prepare-translation` also keeps grouped setting title/description strings and connected multi-line strings batch-atomic when possible. Individual batch entries may include `context_group`; use it to translate sibling UI labels/descriptions and split lines consistently, but the result JSON must still contain only the exact source keys listed in that batch's `entries`.
+`prepare-translation` also keeps grouped setting title/description strings, connected multi-line strings, and prompt-component strings batch-atomic when possible. Individual batch entries may include `context_group`; use it to translate sibling UI labels/descriptions, split lines, and composed prompt messages consistently, but the result JSON must still contain only the exact source keys listed in that batch's `entries`.
 
 ### 3. Dispatch sub-agents
 
@@ -80,7 +80,7 @@ For each generated `reports/translation-runs/<TARGET_LANG>/<MODEL_SLUG>/prompts/
 
 - Spawn one sub-agent (respecting the 25-cap and ramp-up rule).
 - Give it the single batch prompt file AND `prompts/translation/<TARGET_LANG>.md`.
-- Tell it: follow the batch prompt verbatim, use any `context_group` data as read-only sibling/flow context, and write its result JSON ONLY to the `output.result_file` path declared inside that batch prompt. It must not touch anything else.
+- Tell it: follow the batch prompt verbatim, use any `context_group` data as read-only sibling/flow/composition context, and write its result JSON ONLY to the `output.result_file` path declared inside that batch prompt. It must not touch anything else.
 
 Re-dispatch any sub-agent whose batch fails or produces an invalid result file. Continue until every batch has a valid result on disk.
 

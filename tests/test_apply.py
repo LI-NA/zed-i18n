@@ -206,6 +206,74 @@ class ApplyTests(unittest.TestCase):
             source_path.read_text(encoding="utf-8"),
         )
 
+    def test_applies_translation_to_line_continued_rust_string_literal(self) -> None:
+        source_path = self.root / "main.rs"
+        source = (
+            "This file has unsaved changes. Do you want to save or discard them "
+            "before the agent continues editing?"
+        )
+        source_path.write_text(
+            'let message = "This file has unsaved changes. Do you want to save or discard them \\\n'
+            '             before the agent continues editing?".to_string();\n',
+            encoding="utf-8",
+        )
+        manifest = {
+            source: {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "main.rs",
+                        "line": 1,
+                        "call": "authorize_dirty_buffer",
+                        "kind": "prompt_message",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(
+            self.root,
+            manifest,
+            {source: "저장되지 않은 변경 사항이 있습니다. 계속 편집하기 전에 저장하거나 버리시겠습니까?"},
+        )
+
+        self.assertEqual(report.applied, [source])
+        self.assertEqual(report.stale, [])
+        self.assertIn(
+            '"저장되지 않은 변경 사항이 있습니다. 계속 편집하기 전에 저장하거나 버리시겠습니까?"',
+            source_path.read_text(encoding="utf-8"),
+        )
+
+    def test_allows_named_placeholders_to_move_around_implicit_placeholders(self) -> None:
+        source_path = self.root / "main.rs"
+        source = "{message_start} the following {} files?\n{}{unsaved_warning}"
+        source_path.write_text(
+            'format!("{message_start} the following {} files?\\n{}{unsaved_warning}", count, names);\n',
+            encoding="utf-8",
+        )
+        manifest = {
+            source: {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "main.rs",
+                        "line": 1,
+                        "call": "delete_prompt_format",
+                        "kind": "prompt_message",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(
+            self.root,
+            manifest,
+            {source: "다음 {}개 파일을 {message_start}하시겠습니까?\n{}{unsaved_warning}"},
+        )
+
+        self.assertEqual(report.applied, [source])
+        self.assertEqual(report.stale, [])
+
     def test_applies_translation_to_action_doc_comment_occurrence(self) -> None:
         source_path = self.root / "crates" / "agent_ui" / "src" / "agent_ui.rs"
         source_path.parent.mkdir(parents=True)

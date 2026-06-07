@@ -34,7 +34,7 @@ Before any translation work, ground yourself in the repository:
 4. Skim `tools/zed_i18n/translation_pipeline.py` to confirm:
    - `prepare-translation` defaults to missing-only.
    - `--all` is the opt-in full-run flag and must not be used here.
-   - batch entries may include `context_group` review context for grouped settings and connected multi-line strings.
+   - batch entries may include `context_group` review context for grouped settings, connected multi-line strings, and prompt-component strings.
    - `merge-translation` reads `translations/<LANG>.json` and writes a full merged translation file, so it MUST NOT be used for this review artifact.
 5. Confirm these paths exist:
    - `manifest/ui-strings.json` — accepted translation targets
@@ -92,7 +92,7 @@ uv run zed-i18n prepare-translation \
 
 If `.cache/vscode-loc` exists, `prepare-translation` automatically adds optional `vscode_references` translation-memory hints to matching entries. `.cache/vscode-upstream` improves English source recovery for those hints. Missing VS Code reference checkouts are normal and are NOT an anomaly.
 
-Missing-only batches may still include already-translated sibling strings inside an entry's `context_group`. Treat those sibling translations as read-only context for setting title/description consistency or connected-line flow; do not write them into the new-key-only result artifact unless the same source string is part of the planned batch source set.
+Missing-only batches may still include already-translated sibling strings inside an entry's `context_group`. Treat those sibling translations as read-only context for setting title/description consistency, connected-line flow, or prompt/message composition; do not write them into the new-key-only result artifact unless the same source string is part of the planned batch source set.
 
 After each preparation step, read `reports/translation-runs/<LANG>/<MODEL_SLUG>/plan.json` and confirm:
 
@@ -118,7 +118,7 @@ Tell it:
 - You are translating only newly accepted, missing keys for `<LANG>`.
 - Process this language's batch prompts sequentially.
 - Follow each batch prompt verbatim.
-- Use any `context_group` data as read-only sibling/flow context.
+- Use any `context_group` data as read-only sibling/flow/composition context.
 - Use the style guide, glossary/dictionary references, and existing translations to keep terminology and tone consistent.
 - Write each result JSON only to the `output.result_file` path declared inside that batch prompt.
 - Do not touch anything else.
@@ -210,7 +210,7 @@ Tell it:
 
 - You are reviewing only the new-key-only artifact from this run.
 - Use the batch files to identify source strings and source context.
-- Use any `context_group` data in the batch files to review grouped settings and connected multi-line strings together.
+- Use any `context_group` data in the batch files to review grouped settings, connected multi-line strings, and prompt-component strings together.
 - Use `translations/<LANG>.<MODEL_SLUG>.json` to inspect the proposed new translations.
 - Use `translations/<LANG>.json` only as existing translation memory and style reference.
 - Use `prompts/translation/<LANG>.md` as the primary translation prompt and style guide.

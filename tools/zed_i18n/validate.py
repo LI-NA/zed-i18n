@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .rust_strings import rust_format_placeholders
+from .rust_strings import rust_format_placeholders_compatible
 from .translation_checks import protected_tokens_match
 
 
@@ -37,7 +37,7 @@ def validate_translations(
         if translation is None:
             report.missing.append(source)
             continue
-        if rust_format_placeholders(source) != rust_format_placeholders(translation):
+        if not rust_format_placeholders_compatible(source, translation):
             report.placeholder_mismatches.append(source)
         if not protected_tokens_match(source, translation):
             report.protected_token_mismatches.append(source)

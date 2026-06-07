@@ -117,6 +117,7 @@ class TranslationPipelineTests(unittest.TestCase):
         prompt = prompt_path.read_text(encoding="utf-8")
         self.assertIn("Base ko-KR prompt", prompt)
         self.assertIn("Rate Limit Reached", prompt)
+        self.assertIn("prompt-component context", prompt)
 
         prepare_translation_batches(
             root=self.root,

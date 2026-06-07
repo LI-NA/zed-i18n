@@ -128,7 +128,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     context_groups_parser.add_argument(
         "--group-type",
-        choices=("all", "settings", "connected"),
+        choices=("all", "settings", "connected", "prompt", "prompt-components"),
         default="all",
         help="Which grouped review reports to write.",
     )
@@ -536,7 +536,8 @@ def run_extract_context_groups(
     write_context_group_reports(output_path, groups, group_type=group_type)
     print(
         f"Extracted {len(groups.settings)} setting groups and "
-        f"{len(groups.connected_lines)} connected line groups for {language}: "
+        f"{len(groups.connected_lines)} connected line groups and "
+        f"{len(groups.prompt_components)} prompt component groups for {language}: "
         f"{_relative_to_root(root, output_path)}"
     )
     return 0

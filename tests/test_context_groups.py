@@ -138,6 +138,124 @@ class ContextGroupTests(unittest.TestCase):
         )
         self.assertEqual([entry["line"] for entry in group["entries"]], [1, 2])
 
+    def test_builds_prompt_component_group_for_project_panel_delete_prompt(self) -> None:
+        file = "crates/project_panel/src/project_panel.rs"
+        manifest = {
+            "A file or folder with name {} ": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 4342, "prompt", "prompt_message")
+                ],
+            },
+            "already exists in the destination folder. ": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 4343, "replace_prompt_message", "prompt_message")
+                ],
+            },
+            "Do you want to replace it?": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 4344, "replace_prompt_message", "prompt_message")
+                ],
+            },
+            "Do you want to trash": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 2350, "delete_prompt_message_start", "prompt_message")
+                ],
+            },
+            "Are you sure you want to permanently delete": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 2352, "delete_prompt_message_start", "prompt_message")
+                ],
+            },
+            "{message_start} {}?{unsaved_warning}": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 2363, "delete_prompt_format", "prompt_message")
+                ],
+            },
+            "\n\nIt has unsaved changes, which will be lost.": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(file, 2357, "delete_prompt_unsaved_warning", "prompt_message")
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={"Do you want to trash": "휴지통으로 이동"},
+        )
+
+        self.assertEqual(len(groups.prompt_components), 2)
+        group = next(
+            group
+            for group in groups.prompt_components
+            if group["subtype"] == "project_panel_delete_prompt"
+        )
+        self.assertEqual(group["type"], "prompt_components")
+        self.assertEqual(group["subtype"], "project_panel_delete_prompt")
+        self.assertEqual(
+            [entry["source"] for entry in group["entries"]],
+            [
+                "Do you want to trash",
+                "Are you sure you want to permanently delete",
+                "\n\nIt has unsaved changes, which will be lost.",
+                "{message_start} {}?{unsaved_warning}",
+            ],
+        )
+        self.assertEqual(group["entries"][0]["current_translation"], "휴지통으로 이동")
+
+        replace_group = next(
+            group
+            for group in groups.prompt_components
+            if group["subtype"] == "project_panel_replace_prompt"
+        )
+        self.assertEqual(
+            [entry["source"] for entry in replace_group["entries"]],
+            [
+                "A file or folder with name {} ",
+                "already exists in the destination folder. ",
+                "Do you want to replace it?",
+            ],
+        )
+
+        contexts = context_groups_by_source(
+            groups,
+            {"{message_start} {}?{unsaved_warning}"},
+        )
+        self.assertEqual(
+            contexts["{message_start} {}?{unsaved_warning}"]["subtype"],
+            "project_panel_delete_prompt",
+        )
+
+        batches = source_batches_for_context_groups(
+            [
+                "Do you want to trash",
+                "Are you sure you want to permanently delete",
+                "{message_start} {}?{unsaved_warning}",
+                "\n\nIt has unsaved changes, which will be lost.",
+            ],
+            manifest,
+            groups,
+            batch_size=10,
+        )
+        self.assertEqual(
+            batches,
+            [
+                [
+                    "Do you want to trash",
+                    "Are you sure you want to permanently delete",
+                    "\n\nIt has unsaved changes, which will be lost.",
+                    "{message_start} {}?{unsaved_warning}",
+                ]
+            ],
+        )
+
     def test_builds_setting_enum_group_from_dropdown_variant_labels(self) -> None:
         self._write_source(
             "crates/settings_content/src/agent.rs",
@@ -966,7 +1084,7 @@ class ContextGroupTests(unittest.TestCase):
             ],
         )
 
-    def test_writes_settings_and_connected_line_review_reports(self) -> None:
+    def test_writes_settings_connected_line_and_prompt_component_review_reports(self) -> None:
         groups = build_context_groups(
             zed_root=self.zed_root,
             manifest={},
@@ -1013,6 +1131,28 @@ class ContextGroupTests(unittest.TestCase):
                 ],
             }
         )
+        groups.prompt_components.append(
+            {
+                "id": "prompt_components:project_panel_delete_prompt:main.rs:20",
+                "type": "prompt_components",
+                "subtype": "project_panel_delete_prompt",
+                "file": "main.rs",
+                "start_line": 20,
+                "end_line": 22,
+                "joined_source": "Do you want to trash {message_start} {}?",
+                "joined_current_translation": "휴지통으로 이동",
+                "entries": [
+                    {
+                        "role": "message_start",
+                        "source": "Do you want to trash",
+                        "kind": "prompt_message",
+                        "call": "delete_prompt_message_start",
+                        "line": 20,
+                        "current_translation": "휴지통으로 이동",
+                    }
+                ],
+            }
+        )
 
         write_context_group_reports(
             output_dir=self.root / "reports" / "context-groups" / "ko-KR",
@@ -1029,8 +1169,70 @@ class ContextGroupTests(unittest.TestCase):
         connected_md = (
             self.root / "reports" / "context-groups" / "ko-KR" / "connected-lines.md"
         ).read_text(encoding="utf-8")
+        connected_json = self._read_json(
+            self.root / "reports" / "context-groups" / "ko-KR" / "connected-lines.json"
+        )
+        prompt_components_md = (
+            self.root / "reports" / "context-groups" / "ko-KR" / "prompt-components.md"
+        ).read_text(encoding="utf-8")
+        prompt_components_json = self._read_json(
+            self.root / "reports" / "context-groups" / "ko-KR" / "prompt-components.json"
+        )
+        summary = self._read_json(
+            self.root / "reports" / "context-groups" / "ko-KR" / "summary.json"
+        )
         self.assertIn("Line Width", settings_md)
+        self.assertEqual(len(connected_json), 1)
+        self.assertEqual(len(prompt_components_json), 1)
+        self.assertEqual(summary["connected_lines"], 1)
+        self.assertEqual(summary["prompt_components"], 1)
         self.assertIn("First sentence. Second sentence.", connected_md)
+        self.assertNotIn("project_panel_delete_prompt", connected_md)
+        self.assertIn("project_panel_delete_prompt", prompt_components_md)
+
+    def test_writes_only_prompt_component_reports_for_prompt_group_type(self) -> None:
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest={},
+            translations={},
+        )
+        groups.connected_lines.append(
+            {
+                "id": "connected:main.rs:10",
+                "type": "connected_lines",
+                "file": "main.rs",
+                "start_line": 10,
+                "end_line": 11,
+                "joined_source": "First sentence. Second sentence.",
+                "entries": [],
+            }
+        )
+        groups.prompt_components.append(
+            {
+                "id": "prompt_components:project_panel_delete_prompt:main.rs:20",
+                "type": "prompt_components",
+                "subtype": "project_panel_delete_prompt",
+                "file": "main.rs",
+                "start_line": 20,
+                "end_line": 22,
+                "joined_source": "Do you want to trash {message_start} {}?",
+                "entries": [],
+            }
+        )
+
+        write_context_group_reports(
+            output_dir=self.root / "reports" / "context-groups" / "ko-KR",
+            groups=groups,
+            group_type="prompt",
+        )
+
+        report_dir = self.root / "reports" / "context-groups" / "ko-KR"
+        self.assertFalse((report_dir / "settings-groups.json").exists())
+        self.assertFalse((report_dir / "connected-lines.json").exists())
+        self.assertTrue((report_dir / "prompt-components.json").exists())
+        summary = self._read_json(report_dir / "summary.json")
+        self.assertEqual(summary["connected_lines"], 1)
+        self.assertEqual(summary["prompt_components"], 1)
 
     def _write_source(self, relative_path: str, text: str) -> None:
         path = self.zed_root / relative_path

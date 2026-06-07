@@ -19,6 +19,7 @@ Example output shape:
 ## NEVER MODIFY (preserve byte-for-byte inside the translated value)
 
 - Rust format placeholders: `{}`, `{0}`, `{name}`, `{path}`, `{count:?}`, `{n:>3}`
+  - Named/numbered placeholders may move to fit target-language grammar, but anonymous placeholders such as `{}` or `{:?}` must keep their relative order.
 - Markdown code spans — anything inside backticks: `` `settings.json` ``, `` `zed <path>` ``
 - URLs, file paths, file extensions, JSON keys, setting keys, command IDs, action IDs
 - Escape sequences: `\n`, `\t`, `\r`, `\\`

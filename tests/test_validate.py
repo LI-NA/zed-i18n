@@ -31,6 +31,35 @@ class ValidateTests(unittest.TestCase):
         self.assertEqual(report.protected_token_mismatches, [])
         self.assertEqual(report.extra, [])
 
+    def test_allows_named_placeholders_to_move_around_implicit_placeholders(self) -> None:
+        manifest = {
+            "{message_start} the following {} files?\n{}{unsaved_warning}": {
+                "status": "accepted",
+                "occurrences": [],
+            },
+        }
+        translations = {
+            "{message_start} the following {} files?\n{}{unsaved_warning}": (
+                "다음 {}개 파일을 {message_start}하시겠습니까?\n{}{unsaved_warning}"
+            ),
+        }
+
+        report = validate_translations(manifest, translations)
+
+        self.assertEqual(report.placeholder_mismatches, [])
+
+    def test_reports_implicit_placeholder_order_mismatch(self) -> None:
+        manifest = {
+            "Move {} to {:?}": {"status": "accepted", "occurrences": []},
+        }
+        translations = {
+            "Move {} to {:?}": "{:?} 위치로 {} 이동",
+        }
+
+        report = validate_translations(manifest, translations)
+
+        self.assertEqual(report.placeholder_mismatches, ["Move {} to {:?}"])
+
     def test_reports_protected_token_mismatches(self) -> None:
         manifest = {
             "Open `settings.json`": {"status": "accepted", "occurrences": []},
@@ -85,6 +114,20 @@ class ValidateTests(unittest.TestCase):
             ],
         )
         self.assertEqual(report.extra, [])
+
+    def test_allows_edge_space_differences(self) -> None:
+        manifest = {
+            "A file or folder with name {} ": {"status": "accepted", "occurrences": []},
+            " matching “`{}`”": {"status": "accepted", "occurrences": []},
+        }
+        translations = {
+            "A file or folder with name {} ": "{} 이름의 파일이나 폴더가",
+            " matching “`{}`”": "“`{}`”에 일치하는 항목",
+        }
+
+        report = validate_translations(manifest, translations)
+
+        self.assertEqual(report.protected_token_mismatches, [])
 
     def test_reports_extra_translations_not_accepted_by_manifest(self) -> None:
         manifest = {

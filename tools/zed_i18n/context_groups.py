@@ -39,9 +39,10 @@ DOC_COMMENT_CALLS = {"action_doc_comment", "rust_doc_comment"}
 class ContextGroups:
     settings: list[dict[str, Any]] = field(default_factory=list)
     connected_lines: list[dict[str, Any]] = field(default_factory=list)
+    prompt_components: list[dict[str, Any]] = field(default_factory=list)
 
     def all_groups(self) -> list[dict[str, Any]]:
-        return [*self.settings, *self.connected_lines]
+        return [*self.settings, *self.connected_lines, *self.prompt_components]
 
 
 def build_context_groups(
@@ -54,6 +55,7 @@ def build_context_groups(
     return ContextGroups(
         settings=_build_setting_groups(zed_root, occurrences),
         connected_lines=_build_connected_line_groups(occurrences),
+        prompt_components=_build_prompt_component_groups(occurrences),
     )
 
 
@@ -173,9 +175,16 @@ def write_context_group_reports(
             _connected_lines_markdown(groups.connected_lines),
             encoding="utf-8",
         )
+    if group_type in {"all", "prompt", "prompt-components"}:
+        _write_json(output_dir / "prompt-components.json", groups.prompt_components)
+        (output_dir / "prompt-components.md").write_text(
+            _prompt_components_markdown(groups.prompt_components),
+            encoding="utf-8",
+        )
     summary = {
         "settings": len(groups.settings),
         "connected_lines": len(groups.connected_lines),
+        "prompt_components": len(groups.prompt_components),
     }
     _write_json(output_dir / "summary.json", summary)
 
@@ -385,6 +394,71 @@ def _build_connected_line_groups(occurrences: list[dict[str, Any]]) -> list[dict
             previous = occurrence
         _append_connected_group(groups, file, current)
     return _sorted_groups(groups)
+
+
+def _build_prompt_component_groups(occurrences: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for occurrence in occurrences:
+        subtype = _prompt_component_subtype(occurrence)
+        if subtype is None:
+            continue
+        grouped.setdefault((occurrence["file"], subtype), []).append(occurrence)
+
+    groups: list[dict[str, Any]] = []
+    for (file, subtype), group_occurrences in grouped.items():
+        if len(group_occurrences) < 2:
+            continue
+        entries = [
+            _group_entry(occurrence, _prompt_component_role(occurrence))
+            for occurrence in sorted(
+                group_occurrences,
+                key=lambda item: (item["line"], item.get("start_byte", 0), item["source"]),
+            )
+        ]
+        start_line = entries[0]["line"]
+        end_line = entries[-1]["line"]
+        groups.append(
+            {
+                "id": f"prompt_components:{subtype}:{file}:{start_line}",
+                "type": "prompt_components",
+                "subtype": subtype,
+                "file": file,
+                "start_line": start_line,
+                "end_line": end_line,
+                "joined_source": _join_text(entry["source"] for entry in entries),
+                "joined_current_translation": _join_text(
+                    entry.get("current_translation") for entry in entries
+                ),
+                "entries": entries,
+            }
+        )
+    return _sorted_groups(groups)
+
+
+def _prompt_component_subtype(occurrence: dict[str, Any]) -> str | None:
+    file = occurrence["file"]
+    call = occurrence["call"]
+    if file == "crates/project_panel/src/project_panel.rs":
+        if call.startswith("delete_prompt_"):
+            return "project_panel_delete_prompt"
+        if call == "replace_prompt_message" or occurrence["source"] == "A file or folder with name {} ":
+            return "project_panel_replace_prompt"
+    if file == "crates/workspace/src/pane.rs" and call == "save_conflict_prompt":
+        return "workspace_save_conflict_prompt"
+    if file == "crates/agent/src/tools/tool_permissions.rs" and call == "authorize_dirty_buffer":
+        return "agent_dirty_buffer_prompt"
+    return None
+
+
+def _prompt_component_role(occurrence: dict[str, Any]) -> str:
+    call = occurrence["call"]
+    if call.startswith("delete_prompt_"):
+        return call.removeprefix("delete_prompt_")
+    if call.endswith("_prompt_message"):
+        return "message"
+    if call.endswith("_prompt"):
+        return "message"
+    return call
 
 
 def _append_connected_group(
@@ -879,11 +953,22 @@ def _settings_markdown(groups: list[dict[str, Any]]) -> str:
 
 
 def _connected_lines_markdown(groups: list[dict[str, Any]]) -> str:
-    lines = ["# Connected Line Groups", "", f"Total groups: {len(groups)}", ""]
+    return _line_group_markdown("Connected Line Groups", groups)
+
+
+def _prompt_components_markdown(groups: list[dict[str, Any]]) -> str:
+    return _line_group_markdown("Prompt Component Groups", groups)
+
+
+def _line_group_markdown(title: str, groups: list[dict[str, Any]]) -> str:
+    lines = [f"# {title}", "", f"Total groups: {len(groups)}", ""]
     for group in groups:
+        group_title = f"{group['file']}:{group['start_line']}-{group['end_line']}"
+        if group.get("subtype"):
+            group_title += f" `{group['subtype']}`"
         lines.extend(
             [
-                f"## {group['file']}:{group['start_line']}-{group['end_line']}",
+                f"## {group_title}",
                 "",
                 f"Source: {_markdown_text(group.get('joined_source', ''))}",
                 "",

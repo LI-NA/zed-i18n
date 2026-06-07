@@ -228,6 +228,45 @@
     ],
     "status": "ignored"
   },
+  "\n\n1 of these has unsaved changes, which will be lost.": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_unsaved_warning",
+        "end_byte": 94154,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2392,
+        "start_byte": 94097
+      }
+    ],
+    "status": "accepted"
+  },
+  "\n\nIt has unsaved changes, which will be lost.": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_unsaved_warning",
+        "end_byte": 92405,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2357,
+        "start_byte": 92356
+      }
+    ],
+    "status": "accepted"
+  },
+  "\n\n{dirty_buffers} of these have unsaved changes, which will be lost.": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_unsaved_warning",
+        "end_byte": 94341,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2395,
+        "start_byte": 94269
+      }
+    ],
+    "status": "accepted"
+  },
   "\n                        Open your settings to add sensitive paths for which Zed will never predict edits.": {
     "occurrences": [
       {
@@ -2068,6 +2107,32 @@
         "kind": "label",
         "line": 2462,
         "start_byte": 95908
+      }
+    ],
+    "status": "accepted"
+  },
+  ".. 1 file not shown": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_truncated_files",
+        "end_byte": 93418,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2378,
+        "start_byte": 93397
+      }
+    ],
+    "status": "accepted"
+  },
+  ".. {} files not shown": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_truncated_files",
+        "end_byte": 93539,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2380,
+        "start_byte": 93516
       }
     ],
     "status": "accepted"
@@ -5541,6 +5606,14 @@
   "Agent Panel": {
     "occurrences": [
       {
+        "call": "ProjectEmptyState::new",
+        "end_byte": 191279,
+        "file": "crates/agent_ui/src/agent_panel.rs",
+        "kind": "project_empty_state_label",
+        "line": 5108,
+        "start_byte": 191266
+      },
+      {
         "call": "icon_tooltip",
         "end_byte": 163483,
         "file": "crates/agent_ui/src/agent_panel.rs",
@@ -7293,6 +7366,19 @@
         "kind": "prompt_message",
         "line": 2465,
         "start_byte": 92930
+      }
+    ],
+    "status": "accepted"
+  },
+  "Are you sure you want to permanently delete": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_message_start",
+        "end_byte": 92114,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2352,
+        "start_byte": 92069
       }
     ],
     "status": "accepted"
@@ -25528,6 +25614,19 @@
     ],
     "status": "accepted"
   },
+  "Discard changes to {}?": {
+    "occurrences": [
+      {
+        "call": "restore_file_prompt",
+        "end_byte": 86409,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2202,
+        "start_byte": 86385
+      }
+    ],
+    "status": "accepted"
+  },
   "Disconnected": {
     "occurrences": [
       {
@@ -26307,6 +26406,19 @@
     ],
     "status": "accepted"
   },
+  "Do you want to replace it?": {
+    "occurrences": [
+      {
+        "call": "replace_prompt_message",
+        "end_byte": 171093,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 4344,
+        "start_byte": 171065
+      }
+    ],
+    "status": "accepted"
+  },
   "Do you want to save all changes in the following files?": {
     "occurrences": [
       {
@@ -26342,6 +26454,19 @@
         "kind": "prompt_message",
         "line": 9269,
         "start_byte": 346652
+      }
+    ],
+    "status": "accepted"
+  },
+  "Do you want to trash": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_message_start",
+        "end_byte": 92023,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2350,
+        "start_byte": 92001
       }
     ],
     "status": "accepted"
@@ -34465,6 +34590,14 @@
   },
   "Git Panel": {
     "occurrences": [
+      {
+        "call": "ProjectEmptyState::new",
+        "end_byte": 208659,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "project_empty_state_label",
+        "line": 5636,
+        "start_byte": 208648
+      },
       {
         "call": "icon_tooltip",
         "end_byte": 256666,
@@ -54294,6 +54427,14 @@
   },
   "Project Panel": {
     "occurrences": [
+      {
+        "call": "ProjectEmptyState::new",
+        "end_byte": 296323,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "project_empty_state_label",
+        "line": 7123,
+        "start_byte": 296308
+      },
       {
         "call": "icon_tooltip",
         "end_byte": 301511,
@@ -75811,6 +75952,19 @@
     ],
     "status": "accepted"
   },
+  "This cannot be undone.": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_detail",
+        "end_byte": 94755,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_detail",
+        "line": 2406,
+        "start_byte": 94731
+      }
+    ],
+    "status": "accepted"
+  },
   "This commit was already pushed to {}.": {
     "occurrences": [
       {
@@ -75854,6 +76008,58 @@
         "kind": "rust_doc_comment",
         "line": 52,
         "start_byte": 1813
+      }
+    ],
+    "status": "accepted"
+  },
+  "This file has been deleted on disk since you started editing it. Do you want to recreate it?": {
+    "occurrences": [
+      {
+        "call": "save_conflict_prompt",
+        "end_byte": 77052,
+        "file": "crates/workspace/src/pane.rs",
+        "kind": "prompt_message",
+        "line": 2242,
+        "start_byte": 76958
+      }
+    ],
+    "status": "accepted"
+  },
+  "This file has changed on disk since you started editing it. Do you want to overwrite it?": {
+    "occurrences": [
+      {
+        "call": "save_conflict_prompt",
+        "end_byte": 76917,
+        "file": "crates/workspace/src/pane.rs",
+        "kind": "prompt_message",
+        "line": 2240,
+        "start_byte": 76827
+      }
+    ],
+    "status": "accepted"
+  },
+  "This file has unsaved changes and the agent wants to overwrite it.": {
+    "occurrences": [
+      {
+        "call": "authorize_dirty_buffer",
+        "end_byte": 31905,
+        "file": "crates/agent/src/tools/tool_permissions.rs",
+        "kind": "prompt_message",
+        "line": 812,
+        "start_byte": 31837
+      }
+    ],
+    "status": "accepted"
+  },
+  "This file has unsaved changes. Do you want to save or discard them before the agent continues editing?": {
+    "occurrences": [
+      {
+        "call": "authorize_dirty_buffer",
+        "end_byte": 31283,
+        "file": "crates/agent/src/tools/tool_permissions.rs",
+        "kind": "prompt_message",
+        "line": 795,
+        "start_byte": 31164
       }
     ],
     "status": "accepted"
@@ -76617,6 +76823,19 @@
         "kind": "context_menu_entry",
         "line": 4754,
         "start_byte": 189672
+      }
+    ],
+    "status": "accepted"
+  },
+  "Threads Sidebar": {
+    "occurrences": [
+      {
+        "call": "ProjectEmptyState::new",
+        "end_byte": 256166,
+        "file": "crates/sidebar/src/sidebar.rs",
+        "kind": "project_empty_state_label",
+        "line": 6654,
+        "start_byte": 256149
       }
     ],
     "status": "accepted"
@@ -91094,6 +91313,19 @@
     ],
     "status": "accepted"
   },
+  "already exists in the destination folder. ": {
+    "occurrences": [
+      {
+        "call": "replace_prompt_message",
+        "end_byte": 171035,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 4343,
+        "start_byte": 170991
+      }
+    ],
+    "status": "accepted"
+  },
   "an explicit `-e` or `-n` flag.": {
     "occurrences": [
       {
@@ -96786,6 +97018,32 @@
     ],
     "status": "ignored"
   },
+  "{message_start} the following {} files?\n{}{unsaved_warning}": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_format",
+        "end_byte": 94523,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2400,
+        "start_byte": 94461
+      }
+    ],
+    "status": "accepted"
+  },
+  "{message_start} {}?{unsaved_warning}": {
+    "occurrences": [
+      {
+        "call": "delete_prompt_format",
+        "end_byte": 92597,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_message",
+        "line": 2363,
+        "start_byte": 92559
+      }
+    ],
+    "status": "accepted"
+  },
   "{name} ({worktree_root})": {
     "occurrences": [
       {
@@ -96834,6 +97092,19 @@
         "kind": "prompt_message",
         "line": 445,
         "start_byte": 15568
+      }
+    ],
+    "status": "accepted"
+  },
+  "{path} contains unsaved edits. Do you want to save it?": {
+    "occurrences": [
+      {
+        "call": "dirty_message_for",
+        "end_byte": 188394,
+        "file": "crates/workspace/src/pane.rs",
+        "kind": "prompt_message",
+        "line": 4903,
+        "start_byte": 188338
       }
     ],
     "status": "accepted"

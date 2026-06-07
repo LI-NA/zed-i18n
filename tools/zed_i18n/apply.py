@@ -5,7 +5,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import re
 
-from .rust_strings import parse_rust_string_literal, rust_format_placeholders, rust_string_literal
+from .rust_strings import (
+    parse_rust_string_literal,
+    rust_format_placeholders_compatible,
+    rust_string_literal,
+)
 
 
 @dataclass
@@ -43,7 +47,7 @@ def apply_translations(
             report.missing.append(source)
             continue
 
-        if rust_format_placeholders(source) != rust_format_placeholders(translation):
+        if not rust_format_placeholders_compatible(source, translation):
             raise ValueError(f"placeholder mismatch for {source!r}")
 
         occurrences = entry.get("occurrences", [])
@@ -371,7 +375,11 @@ def _regular_string_literal_end(text: str, quote_index: int) -> int | None:
 
 
 def _literal_source(literal: str) -> str:
-    return parse_rust_string_literal(literal)
+    return parse_rust_string_literal(_collapse_rust_string_line_continuations(literal))
+
+
+def _collapse_rust_string_line_continuations(literal: str) -> str:
+    return re.sub(r"\\\r?\n[ \t]*", "", literal)
 
 
 def _is_doc_comment_occurrence(occurrence: dict[str, object]) -> bool:

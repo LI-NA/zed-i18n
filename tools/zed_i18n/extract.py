@@ -72,6 +72,11 @@ CALL_RULES: dict[str, tuple[int, str, str]] = {
     ),
     "ListBulletItem::new": (0, "list_bullet_item", "ListBulletItem::new"),
     "ProfileModalHeader::new": (0, "modal_header", "ProfileModalHeader::new"),
+    "ProjectEmptyState::new": (
+        0,
+        "project_empty_state_label",
+        "ProjectEmptyState::new",
+    ),
 }
 
 STRUCT_FIELD_RULES: dict[tuple[str, str], tuple[str, str]] = {
@@ -188,6 +193,7 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
 
     occurrences.extend(_extract_action_doc_comments(source, relative_path))
     occurrences.extend(_extract_line_candidates(source, relative_path))
+    occurrences.extend(_extract_agent_dirty_buffer_prompt_occurrences(source_bytes, relative_path))
     occurrences.extend(_extract_settings_enum_variant_labels(source, relative_path))
     return _dedupe_occurrences(occurrences)
 
@@ -783,6 +789,52 @@ def _extract_line_candidates(source: str, relative_path: str) -> list[StringOccu
     return candidates
 
 
+AGENT_DIRTY_BUFFER_PROMPT_MESSAGES = {
+    "This file has unsaved changes. Do you want to save or discard them before the agent continues editing?",
+    "This file has unsaved changes and the agent wants to overwrite it.",
+}
+
+
+def _collapse_rust_string_line_continuations(literal: str) -> str:
+    return re.sub(r"\\\r?\n[ \t]*", "", literal)
+
+
+def _extract_agent_dirty_buffer_prompt_occurrences(
+    source_bytes: bytes,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    if not _is_agent_tool_permissions_path(relative_path):
+        return []
+
+    parser = _rust_parser()
+    tree = parser.parse(source_bytes)
+    if tree is None:
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    for node in _walk(tree.root_node):
+        if node.type != "string_literal":
+            continue
+
+        literal = _node_text(source_bytes, node)
+        source = parse_rust_string_literal(_collapse_rust_string_line_continuations(literal))
+        if source not in AGENT_DIRTY_BUFFER_PROMPT_MESSAGES:
+            continue
+
+        occurrences.append(
+            StringOccurrence(
+                source=source,
+                file=relative_path,
+                line=node.start_point[0] + 1,
+                call="authorize_dirty_buffer",
+                kind="prompt_message",
+                start_byte=node.start_byte,
+                end_byte=node.end_byte,
+            )
+        )
+    return occurrences
+
+
 def _extract_settings_enum_variant_labels(source: str, relative_path: str) -> list[StringOccurrence]:
     if not _is_settings_content_path(relative_path):
         return []
@@ -1169,6 +1221,8 @@ def _line_patterns_for_path(
         patterns.extend(APP_MENU_LINE_PATTERNS)
     if _is_git_panel_path(relative_path):
         patterns.extend(GIT_PANEL_LINE_PATTERNS)
+    if _is_project_panel_path(relative_path):
+        patterns.extend(PROJECT_PANEL_LINE_PATTERNS)
     if _is_git_blame_or_commit_tooltip_path(relative_path):
         patterns.extend(GIT_COMMIT_TOOLTIP_LINE_PATTERNS)
     if _is_git_branch_picker_path(relative_path):
@@ -1280,6 +1334,10 @@ def _is_workspace_pane_path(relative_path: str) -> bool:
     return relative_path == "crates/workspace/src/pane.rs"
 
 
+def _is_project_panel_path(relative_path: str) -> bool:
+    return relative_path == "crates/project_panel/src/project_panel.rs"
+
+
 def _is_search_path(relative_path: str) -> bool:
     return relative_path == "crates/search/src/search.rs"
 
@@ -1294,6 +1352,10 @@ def _is_agent_entry_view_state_path(relative_path: str) -> bool:
 
 def _is_agent_tool_path(relative_path: str) -> bool:
     return relative_path.startswith("crates/agent/src/tools/")
+
+
+def _is_agent_tool_permissions_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent/src/tools/tool_permissions.rs"
 
 
 def _is_update_title_tool_path(relative_path: str) -> bool:
@@ -1870,6 +1932,108 @@ WORKSPACE_PANE_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'\bend_slot_tooltip_text\s*=\s*("(?:\\.|[^"\\])*")'),
         "end_slot_tooltip_text",
         "tab_tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*const\s+(?:CONFLICT_MESSAGE|DELETED_MESSAGE):\s*&str\s*=\s*("(?:This file has changed on disk since you started editing it\. Do you want to overwrite it\?|This file has been deleted on disk since you started editing it\. Do you want to recreate it\?)");'
+        ),
+        "save_conflict_prompt",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bformat!\(\s*("\{path\} contains unsaved edits\. Do you want to save it\?")'),
+        "dirty_message_for",
+        "prompt_message",
+        1,
+    ),
+)
+
+
+PROJECT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\bformat!\(\s*("Discard changes to \{\}\?")'),
+        "restore_file_prompt",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("(?:Do you want to trash|Are you sure you want to permanently delete)")\s*$'
+        ),
+        "delete_prompt_message_start",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("\{message_start\} \{\}\?\{unsaved_warning\}"),?\s*$'),
+        "delete_prompt_format",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("\{message_start\} the following \{\} files\?\\n\{\}\{unsaved_warning\}"),?\s*$'
+        ),
+        "delete_prompt_format",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("\\n\\nIt has unsaved changes, which will be lost\.")'),
+        "delete_prompt_unsaved_warning",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("\\n\\n1 of these has unsaved changes, which will be lost\.")\.to_string\(\)'
+        ),
+        "delete_prompt_unsaved_warning",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'\bformat!\(\s*("\\n\\n\{dirty_buffers\} of these have unsaved changes, which will be lost\.")'
+        ),
+        "delete_prompt_unsaved_warning",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("\\n\\n\{dirty_buffers\} of these have unsaved changes, which will be lost\.")'
+        ),
+        "delete_prompt_unsaved_warning",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bpaths\.push\(\s*("\.\. 1 file not shown")\.into\(\)'),
+        "delete_prompt_truncated_files",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bpaths\.push\(\s*format!\(\s*("\.\. \{\} files not shown")'),
+        "delete_prompt_truncated_files",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bthen_some\(\s*("This cannot be undone\.")'),
+        "delete_prompt_detail",
+        "prompt_detail",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("(?:A file or folder with name \{\} |already exists in the destination folder\. |Do you want to replace it\?)"),?\s*$'
+        ),
+        "replace_prompt_message",
+        "prompt_message",
         1,
     ),
 )

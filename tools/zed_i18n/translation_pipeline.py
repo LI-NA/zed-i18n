@@ -13,7 +13,7 @@ from .context_groups import (
     preferred_occurrence_from_context,
     source_batches_for_context_groups,
 )
-from .rust_strings import rust_format_placeholders
+from .rust_strings import rust_format_placeholders_compatible
 from .translation_checks import protected_tokens_match
 from .vscode_loc import (
     VscodeTranslationIndex,
@@ -243,7 +243,7 @@ def merge_translation_results(
             if not isinstance(translation, str):
                 report.invalid_values.append(source)
                 continue
-            if rust_format_placeholders(source) != rust_format_placeholders(translation):
+            if not rust_format_placeholders_compatible(source, translation):
                 report.placeholder_mismatches.append(source)
                 continue
             if not protected_tokens_match(source, translation):
@@ -377,9 +377,10 @@ def _batch_prompt(base_prompt: str, batch_payload: dict[str, Any]) -> str:
             "Use `null` when the item should be left for manual review. "
             "When an entry has `vscode_references`, treat them as VS Code language-pack "
             "translation-memory hints, not mandatory replacements. "
-            "When an entry has `context_group`, use the grouped title/description or "
-            "connected-line context to keep related translations consistent, but still output "
-            "only the exact `source` keys listed in this batch's `entries`. "
+            "When an entry has `context_group`, use the grouped title/description, "
+            "connected-line context, or prompt-component context to keep related translations "
+            "consistent, but still output only the exact `source` keys listed in this batch's "
+            "`entries`. "
             "Save the JSON response to the `output.result_file` path after translation.",
             "## Batch Payload\n"
             "```json\n"

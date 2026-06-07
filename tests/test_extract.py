@@ -1076,6 +1076,164 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(set(by_source), {"Unpin Tab", "Close Tab"})
         self.assertEqual(by_source["Close Tab"].kind, "tab_tooltip")
 
+    def test_extracts_workspace_pane_dirty_buffer_prompt(self) -> None:
+        source = "\n".join(
+            [
+                "fn dirty_message_for(buffer_path: Option<ProjectPath>, path_style: PathStyle) -> String {",
+                '    const CONFLICT_MESSAGE: &str = "This file has changed on disk since you started editing it. Do you want to overwrite it?";',
+                '    const DELETED_MESSAGE: &str = "This file has been deleted on disk since you started editing it. Do you want to recreate it?";',
+                '    format!("{path} contains unsaved edits. Do you want to save it?")',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/workspace/src/pane.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "This file has changed on disk since you started editing it. Do you want to overwrite it?",
+                "This file has been deleted on disk since you started editing it. Do you want to recreate it?",
+                "{path} contains unsaved edits. Do you want to save it?",
+            },
+        )
+        self.assertEqual(
+            by_source["{path} contains unsaved edits. Do you want to save it?"].kind,
+            "prompt_message",
+        )
+
+    def test_extracts_project_empty_state_panel_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn render_empty_state(focus_handle: FocusHandle, cx: &mut App) {",
+                "    ProjectEmptyState::new(",
+                '        "Project Panel",',
+                "        focus_handle.clone(),",
+                "        KeyBinding::for_action(&workspace::Open::default(), cx),",
+                "    );",
+                '    ProjectEmptyState::new("Threads Sidebar", focus_handle, key_binding);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/project_panel/src/project_panel.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Project Panel", "Threads Sidebar"})
+        self.assertEqual(by_source["Project Panel"].kind, "project_empty_state_label")
+        self.assertEqual(by_source["Threads Sidebar"].call, "ProjectEmptyState::new")
+
+    def test_extracts_project_panel_unsaved_delete_warnings(self) -> None:
+        source = "\n".join(
+            [
+                "fn delete_prompt(dirty_buffers: usize) {",
+                '    let prompt = format!("Discard changes to {}?", file_name);',
+                "    let message_start = if trash {",
+                '        "Do you want to trash"',
+                "    } else {",
+                '        "Are you sure you want to permanently delete"',
+                "    };",
+                "    let single = if dirty_buffers > 0 {",
+                '        "\\n\\nIt has unsaved changes, which will be lost."',
+                "    } else {",
+                '        ""',
+                "    };",
+                "    format!(",
+                '        "{message_start} {}?{unsaved_warning}",',
+                "        MarkdownInlineCode(path)",
+                "    );",
+                "    let many = if dirty_buffers == 1 {",
+                '        "\\n\\n1 of these has unsaved changes, which will be lost.".to_string()',
+                "    } else {",
+                "        format!(",
+                '            "\\n\\n{dirty_buffers} of these have unsaved changes, which will be lost."',
+                "        )",
+                "    };",
+                '    paths.push(".. 1 file not shown".into());',
+                '    paths.push(format!(".. {} files not shown", truncated_path_counts));',
+                "    format!(",
+                '        "{message_start} the following {} files?\\n{}{unsaved_warning}",',
+                "        file_paths.len(),",
+                "        names.join(\"\\n\")",
+                "    );",
+                '    let detail = (!trash).then_some("This cannot be undone.");',
+                "    let prompt_message = format!(",
+                "        concat!(",
+                '            "A file or folder with name {} ",',
+                '            "already exists in the destination folder. ",',
+                '            "Do you want to replace it?"',
+                "        ),",
+                "        filename",
+                "    );",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/project_panel/src/project_panel.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "A file or folder with name {} ",
+                "Do you want to trash",
+                "Are you sure you want to permanently delete",
+                "Discard changes to {}?",
+                "already exists in the destination folder. ",
+                "Do you want to replace it?",
+                "{message_start} {}?{unsaved_warning}",
+                "{message_start} the following {} files?\n{}{unsaved_warning}",
+                "\n\nIt has unsaved changes, which will be lost.",
+                "\n\n1 of these has unsaved changes, which will be lost.",
+                "\n\n{dirty_buffers} of these have unsaved changes, which will be lost.",
+                ".. 1 file not shown",
+                ".. {} files not shown",
+                "This cannot be undone.",
+            },
+        )
+
+    def test_extracts_agent_dirty_buffer_permission_messages(self) -> None:
+        source = "\n".join(
+            [
+                "fn authorize_dirty_buffer(kind: DirtyBufferPromptKind) {",
+                "    let (message, options) = match kind {",
+                "        DirtyBufferPromptKind::Edit => (",
+                '            "This file has unsaved changes. Do you want to save or discard them \\',
+                '             before the agent continues editing?"',
+                "                .to_string(),",
+                "            vec![],",
+                "        ),",
+                "        DirtyBufferPromptKind::Overwrite => (",
+                '            "This file has unsaved changes and the agent wants to overwrite it.".to_string(),',
+                "            vec![],",
+                "        ),",
+                "    };",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/tools/tool_permissions.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "This file has unsaved changes. Do you want to save or discard them before the agent continues editing?",
+                "This file has unsaved changes and the agent wants to overwrite it.",
+            },
+        )
+
     def test_extracts_tool_permission_tool_info_strings(self) -> None:
         source = "\n".join(
             [

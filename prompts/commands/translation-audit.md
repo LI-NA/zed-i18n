@@ -65,7 +65,7 @@ Output a 5–8 line summary of findings (in Korean), the resolved locale list, a
 
 - For each locale in `TARGET LANGUAGES`, run a per-batch audit using one Claude Code sub-agent per batch.
 - Each sub-agent emits `changes.json` (must-fix) + `suggestions.json` (ideation) + `notes.md` (audit memo) for its assigned batch.
-- Use context-group reports to review setting title/description pairs and connected multi-line strings as UI units instead of isolated alphabetic keys.
+- Use context-group reports to review setting title/description pairs, connected multi-line strings, and prompt-component strings as UI units instead of isolated alphabetic keys.
 - After every batch in a locale finishes, the main agent applies that locale's `changes.json` entries to `translations/<LOCALE>.json` via the provided apply script.
 - After all locales finish, compile per-locale `suggestions.md` and a top-level `SUMMARY.md`.
 - **No `translations/<LOCALE>.json` is ever modified by a sub-agent directly** — only the main agent applies changes through the apply script.
@@ -98,6 +98,7 @@ If `reports/<AUDIT_DIR_NAME>/preprocess/batches.json` already exists, ensure `re
    - group keys by their first occurrence's source file, sort by line within each file
    - keep setting title/description context groups atomic using `settings-groups.json`
    - keep connected-line context groups atomic using `connected-lines.json`
+   - keep prompt-component context groups atomic using `prompt-components.json`
    - pack into batches targeting ~320 keys (max 420), keeping all context groups atomic
    - emit `batches.json`, `clusters.json`, `context-groups.json`, `summary.md` in the same folder
 4. Write `reports/<AUDIT_DIR_NAME>/preprocess/build_batch_meta.py` — per-batch metadata extractor. For each batch in `batches.json` it writes `batch-meta/batch-XXX.json` containing for each key: `key`, `source` (English), `primary` (file/line/kind/call from first occurrence), `files` (deduped), `occurrence_count`, and `cluster_id` / `context_group_id` / `context_group_type` when applicable. This lets sub-agents skip the 92K-line manifest.
@@ -112,7 +113,7 @@ If `reports/<AUDIT_DIR_NAME>/preprocess/batches.json` already exists, ensure `re
    - the prohibition list (no worktree / no branch / no git write / no `translations/*.json` modification / no auto-script audit / no sub-agent spawning)
    - the output spec for `changes.json`, `suggestions.json`, `notes.md` (key MUST byte-match catalog; current MUST byte-match the live translation; placeholders/backticks/product names/escapes preserved)
    - conservative target: **1–5% must-fix rate**
-   - context-group workflow: read `reports/<AUDIT_DIR_NAME>/context-groups/<LOCALE>/settings-groups.md` and `connected-lines.md` for assigned keys before proposing sibling or line-flow fixes
+   - context-group workflow: read `reports/<AUDIT_DIR_NAME>/context-groups/<LOCALE>/settings-groups.md`, `connected-lines.md`, and `prompt-components.md` for assigned keys before proposing sibling, line-flow, or prompt-composition fixes
 7. Write `reports/<AUDIT_DIR_NAME>/apply_changes.py` — applies one locale's `batch-XX/changes.json` files into `translations/<LOCALE>.json`. It must:
    - verify each change's `current` byte-matches the live file before applying (skip with warning on mismatch)
    - preserve original file formatting (2-space indent, `ensure_ascii=False`, sorted keys, trailing `\n`, Windows-default newline handling)
@@ -144,7 +145,7 @@ For each locale in `TARGET LANGUAGES`, in this exact order:
    Grouped review context: `reports/<AUDIT_DIR_NAME>/context-groups/<LOCALE>/`.
    Output: `reports/<AUDIT_DIR_NAME>/<LOCALE>/batch-NN/` — `changes.json`, `suggestions.json`, `notes.md` (use `batch-NN`, two-digit zero-padded folder name).
 
-   Reminders: no worktree/branch/commit/push; do not modify `translations/<LOCALE>.json`; audit each key by reading it (no auto-scripted comparison); review setting groups and connected-line groups as units when present; be conservative (~1–5% must-fix); final report under 200 words, file paths only.
+   Reminders: no worktree/branch/commit/push; do not modify `translations/<LOCALE>.json`; audit each key by reading it (no auto-scripted comparison); review setting groups, connected-line groups, and prompt-component groups as units when present; be conservative (~1–5% must-fix); final report under 200 words, file paths only.
    ```
 
    Use `subagent_type: "general-purpose"`, `model: "opus"`. Do NOT pass `isolation: "worktree"`. Wait for all 6 to return before launching the next round.

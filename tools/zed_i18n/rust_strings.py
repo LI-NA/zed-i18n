@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 import ast
 import re
 import warnings
@@ -32,6 +33,28 @@ def rust_format_placeholders(text: str) -> list[str]:
             continue
         index += 1
     return placeholders
+
+
+def rust_format_placeholders_compatible(source: str, translation: str) -> bool:
+    source_implicit, source_explicit = _rust_format_placeholder_profile(source)
+    translation_implicit, translation_explicit = _rust_format_placeholder_profile(translation)
+    return source_implicit == translation_implicit and source_explicit == translation_explicit
+
+
+def _rust_format_placeholder_profile(text: str) -> tuple[list[str], Counter[str]]:
+    implicit: list[str] = []
+    explicit: Counter[str] = Counter()
+    for placeholder in rust_format_placeholders(text):
+        if _is_implicit_rust_format_placeholder(placeholder):
+            implicit.append(placeholder)
+        else:
+            explicit[placeholder] += 1
+    return implicit, explicit
+
+
+def _is_implicit_rust_format_placeholder(placeholder: str) -> bool:
+    inner = placeholder[1:-1]
+    return inner == "" or inner.startswith(":")
 
 
 def parse_rust_string_literal(literal: str) -> str:

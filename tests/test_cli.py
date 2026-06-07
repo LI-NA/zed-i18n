@@ -104,6 +104,18 @@ class CliTests(unittest.TestCase):
         self.assertEqual(context_group_args.language, "ko-KR")
         self.assertEqual(context_group_args.group_type, "settings")
         self.assertEqual(context_group_args.output_dir, "reports/context-groups/ko-KR")
+        self.assertEqual(
+            parser.parse_args(
+                [
+                    "extract-context-groups",
+                    "--language",
+                    "ko-KR",
+                    "--group-type",
+                    "prompt",
+                ]
+            ).group_type,
+            "prompt",
+        )
         glossary_args = parser.parse_args(
             [
                 "generate-vscode-glossary",
