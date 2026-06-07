@@ -353,7 +353,7 @@ def _find_regular_string_literal_span(
         end_index = _regular_string_literal_end(text, quote_index)
         if end_index is None:
             return None
-        if _literal_source(text[quote_index:end_index]) == source:
+        if source in _literal_sources(text[quote_index:end_index]):
             return quote_index, end_index
         quote_index = text.find('"', end_index)
     return None
@@ -374,8 +374,12 @@ def _regular_string_literal_end(text: str, quote_index: int) -> int | None:
     return None
 
 
-def _literal_source(literal: str) -> str:
-    return parse_rust_string_literal(_collapse_rust_string_line_continuations(literal))
+def _literal_sources(literal: str) -> tuple[str, ...]:
+    sources = [
+        parse_rust_string_literal(_collapse_rust_string_line_continuations(literal)),
+        parse_rust_string_literal(literal),
+    ]
+    return tuple(dict.fromkeys(sources))
 
 
 def _collapse_rust_string_line_continuations(literal: str) -> str:

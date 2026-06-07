@@ -244,6 +244,44 @@ class ApplyTests(unittest.TestCase):
             source_path.read_text(encoding="utf-8"),
         )
 
+    def test_applies_translation_to_legacy_line_continued_manifest_source(self) -> None:
+        source_path = self.root / "main.rs"
+        source = (
+            "Run LLMs locally on your machine with Ollama, or connect to an Ollama server. "
+            "                Can provide access to Llama, Mistral, Gemma, and hundreds of other models."
+        )
+        source_path.write_text(
+            'Label::new("Run LLMs locally on your machine with Ollama, or connect to an Ollama server. \\\n'
+            '                Can provide access to Llama, Mistral, Gemma, and hundreds of other models.");\n',
+            encoding="utf-8",
+        )
+        manifest = {
+            source: {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "main.rs",
+                        "line": 1,
+                        "call": "Label::new",
+                        "kind": "label",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(
+            self.root,
+            manifest,
+            {source: "로컬 Ollama로 LLM을 실행하거나 Ollama 서버에 연결할 수 있습니다."},
+        )
+
+        self.assertEqual(report.applied, [source])
+        self.assertEqual(report.stale, [])
+        self.assertIn(
+            '"로컬 Ollama로 LLM을 실행하거나 Ollama 서버에 연결할 수 있습니다."',
+            source_path.read_text(encoding="utf-8"),
+        )
+
     def test_allows_named_placeholders_to_move_around_implicit_placeholders(self) -> None:
         source_path = self.root / "main.rs"
         source = "{message_start} the following {} files?\n{}{unsaved_warning}"
