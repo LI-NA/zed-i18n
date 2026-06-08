@@ -81,6 +81,7 @@ Use these manual project terms alongside the generated VS Code glossary.
 - **Skill / Skills** (Agent Skills feature): use `스킬`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
 - **Agent / Agents** (AI agent feature): use `에이전트`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
 - **Provider / Providers** (AI/model provider feature): use `프로바이더`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `생성 토큰` for the model's generated-response token budget — distinct from `Max Output Tokens` = `출력 토큰`. Do NOT use the editor-completion term `자동 완성` here.
 
 ## DISAMBIGUATION RULES
 

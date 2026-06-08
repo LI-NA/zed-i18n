@@ -2581,6 +2581,327 @@ class ExtractTests(unittest.TestCase):
 
         self.assertEqual(occurrences, [])
 
+    def test_extracts_agent_notification_captions(self) -> None:
+        source = "\n".join(
+            [
+                "fn handle_event(&mut self, used_tools: bool, window: &mut Window, cx: &mut Context<Self>) {",
+                '    self.notify_with_sound("Waiting for tool confirmation", IconName::Info, window, cx);',
+                "    self.notify_with_sound(",
+                "        if used_tools {",
+                '            "Finished running tools"',
+                "        } else {",
+                '            "New message"',
+                "        },",
+                "        IconName::ZedAssistant,",
+                "        window,",
+                "        cx,",
+                "    );",
+                '    self.notify_with_sound("Agent stopped due to an error", IconName::Warning, window, cx);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/conversation_view.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Waiting for tool confirmation",
+                "Finished running tools",
+                "New message",
+                "Agent stopped due to an error",
+            },
+        )
+        self.assertEqual(by_source["Waiting for tool confirmation"].call, "notify_with_sound")
+        self.assertEqual(by_source["Agent stopped due to an error"].kind, "notification")
+
+    def test_extracts_settings_migration_banner_messages(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(&mut self, err: String, cx: &mut Context<SettingsWindow>) {",
+                "    this.child(banner(",
+                '        "Failed to load your settings. Some values may be incorrect and changes may be lost.",',
+                "        err,",
+                "        &mut self.shown_errors,",
+                "        cx,",
+                "    ));",
+                "    this.child(banner(",
+                '        "Your settings are out of date, and need to be updated.",',
+                "        match &self.current_file {",
+                '            SettingsUiFile::User => "They can be automatically migrated to the latest version.",',
+                '            SettingsUiFile::Project(_) => "They must be manually migrated to the latest version.",',
+                "        }.to_string(),",
+                "        &mut self.shown_errors,",
+                "        cx,",
+                "    ));",
+                "    this.child(banner(",
+                '        "Your settings file is out of date, automatic migration failed",',
+                "        err.clone(),",
+                "        &mut self.shown_errors,",
+                "        cx,",
+                "    ));",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_ui/src/settings_ui.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Failed to load your settings. Some values may be incorrect and changes may be lost.",
+                "Your settings are out of date, and need to be updated.",
+                "They can be automatically migrated to the latest version.",
+                "They must be manually migrated to the latest version.",
+                "Your settings file is out of date, automatic migration failed",
+            },
+        )
+        self.assertEqual(
+            by_source["Your settings are out of date, and need to be updated."].kind,
+            "settings_warning_banner",
+        )
+        self.assertEqual(
+            by_source["They must be manually migrated to the latest version."].kind,
+            "settings_warning_detail",
+        )
+
+    def test_extracts_bundled_file_titles_only(self) -> None:
+        source = "\n".join(
+            [
+                "fn register(cx: &mut App) {",
+                "    open_bundled_file(",
+                "        workspace,",
+                '        asset_str::<Assets>("licenses.md"),',
+                '        "Open Source License Attribution",',
+                '        "Markdown",',
+                "        window,",
+                "        cx,",
+                "    );",
+                '    open_bundled_file(workspace, settings::default_settings(), "Default Settings", "JSON", window, cx);',
+                '    open_bundled_file(workspace, settings::default_keymap(), "Default Key Bindings", "JSON", window, cx);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/zed/src/zed.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "Open Source License Attribution",
+                "Default Settings",
+                "Default Key Bindings",
+            },
+        )
+
+    def test_extracts_completion_kind_tooltip_names(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(kind: CompletionItemKind) {",
+                "    badge.tooltip(Tooltip::text(completion_kind_name(kind)));",
+                "}",
+                "fn completion_kind_name(kind: CompletionItemKind) -> &'static str {",
+                "    match kind {",
+                '        CompletionItemKind::TEXT => "Text",',
+                '        CompletionItemKind::METHOD => "Method",',
+                '        CompletionItemKind::TYPE_PARAMETER => "Type Parameter",',
+                '        _ => "Unknown",',
+                "    }",
+                "}",
+                "fn completion_kind_letter(kind: CompletionItemKind) -> Option<&'static str> {",
+                "    Some(match kind {",
+                '        CompletionItemKind::TEXT => "t",',
+                '        CompletionItemKind::METHOD => "m",',
+                '        _ => "?",',
+                "    })",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/editor/src/code_context_menus.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"Text", "Method", "Type Parameter", "Unknown"},
+        )
+
+    def test_extracts_prompt_error_titles_and_details(self) -> None:
+        source = "\n".join(
+            [
+                "fn show_errors(workspace: &mut Workspace, task: Task<anyhow::Result<()>>) {",
+                '    workspace.show_error(&"There’s no active call; join one first.", cx);',
+                '    task.detach_and_prompt_err("Failed to move channel", window, cx, |e, _, _| {',
+                "        match e.error_code() {",
+                '            ErrorCode::BadPublicNesting => Some("Public channels must have public parents".into()),',
+                '            ErrorCode::CircularNesting => Some("You cannot move a channel into itself".into()),',
+                "            _ => None,",
+                "        }",
+                "    });",
+                '    task.detach_and_prompt_err("Sharing Screen Failed", window, cx, |e, _, _| Some(format!("{e:?}")));',
+                '    task.prompt_err("Failed to connect", window, cx, |_, _, _| None);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/collab_ui/src/collab_panel.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "There’s no active call; join one first.",
+                "Failed to move channel",
+                "Public channels must have public parents",
+                "You cannot move a channel into itself",
+                "Sharing Screen Failed",
+                "Failed to connect",
+            },
+        )
+        self.assertEqual(by_source["Failed to move channel"].kind, "error_prompt")
+        self.assertEqual(by_source["Public channels must have public parents"].kind, "error_detail")
+        self.assertEqual(by_source["There’s no active call; join one first."].call, "show_error")
+        self.assertNotIn("{e:?}", by_source)
+
+    def test_extracts_git_panel_error_spawn_prompts(self) -> None:
+        occurrences = extract_ui_strings_from_source(
+            'error_spawn("There are still conflicts. You must stage these before committing", window, cx);',
+            relative_path="crates/git_ui/src/git_panel.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"There are still conflicts. You must stage these before committing"},
+        )
+        self.assertEqual(occurrences[0].call, "error_spawn")
+
+    def test_extracts_add_llm_provider_input_labels_and_textual_placeholders(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(provider: LlmCompatibleProvider, window: &mut Window, cx: &mut App) {",
+                '    single_line_input("Provider Name", provider.name(), None, 1, window, cx);',
+                '    single_line_input("API URL", provider.api_url(), None, 2, window, cx);',
+                '    single_line_input("Model Name", "e.g. gpt-5, claude-opus-4", None, 4, window, cx);',
+                '    single_line_input("Max Completion Tokens", "200000", Some("200000"), 5, window, cx);',
+                '    single_line_input("Max Output Tokens", "Max Output Tokens", Some("32000"), 6, window, cx);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Provider Name",
+                "API URL",
+                "Model Name",
+                "e.g. gpt-5, claude-opus-4",
+                "Max Completion Tokens",
+                "Max Output Tokens",
+            },
+        )
+        self.assertEqual(by_source["Provider Name"].kind, "input_label")
+        self.assertEqual(by_source["e.g. gpt-5, claude-opus-4"].kind, "placeholder")
+        self.assertNotIn("200000", by_source)
+        self.assertNotIn("32000", by_source)
+
+    def test_extracts_time_format_strings_without_layout_templates(self) -> None:
+        source = "\n".join(
+            [
+                "fn format_absolute_timestamp(timestamp: OffsetDateTime, reference: OffsetDateTime) -> String {",
+                '    format!("Today at {}", format_absolute_time(timestamp));',
+                '    format!("Yesterday at {}", format_absolute_time(timestamp));',
+                '    format!("{} {}", format_absolute_date(timestamp, reference, true), format_absolute_time(timestamp));',
+                "}",
+                "fn format_relative_time(timestamp: OffsetDateTime, reference: OffsetDateTime) -> Option<String> {",
+                '    Some("Just now".to_string());',
+                '    Some("1 minute ago".to_string());',
+                '    Some(format!("{} minutes ago", minutes));',
+                '    Some(format!("{}:{:02} {}", hour, minute, meridiem));',
+                "}",
+                "fn format_relative_date(timestamp: OffsetDateTime, reference: OffsetDateTime) -> String {",
+                '    "Today".to_string();',
+                '    "Yesterday".to_string();',
+                '    format!("{} days ago", days);',
+                '    format!("{years} years ago");',
+                "}",
+                "#[cfg(test)]",
+                "mod tests {",
+                "    fn test_format_timestamp() {",
+                '        assert_eq!(format_timestamp(), "Today at 15:30");',
+                '        assert_eq!(format_relative_date(), "2 years ago");',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/time_format/src/time_format.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "Today at {}",
+                "Yesterday at {}",
+                "Just now",
+                "1 minute ago",
+                "{} minutes ago",
+                "Today",
+                "Yesterday",
+                "{} days ago",
+                "{years} years ago",
+            },
+        )
+
+    def test_ignores_format_distance_composition_strings(self) -> None:
+        source = "\n".join(
+            [
+                "fn distance_string(distance: i64, include_seconds: bool, add_suffix: bool, hide_prefix: bool) -> String {",
+                '    let suffix = if distance < 0 { " from now" } else { " ago" };',
+                '    let string = if hide_prefix { "a minute" } else { "less than a minute" }.to_string();',
+                '    format!("{} minutes", minutes);',
+                '    format!("almost {} years", years + 1);',
+                '    format!("{}{}", string, suffix);',
+                "}",
+                "#[cfg(test)]",
+                "mod tests {",
+                "    fn test_format_distance() {",
+                '        assert_eq!("about 2 hours from now", format_distance());',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/ui/src/utils/format_distance.rs",
+        )
+
+        self.assertEqual({occurrence.source for occurrence in occurrences}, set())
+
 
 if __name__ == "__main__":
     unittest.main()

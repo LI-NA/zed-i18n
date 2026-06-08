@@ -2,38 +2,6 @@
   "": {
     "occurrences": [
       {
-        "call": "SharedString::from",
-        "end_byte": 15492,
-        "file": "crates/agent_servers/src/custom.rs",
-        "kind": "shared_string",
-        "line": 446,
-        "start_byte": 15490
-      },
-      {
-        "call": "SharedString::from",
-        "end_byte": 34990,
-        "file": "crates/agent_ui/src/agent_panel.rs",
-        "kind": "shared_string",
-        "line": 852,
-        "start_byte": 34988
-      },
-      {
-        "call": "SharedString::new_static",
-        "end_byte": 18116,
-        "file": "crates/gpui/src/text_system.rs",
-        "kind": "shared_string",
-        "line": 497,
-        "start_byte": 18114
-      },
-      {
-        "call": "child",
-        "end_byte": 23862,
-        "file": "crates/inspector_ui/src/div_inspector.rs",
-        "kind": "child_text",
-        "line": 596,
-        "start_byte": 23860
-      },
-      {
         "call": "ListBulletItem::new",
         "end_byte": 21929,
         "file": "crates/language_models/src/provider/anthropic.rs",
@@ -170,22 +138,6 @@
         "start_byte": 14220
       },
       {
-        "call": "SharedString::from",
-        "end_byte": 57040,
-        "file": "crates/project/src/agent_server_store.rs",
-        "kind": "shared_string",
-        "line": 1633,
-        "start_byte": 57038
-      },
-      {
-        "call": "Label::new",
-        "end_byte": 5178,
-        "file": "crates/recent_projects/src/disconnected_overlay.rs",
-        "kind": "label",
-        "line": 160,
-        "start_byte": 5176
-      },
-      {
         "call": "LoadingLabel::new",
         "end_byte": 79395,
         "file": "crates/recent_projects/src/remote_servers.rs",
@@ -200,14 +152,6 @@
         "kind": "list_bullet_item",
         "line": 101,
         "start_byte": 3360
-      },
-      {
-        "call": "SharedString::new_static",
-        "end_byte": 1397,
-        "file": "crates/which_key/src/which_key_modal.rs",
-        "kind": "shared_string",
-        "line": 44,
-        "start_byte": 1395
       },
       {
         "call": "child",
@@ -2401,6 +2345,45 @@
     ],
     "status": "accepted"
   },
+  "1 hour ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9299,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 269,
+        "start_byte": 9287
+      }
+    ],
+    "status": "accepted"
+  },
+  "1 minute ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9095,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 264,
+        "start_byte": 9081
+      }
+    ],
+    "status": "accepted"
+  },
+  "1 month ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 10234,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 294,
+        "start_byte": 10221
+      }
+    ],
+    "status": "accepted"
+  },
   "1 rule": {
     "occurrences": [
       {
@@ -2462,6 +2445,32 @@
         "kind": "shared_string",
         "line": 974,
         "start_byte": 42189
+      }
+    ],
+    "status": "accepted"
+  },
+  "1 week ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9968,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 289,
+        "start_byte": 9956
+      }
+    ],
+    "status": "accepted"
+  },
+  "1 year ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 10500,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 299,
+        "start_byte": 10488
       }
     ],
     "status": "accepted"
@@ -3533,6 +3542,14 @@
   },
   "API URL": {
     "occurrences": [
+      {
+        "call": "single_line_input",
+        "end_byte": 1905,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "input_label",
+        "line": 70,
+        "start_byte": 1896
+      },
       {
         "call": "label",
         "end_byte": 26095,
@@ -5745,6 +5762,19 @@
         "kind": "label",
         "line": 693,
         "start_byte": 25879
+      }
+    ],
+    "status": "accepted"
+  },
+  "Agent stopped due to an error": {
+    "occurrences": [
+      {
+        "call": "notify_with_sound",
+        "end_byte": 62908,
+        "file": "crates/agent_ui/src/conversation_view.rs",
+        "kind": "notification",
+        "line": 1660,
+        "start_byte": 62877
       }
     ],
     "status": "accepted"
@@ -9814,6 +9844,19 @@
     ],
     "status": "accepted"
   },
+  "Call failed": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 97034,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2591,
+        "start_byte": 97021
+      }
+    ],
+    "status": "accepted"
+  },
   "Call {}": {
     "occurrences": [
       {
@@ -11110,6 +11153,19 @@
         "kind": "rust_doc_comment",
         "line": 1212,
         "start_byte": 35758
+      }
+    ],
+    "status": "accepted"
+  },
+  "Class": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60651,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1592,
+        "start_byte": 60644
       }
     ],
     "status": "accepted"
@@ -12970,6 +13026,19 @@
     ],
     "status": "accepted"
   },
+  "Color": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61085,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1601,
+        "start_byte": 61078
+      }
+    ],
+    "status": "accepted"
+  },
   "Color for added words in word diffs.": {
     "occurrences": [
       {
@@ -14379,6 +14448,32 @@
         "kind": "shared_string",
         "line": 60,
         "start_byte": 2081
+      }
+    ],
+    "status": "accepted"
+  },
+  "Constant": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61341,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1606,
+        "start_byte": 61331
+      }
+    ],
+    "status": "accepted"
+  },
+  "Constructor": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60507,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1589,
+        "start_byte": 60494
       }
     ],
     "status": "accepted"
@@ -18950,6 +19045,19 @@
     ],
     "status": "accepted"
   },
+  "Default Key Bindings": {
+    "occurrences": [
+      {
+        "call": "open_bundled_file",
+        "end_byte": 9616,
+        "file": "crates/zed/src/zed.rs",
+        "kind": "bundled_file_title",
+        "line": 282,
+        "start_byte": 9594
+      }
+    ],
+    "status": "accepted"
+  },
   "Default Mode": {
     "occurrences": [
       {
@@ -19006,6 +19114,32 @@
         "kind": "tooltip",
         "line": 344,
         "start_byte": 12374
+      }
+    ],
+    "status": "accepted"
+  },
+  "Default Semantic Token Rules": {
+    "occurrences": [
+      {
+        "call": "open_bundled_file",
+        "end_byte": 8890,
+        "file": "crates/zed/src/zed.rs",
+        "kind": "bundled_file_title",
+        "line": 258,
+        "start_byte": 8860
+      }
+    ],
+    "status": "accepted"
+  },
+  "Default Settings": {
+    "occurrences": [
+      {
+        "call": "open_bundled_file",
+        "end_byte": 9247,
+        "file": "crates/zed/src/zed.rs",
+        "kind": "bundled_file_title",
+        "line": 270,
+        "start_byte": 9229
       }
     ],
     "status": "accepted"
@@ -25664,6 +25798,32 @@
     ],
     "status": "accepted"
   },
+  "Disconnected from SSH host": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 32795,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "error_detail",
+        "line": 875,
+        "start_byte": 32767
+      }
+    ],
+    "status": "accepted"
+  },
+  "Disconnected from remote project": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 32941,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "error_detail",
+        "line": 877,
+        "start_byte": 32907
+      }
+    ],
+    "status": "accepted"
+  },
   "Dismiss": {
     "occurrences": [
       {
@@ -29074,6 +29234,32 @@
     ],
     "status": "accepted"
   },
+  "Enum": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60939,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1598,
+        "start_byte": 60933
+      }
+    ],
+    "status": "accepted"
+  },
+  "Enum Member": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61289,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1605,
+        "start_byte": 61276
+      }
+    ],
+    "status": "accepted"
+  },
   "Environment": {
     "occurrences": [
       {
@@ -29155,6 +29341,19 @@
     ],
     "status": "ignored"
   },
+  "Error installing zed cli": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 3658,
+        "file": "crates/install_cli/src/install_cli_binary.rs",
+        "kind": "error_prompt",
+        "line": 100,
+        "start_byte": 3632
+      }
+    ],
+    "status": "accepted"
+  },
   "Error loading: {}": {
     "occurrences": [
       {
@@ -29164,6 +29363,19 @@
         "kind": "label",
         "line": 3335,
         "start_byte": 129767
+      }
+    ],
+    "status": "accepted"
+  },
+  "Error registering zed:// scheme": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 42407,
+        "file": "crates/zed/src/zed.rs",
+        "kind": "error_prompt",
+        "line": 1116,
+        "start_byte": 42374
       }
     ],
     "status": "accepted"
@@ -29180,6 +29392,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Error: {:?}": {
+    "occurrences": [
+      {
+        "call": "show_error",
+        "end_byte": 6382,
+        "file": "crates/auto_update_helper/src/dialog.rs",
+        "kind": "error_prompt",
+        "line": 193,
+        "start_byte": 6369
+      }
+    ],
+    "status": "accepted"
   },
   "Error: {err}": {
     "occurrences": [
@@ -29284,6 +29509,19 @@
         "kind": "action_description",
         "line": 386,
         "start_byte": 12647
+      }
+    ],
+    "status": "accepted"
+  },
+  "Event": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61435,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1608,
+        "start_byte": 61428
       }
     ],
     "status": "accepted"
@@ -30361,6 +30599,27 @@
     ],
     "status": "accepted"
   },
+  "Failed to :w": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 19760,
+        "file": "crates/vim/src/command.rs",
+        "kind": "error_prompt",
+        "line": 541,
+        "start_byte": 19746
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 20026,
+        "file": "crates/vim/src/command.rs",
+        "kind": "error_prompt",
+        "line": 548,
+        "start_byte": 20012
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to Load: {link_label}": {
     "occurrences": [
       {
@@ -30387,6 +30646,19 @@
     ],
     "status": "accepted"
   },
+  "Failed to apply stash": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 11279,
+        "file": "crates/git_ui/src/stash_picker.rs",
+        "kind": "error_prompt",
+        "line": 362,
+        "start_byte": 11256
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to cancel ETW recording: {error:#}": {
     "occurrences": [
       {
@@ -30396,6 +30668,19 @@
         "kind": "notification",
         "line": 159,
         "start_byte": 5430
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to change branch": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 42446,
+        "file": "crates/git_ui/src/branch_picker.rs",
+        "kind": "error_prompt",
+        "line": 1322,
+        "start_byte": 42421
       }
     ],
     "status": "accepted"
@@ -30415,6 +30700,38 @@
   },
   "Failed to connect": {
     "occurrences": [
+      {
+        "call": "prompt_err",
+        "end_byte": 49744,
+        "file": "crates/git_ui/src/worktree_picker.rs",
+        "kind": "error_prompt",
+        "line": 1305,
+        "start_byte": 49725
+      },
+      {
+        "call": "prompt_err",
+        "end_byte": 33833,
+        "file": "crates/recent_projects/src/remote_servers.rs",
+        "kind": "error_prompt",
+        "line": 998,
+        "start_byte": 33814
+      },
+      {
+        "call": "prompt_err",
+        "end_byte": 36449,
+        "file": "crates/recent_projects/src/remote_servers.rs",
+        "kind": "error_prompt",
+        "line": 1073,
+        "start_byte": 36430
+      },
+      {
+        "call": "prompt_err",
+        "end_byte": 40828,
+        "file": "crates/recent_projects/src/remote_servers.rs",
+        "kind": "error_prompt",
+        "line": 1187,
+        "start_byte": 40809
+      },
       {
         "call": "prompt",
         "end_byte": 59483,
@@ -30531,6 +30848,74 @@
     ],
     "status": "accepted"
   },
+  "Failed to create branch": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 25621,
+        "file": "crates/git_ui/src/branch_picker.rs",
+        "kind": "error_prompt",
+        "line": 872,
+        "start_byte": 25596
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to create buffer": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 95989,
+        "file": "crates/editor/src/editor.rs",
+        "kind": "error_prompt",
+        "line": 2684,
+        "start_byte": 95964
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 98837,
+        "file": "crates/editor/src/editor.rs",
+        "kind": "error_prompt",
+        "line": 2766,
+        "start_byte": 98812
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to create channel": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 74684,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1900,
+        "start_byte": 74658
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 74962,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1907,
+        "start_byte": 74936
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to create remote": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 26198,
+        "file": "crates/git_ui/src/branch_picker.rs",
+        "kind": "error_prompt",
+        "line": 892,
+        "start_byte": 26173
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to decode clipboard content (expected base64)": {
     "occurrences": [
       {
@@ -30544,6 +30929,32 @@
     ],
     "status": "accepted"
   },
+  "Failed to drop stash": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 9686,
+        "file": "crates/git_ui/src/stash_picker.rs",
+        "kind": "error_prompt",
+        "line": 311,
+        "start_byte": 9664
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to edit debug.json": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 18513,
+        "file": "crates/debugger_ui/src/new_process_modal.rs",
+        "kind": "error_prompt",
+        "line": 457,
+        "start_byte": 18486
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to generate commit message: {err}": {
     "occurrences": [
       {
@@ -30553,6 +30964,45 @@
         "kind": "error_prompt",
         "line": 4130,
         "start_byte": 145462
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to grant mic access": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 53570,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1374,
+        "start_byte": 53542
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to grant write access": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 54797,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1400,
+        "start_byte": 54767
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to hang up": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 79870,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2062,
+        "start_byte": 79851
       }
     ],
     "status": "accepted"
@@ -30583,8 +31033,29 @@
     ],
     "status": "accepted"
   },
+  "Failed to invite member": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 22885,
+        "file": "crates/collab_ui/src/collab_panel/channel_modal.rs",
+        "kind": "error_prompt",
+        "line": 603,
+        "start_byte": 22860
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to join channel": {
     "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 97638,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2609,
+        "start_byte": 97614
+      },
       {
         "call": "prompt",
         "end_byte": 353499,
@@ -30592,6 +31063,56 @@
         "kind": "prompt_message",
         "line": 9459,
         "start_byte": 353475
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to join project": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 47682,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1216,
+        "start_byte": 47658
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 70167,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1798,
+        "start_byte": 70143
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 14660,
+        "file": "crates/workspace/src/pane_group.rs",
+        "kind": "error_prompt",
+        "line": 450,
+        "start_byte": 14636
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 208965,
+        "file": "crates/workspace/src/workspace.rs",
+        "kind": "error_prompt",
+        "line": 5906,
+        "start_byte": 208941
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to leave channel": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 93602,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2484,
+        "start_byte": 93577
       }
     ],
     "status": "accepted"
@@ -30669,6 +31190,19 @@
     ],
     "status": "accepted"
   },
+  "Failed to load your settings. Some values may be incorrect and changes may be lost.": {
+    "occurrences": [
+      {
+        "call": "settings_warning_banner",
+        "end_byte": 132095,
+        "file": "crates/settings_ui/src/settings_ui.rs",
+        "kind": "settings_warning_banner",
+        "line": 3362,
+        "start_byte": 132010
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to load {path}\n{message}": {
     "occurrences": [
       {
@@ -30708,6 +31242,58 @@
     ],
     "status": "accepted"
   },
+  "Failed to move channel": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 86003,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2250,
+        "start_byte": 85979
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to move channel down": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 87803,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2302,
+        "start_byte": 87774
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to move channel up": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 87725,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2301,
+        "start_byte": 87698
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to open file": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 32545,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "error_prompt",
+        "line": 872,
+        "start_byte": 32524
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to open permalink: {err}": {
     "occurrences": [
       {
@@ -30717,6 +31303,35 @@
         "kind": "toast",
         "line": 1339,
         "start_byte": 46709
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to open project": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 84741,
+        "file": "crates/recent_projects/src/recent_projects.rs",
+        "kind": "error_prompt",
+        "line": 2075,
+        "start_byte": 84717
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 86117,
+        "file": "crates/recent_projects/src/recent_projects.rs",
+        "kind": "error_prompt",
+        "line": 2103,
+        "start_byte": 86093
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 9669,
+        "file": "crates/recent_projects/src/sidebar_recent_projects.rs",
+        "kind": "error_prompt",
+        "line": 282,
+        "start_byte": 9645
       }
     ],
     "status": "accepted"
@@ -30760,6 +31375,19 @@
     ],
     "status": "accepted"
   },
+  "Failed to pop stash": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 10761,
+        "file": "crates/git_ui/src/stash_picker.rs",
+        "kind": "error_prompt",
+        "line": 346,
+        "start_byte": 10740
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to read telemetry log: {}": {
     "occurrences": [
       {
@@ -30769,6 +31397,71 @@
         "kind": "toast",
         "line": 272,
         "start_byte": 8569
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to reconnect": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 4263,
+        "file": "crates/recent_projects/src/disconnected_overlay.rs",
+        "kind": "error_prompt",
+        "line": 136,
+        "start_byte": 4242
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to remove contact": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 95860,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2551,
+        "start_byte": 95834
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to remove member": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 21820,
+        "file": "crates/collab_ui/src/collab_panel/channel_modal.rs",
+        "kind": "error_prompt",
+        "line": 572,
+        "start_byte": 21795
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to rename branch": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 13927,
+        "file": "crates/git_ui/src/git_ui.rs",
+        "kind": "error_prompt",
+        "line": 381,
+        "start_byte": 13902
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to respond to contact request": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 96302,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2566,
+        "start_byte": 96264
       }
     ],
     "status": "accepted"
@@ -30812,6 +31505,19 @@
     ],
     "status": "accepted"
   },
+  "Failed to revoke access": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 56385,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 1433,
+        "start_byte": 56360
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to run {}. Click to show error.": {
     "occurrences": [
       {
@@ -30821,6 +31527,80 @@
         "kind": "content_message",
         "line": 529,
         "start_byte": 20994
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to save": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 13921,
+        "file": "crates/vim/src/command.rs",
+        "kind": "error_prompt",
+        "line": 411,
+        "start_byte": 13905
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 17501,
+        "file": "crates/vim/src/command.rs",
+        "kind": "error_prompt",
+        "line": 485,
+        "start_byte": 17485
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 18469,
+        "file": "crates/vim/src/command.rs",
+        "kind": "error_prompt",
+        "line": 509,
+        "start_byte": 18453
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 261202,
+        "file": "crates/workspace/src/workspace.rs",
+        "kind": "error_prompt",
+        "line": 7273,
+        "start_byte": 261186
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 261491,
+        "file": "crates/workspace/src/workspace.rs",
+        "kind": "error_prompt",
+        "line": 7278,
+        "start_byte": 261475
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 261788,
+        "file": "crates/workspace/src/workspace.rs",
+        "kind": "error_prompt",
+        "line": 7283,
+        "start_byte": 261772
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 262063,
+        "file": "crates/workspace/src/workspace.rs",
+        "kind": "error_prompt",
+        "line": 7288,
+        "start_byte": 262047
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to set channel visibility": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 84311,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 2197,
+        "start_byte": 84277
       }
     ],
     "status": "accepted"
@@ -30885,6 +31665,32 @@
     ],
     "status": "accepted"
   },
+  "Failed to trash files": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 59666,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "error_prompt",
+        "line": 1777,
+        "start_byte": 59643
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to update role": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 20382,
+        "file": "crates/collab_ui/src/collab_panel/channel_modal.rs",
+        "kind": "error_prompt",
+        "line": 531,
+        "start_byte": 20359
+      }
+    ],
+    "status": "accepted"
+  },
   "Failed to validate action arguments": {
     "occurrences": [
       {
@@ -30907,6 +31713,19 @@
         "kind": "shared_string",
         "line": 269,
         "start_byte": 8311
+      }
+    ],
+    "status": "accepted"
+  },
+  "Failed to write lines": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 16820,
+        "file": "crates/vim/src/command.rs",
+        "kind": "error_prompt",
+        "line": 467,
+        "start_byte": 16797
       }
     ],
     "status": "accepted"
@@ -31289,8 +32108,29 @@
     ],
     "status": "accepted"
   },
+  "Field": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60553,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1590,
+        "start_byte": 60546
+      }
+    ],
+    "status": "accepted"
+  },
   "File": {
     "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61129,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1602,
+        "start_byte": 61123
+      },
       {
         "call": "Menu.name",
         "end_byte": 4862,
@@ -32107,6 +32947,19 @@
     ],
     "status": "accepted"
   },
+  "Finished running tools": {
+    "occurrences": [
+      {
+        "call": "notify_with_sound",
+        "end_byte": 60955,
+        "file": "crates/agent_ui/src/conversation_view.rs",
+        "kind": "notification",
+        "line": 1617,
+        "start_byte": 60931
+      }
+    ],
+    "status": "accepted"
+  },
   "First Project Directory": {
     "occurrences": [
       {
@@ -32722,6 +33575,19 @@
         "kind": "tooltip",
         "line": 8527,
         "start_byte": 346583
+      }
+    ],
+    "status": "accepted"
+  },
+  "Folder": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61231,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1604,
+        "start_byte": 61223
       }
     ],
     "status": "accepted"
@@ -34232,6 +35098,19 @@
         "kind": "settings_enum_variant_label",
         "line": 945,
         "start_byte": 28009
+      }
+    ],
+    "status": "accepted"
+  },
+  "Function": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60449,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1588,
+        "start_byte": 60439
       }
     ],
     "status": "accepted"
@@ -39796,6 +40675,19 @@
     ],
     "status": "accepted"
   },
+  "Interface": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60705,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1593,
+        "start_byte": 60694
+      }
+    ],
+    "status": "accepted"
+  },
   "Interrupt": {
     "occurrences": [
       {
@@ -40463,6 +41355,19 @@
     ],
     "status": "accepted"
   },
+  "Just now": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9048,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 263,
+        "start_byte": 9038
+      }
+    ],
+    "status": "accepted"
+  },
   "Keep": {
     "occurrences": [
       {
@@ -40842,6 +41747,19 @@
         "kind": "input_error",
         "line": 2751,
         "start_byte": 106920
+      }
+    ],
+    "status": "accepted"
+  },
+  "Keyword": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60989,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1599,
+        "start_byte": 60980
       }
     ],
     "status": "accepted"
@@ -42930,6 +43848,19 @@
     ],
     "status": "accepted"
   },
+  "Max Completion Tokens": {
+    "occurrences": [
+      {
+        "call": "single_line_input",
+        "end_byte": 3648,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "input_label",
+        "line": 130,
+        "start_byte": 3625
+      }
+    ],
+    "status": "accepted"
+  },
   "Max Completion Tokens must be a number": {
     "occurrences": [
       {
@@ -42958,6 +43889,22 @@
   },
   "Max Output Tokens": {
     "occurrences": [
+      {
+        "call": "single_line_input",
+        "end_byte": 3861,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "input_label",
+        "line": 138,
+        "start_byte": 3842
+      },
+      {
+        "call": "single_line_input.placeholder",
+        "end_byte": 3894,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "placeholder",
+        "line": 139,
+        "start_byte": 3875
+      },
       {
         "call": "SettingItem.title",
         "end_byte": 16074,
@@ -43018,6 +43965,22 @@
   },
   "Max Tokens": {
     "occurrences": [
+      {
+        "call": "single_line_input",
+        "end_byte": 4070,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "input_label",
+        "line": 146,
+        "start_byte": 4058
+      },
+      {
+        "call": "single_line_input.placeholder",
+        "end_byte": 4096,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "placeholder",
+        "line": 147,
+        "start_byte": 4084
+      },
       {
         "call": "SettingItem.title",
         "end_byte": 23663,
@@ -43523,6 +44486,19 @@
         "kind": "placeholder",
         "line": 3063,
         "start_byte": 116602
+      }
+    ],
+    "status": "accepted"
+  },
+  "Method": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60397,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1587,
+        "start_byte": 60389
       }
     ],
     "status": "accepted"
@@ -44096,6 +45072,19 @@
     ],
     "status": "accepted"
   },
+  "Model Name": {
+    "occurrences": [
+      {
+        "call": "single_line_input",
+        "end_byte": 3402,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "input_label",
+        "line": 122,
+        "start_byte": 3390
+      }
+    ],
+    "status": "accepted"
+  },
   "Model Name cannot be empty": {
     "occurrences": [
       {
@@ -44243,6 +45232,19 @@
         "kind": "setting_description",
         "line": 1106,
         "start_byte": 53640
+      }
+    ],
+    "status": "accepted"
+  },
+  "Module": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60753,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1594,
+        "start_byte": 60745
       }
     ],
     "status": "accepted"
@@ -46839,6 +47841,19 @@
     ],
     "status": "accepted"
   },
+  "New message": {
+    "occurrences": [
+      {
+        "call": "notify_with_sound",
+        "end_byte": 61030,
+        "file": "crates/agent_ui/src/conversation_view.rs",
+        "kind": "notification",
+        "line": 1619,
+        "start_byte": 61017
+      }
+    ],
+    "status": "accepted"
+  },
   "New version available": {
     "occurrences": [
       {
@@ -47284,6 +48299,14 @@
   },
   "No changes to commit": {
     "occurrences": [
+      {
+        "call": "error_spawn",
+        "end_byte": 81937,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "error_prompt",
+        "line": 2382,
+        "start_byte": 81915
+      },
       {
         "call": "Label::new",
         "end_byte": 204670,
@@ -50026,6 +51049,19 @@
     ],
     "status": "accepted"
   },
+  "Open Source License Attribution": {
+    "occurrences": [
+      {
+        "call": "open_bundled_file",
+        "end_byte": 7015,
+        "file": "crates/zed/src/zed.rs",
+        "kind": "bundled_file_title",
+        "line": 201,
+        "start_byte": 6982
+      }
+    ],
+    "status": "accepted"
+  },
   "Open Thread as Markdown": {
     "occurrences": [
       {
@@ -52091,6 +53127,19 @@
         "kind": "label",
         "line": 160,
         "start_byte": 5124
+      }
+    ],
+    "status": "accepted"
+  },
+  "Operator": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61487,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1609,
+        "start_byte": 61477
       }
     ],
     "status": "accepted"
@@ -54710,6 +55759,19 @@
     ],
     "status": "accepted"
   },
+  "Property": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60805,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1595,
+        "start_byte": 60795
+      }
+    ],
+    "status": "accepted"
+  },
   "Provider": {
     "occurrences": [
       {
@@ -54719,6 +55781,19 @@
         "kind": "label",
         "line": 156,
         "start_byte": 5400
+      }
+    ],
+    "status": "accepted"
+  },
+  "Provider Name": {
+    "occurrences": [
+      {
+        "call": "single_line_input",
+        "end_byte": 1815,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "input_label",
+        "line": 69,
+        "start_byte": 1800
       }
     ],
     "status": "accepted"
@@ -54797,6 +55872,19 @@
         "kind": "label",
         "line": 178,
         "start_byte": 6127
+      }
+    ],
+    "status": "accepted"
+  },
+  "Public channels must have public parents": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 86192,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_detail",
+        "line": 2253,
+        "start_byte": 86150
       }
     ],
     "status": "accepted"
@@ -55835,6 +56923,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Reference": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61183,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1603,
+        "start_byte": 61172
+      }
+    ],
+    "status": "accepted"
   },
   "Refresh Diagnostics": {
     "occurrences": [
@@ -65152,6 +66253,27 @@
     ],
     "status": "accepted"
   },
+  "Sharing Screen Failed": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 3314,
+        "file": "crates/title_bar/src/collab.rs",
+        "kind": "error_prompt",
+        "line": 89,
+        "start_byte": 3291
+      },
+      {
+        "call": "detach_and_prompt_err",
+        "end_byte": 24359,
+        "file": "crates/title_bar/src/collab.rs",
+        "kind": "error_prompt",
+        "line": 589,
+        "start_byte": 24336
+      }
+    ],
+    "status": "accepted"
+  },
   "Shell": {
     "occurrences": [
       {
@@ -68466,6 +69588,19 @@
     ],
     "status": "accepted"
   },
+  "Snippet": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61039,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1600,
+        "start_byte": 61030
+      }
+    ],
+    "status": "accepted"
+  },
   "Snippet Sort Order": {
     "occurrences": [
       {
@@ -70767,6 +71902,19 @@
     ],
     "status": "ignored"
   },
+  "Struct": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61389,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1607,
+        "start_byte": 61381
+      }
+    ],
+    "status": "accepted"
+  },
   "Subagent": {
     "occurrences": [
       {
@@ -72326,6 +73474,14 @@
   },
   "Text": {
     "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60349,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1586,
+        "start_byte": 60343
+      },
       {
         "call": "Headline::new",
         "end_byte": 3686,
@@ -74952,6 +76108,27 @@
     ],
     "status": "accepted"
   },
+  "The remote instance of Zed does not support this yet. It must be upgraded to {}": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 96235,
+        "file": "crates/editor/src/editor.rs",
+        "kind": "error_detail",
+        "line": 2689,
+        "start_byte": 96154
+      },
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 99061,
+        "file": "crates/editor/src/editor.rs",
+        "kind": "error_detail",
+        "line": 2769,
+        "start_byte": 98980
+      }
+    ],
+    "status": "accepted"
+  },
   "The request could not be completed after multiple attempts.                 Try again in a moment.": {
     "occurrences": [
       {
@@ -75590,6 +76767,19 @@
     ],
     "status": "accepted"
   },
+  "There are still conflicts. You must stage these before committing": {
+    "occurrences": [
+      {
+        "call": "error_spawn",
+        "end_byte": 80556,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "error_prompt",
+        "line": 2344,
+        "start_byte": 80489
+      }
+    ],
+    "status": "accepted"
+  },
   "There {} {} {} with the same keystrokes.": {
     "occurrences": [
       {
@@ -75599,6 +76789,19 @@
         "kind": "label",
         "line": 3116,
         "start_byte": 121206
+      }
+    ],
+    "status": "accepted"
+  },
+  "There’s no active call; join one first.": {
+    "occurrences": [
+      {
+        "call": "show_error",
+        "end_byte": 7287,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_prompt",
+        "line": 169,
+        "start_byte": 7244
       }
     ],
     "status": "accepted"
@@ -75672,6 +76875,32 @@
         "kind": "rust_doc_comment",
         "line": 185,
         "start_byte": 7232
+      }
+    ],
+    "status": "accepted"
+  },
+  "They can be automatically migrated to the latest version.": {
+    "occurrences": [
+      {
+        "call": "settings_warning_banner",
+        "end_byte": 132627,
+        "file": "crates/settings_ui/src/settings_ui.rs",
+        "kind": "settings_warning_detail",
+        "line": 3372,
+        "start_byte": 132568
+      }
+    ],
+    "status": "accepted"
+  },
+  "They must be manually migrated to the latest version.": {
+    "occurrences": [
+      {
+        "call": "settings_warning_banner",
+        "end_byte": 132771,
+        "file": "crates/settings_ui/src/settings_ui.rs",
+        "kind": "settings_warning_detail",
+        "line": 3373,
+        "start_byte": 132716
       }
     ],
     "status": "accepted"
@@ -76598,6 +77827,19 @@
     ],
     "status": "accepted"
   },
+  "This user has not yet signed the CLA at https://zed.dev/cla.": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 55004,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_detail",
+        "line": 1402,
+        "start_byte": 54942
+      }
+    ],
+    "status": "accepted"
+  },
   "This view lets you determine the current context stack for creating custom key bindings in Zed. When a keyboard shortcut is triggered, it also shows all the possible contexts it could have triggered in, and which one matched.": {
     "occurrences": [
       {
@@ -77121,6 +78363,32 @@
     ],
     "status": "accepted"
   },
+  "To make a channel private, all of its subchannels must be private.": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 84704,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_detail",
+        "line": 2202,
+        "start_byte": 84636
+      }
+    ],
+    "status": "accepted"
+  },
+  "To make a channel public, its parent channel must be public.": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 84564,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_detail",
+        "line": 2200,
+        "start_byte": 84502
+      }
+    ],
+    "status": "accepted"
+  },
   "To override settings for a language, add an entry for that language server's": {
     "occurrences": [
       {
@@ -77454,6 +78722,88 @@
         "kind": "label",
         "line": 475,
         "start_byte": 15329
+      }
+    ],
+    "status": "accepted"
+  },
+  "Today": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 3058,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 82,
+        "start_byte": 3051
+      },
+      {
+        "call": "time_format",
+        "end_byte": 3559,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 98,
+        "start_byte": 3552
+      },
+      {
+        "call": "time_format",
+        "end_byte": 6547,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 189,
+        "start_byte": 6540
+      },
+      {
+        "call": "time_format",
+        "end_byte": 7057,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 205,
+        "start_byte": 7050
+      },
+      {
+        "call": "time_format",
+        "end_byte": 7905,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 227,
+        "start_byte": 7898
+      },
+      {
+        "call": "time_format",
+        "end_byte": 9745,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 283,
+        "start_byte": 9738
+      },
+      {
+        "call": "time_format",
+        "end_byte": 13219,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 378,
+        "start_byte": 13212
+      }
+    ],
+    "status": "accepted"
+  },
+  "Today at {}": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 5504,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 157,
+        "start_byte": 5491
+      },
+      {
+        "call": "time_format",
+        "end_byte": 14939,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 432,
+        "start_byte": 14926
       }
     ],
     "status": "accepted"
@@ -80275,6 +81625,19 @@
     ],
     "status": "accepted"
   },
+  "Type Parameter": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61551,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1610,
+        "start_byte": 61535
+      }
+    ],
+    "status": "accepted"
+  },
   "Type a path…": {
     "occurrences": [
       {
@@ -80922,6 +82285,19 @@
     ],
     "status": "accepted"
   },
+  "Unit": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60849,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1596,
+        "start_byte": 60843
+      }
+    ],
+    "status": "accepted"
+  },
   "Unknown": {
     "occurrences": [
       {
@@ -80931,6 +82307,14 @@
         "kind": "button",
         "line": 341,
         "start_byte": 10383
+      },
+      {
+        "call": "completion_kind_name",
+        "end_byte": 61575,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1611,
+        "start_byte": 61566
       },
       {
         "call": "Button::new",
@@ -82847,6 +84231,19 @@
     ],
     "status": "accepted"
   },
+  "Value": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60895,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1597,
+        "start_byte": 60888
+      }
+    ],
+    "status": "accepted"
+  },
   "Values are clamped to the [0.0, 1.0] range.": {
     "occurrences": [
       {
@@ -82895,6 +84292,19 @@
         "kind": "rust_doc_comment",
         "line": 49,
         "start_byte": 1792
+      }
+    ],
+    "status": "accepted"
+  },
+  "Variable": {
+    "occurrences": [
+      {
+        "call": "completion_kind_name",
+        "end_byte": 60605,
+        "file": "crates/editor/src/code_context_menus.rs",
+        "kind": "completion_kind_tooltip",
+        "line": 1591,
+        "start_byte": 60595
       }
     ],
     "status": "accepted"
@@ -83848,6 +85258,19 @@
         "kind": "label",
         "line": 259,
         "start_byte": 9637
+      }
+    ],
+    "status": "accepted"
+  },
+  "Waiting for tool confirmation": {
+    "occurrences": [
+      {
+        "call": "notify_with_sound",
+        "end_byte": 57647,
+        "file": "crates/agent_ui/src/conversation_view.rs",
+        "kind": "notification",
+        "line": 1552,
+        "start_byte": 57616
       }
     ],
     "status": "accepted"
@@ -89907,6 +91330,88 @@
     ],
     "status": "accepted"
   },
+  "Yesterday": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 3168,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 84,
+        "start_byte": 3157
+      },
+      {
+        "call": "time_format",
+        "end_byte": 3669,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 100,
+        "start_byte": 3658
+      },
+      {
+        "call": "time_format",
+        "end_byte": 6657,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 191,
+        "start_byte": 6646
+      },
+      {
+        "call": "time_format",
+        "end_byte": 7167,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 207,
+        "start_byte": 7156
+      },
+      {
+        "call": "time_format",
+        "end_byte": 8015,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 229,
+        "start_byte": 8004
+      },
+      {
+        "call": "time_format",
+        "end_byte": 9783,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 284,
+        "start_byte": 9772
+      },
+      {
+        "call": "time_format",
+        "end_byte": 13333,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 380,
+        "start_byte": 13322
+      }
+    ],
+    "status": "accepted"
+  },
+  "Yesterday at {}": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 5650,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 159,
+        "start_byte": 5633
+      },
+      {
+        "call": "time_format",
+        "end_byte": 15072,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 434,
+        "start_byte": 15055
+      }
+    ],
+    "status": "accepted"
+  },
   "You": {
     "occurrences": [
       {
@@ -90087,6 +91592,32 @@
         "kind": "label",
         "line": 473,
         "start_byte": 23536
+      }
+    ],
+    "status": "accepted"
+  },
+  "You cannot move a channel into a different root channel": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 86512,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_detail",
+        "line": 2259,
+        "start_byte": 86455
+      }
+    ],
+    "status": "accepted"
+  },
+  "You cannot move a channel into itself": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 86343,
+        "file": "crates/collab_ui/src/collab_panel.rs",
+        "kind": "error_detail",
+        "line": 2256,
+        "start_byte": 86304
       }
     ],
     "status": "accepted"
@@ -90308,6 +91839,32 @@
         "kind": "child_text",
         "line": 2531,
         "start_byte": 95493
+      }
+    ],
+    "status": "accepted"
+  },
+  "Your settings are out of date, and need to be updated.": {
+    "occurrences": [
+      {
+        "call": "settings_warning_banner",
+        "end_byte": 132463,
+        "file": "crates/settings_ui/src/settings_ui.rs",
+        "kind": "settings_warning_banner",
+        "line": 3370,
+        "start_byte": 132407
+      }
+    ],
+    "status": "accepted"
+  },
+  "Your settings file is out of date, automatic migration failed": {
+    "occurrences": [
+      {
+        "call": "settings_warning_banner",
+        "end_byte": 133135,
+        "file": "crates/settings_ui/src/settings_ui.rs",
+        "kind": "settings_warning_banner",
+        "line": 3380,
+        "start_byte": 133072
       }
     ],
     "status": "accepted"
@@ -92239,6 +93796,19 @@
         "kind": "rust_doc_comment",
         "line": 96,
         "start_byte": 3409
+      }
+    ],
+    "status": "accepted"
+  },
+  "e.g. gpt-5, claude-opus-4, gemini-2.5-pro": {
+    "occurrences": [
+      {
+        "call": "single_line_input.placeholder",
+        "end_byte": 3459,
+        "file": "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        "kind": "placeholder",
+        "line": 123,
+        "start_byte": 3416
       }
     ],
     "status": "accepted"
@@ -96698,6 +98268,19 @@
     ],
     "status": "ignored"
   },
+  "{:?}\n\nPlease check that you have given Zed permissions to record your screen in Settings.": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 3444,
+        "file": "crates/title_bar/src/collab.rs",
+        "kind": "error_detail",
+        "line": 89,
+        "start_byte": 3351
+      }
+    ],
+    "status": "accepted"
+  },
   "{:?}|{:?}": {
     "occurrences": [
       {
@@ -97333,6 +98916,19 @@
     ],
     "status": "accepted"
   },
+  "{years} years ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 10578,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 300,
+        "start_byte": 10559
+      }
+    ],
+    "status": "accepted"
+  },
   "{}": {
     "occurrences": [
       {
@@ -97583,6 +99179,19 @@
     ],
     "status": "accepted"
   },
+  "{} days ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9835,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 285,
+        "start_byte": 9822
+      }
+    ],
+    "status": "accepted"
+  },
   "{} entries": {
     "occurrences": [
       {
@@ -97622,6 +99231,19 @@
     ],
     "status": "accepted"
   },
+  "{} hours ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9367,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 270,
+        "start_byte": 9353
+      }
+    ],
+    "status": "accepted"
+  },
   "{} invalid": {
     "occurrences": [
       {
@@ -97657,6 +99279,19 @@
         "kind": "tooltip",
         "line": 298,
         "start_byte": 12194
+      }
+    ],
+    "status": "accepted"
+  },
+  "{} is not shared by the host. This could be because it has been marked as `private`": {
+    "occurrences": [
+      {
+        "call": "detach_and_prompt_err.detail",
+        "end_byte": 33208,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "error_detail",
+        "line": 880,
+        "start_byte": 33123
       }
     ],
     "status": "accepted"
@@ -97739,6 +99374,32 @@
     ],
     "status": "accepted"
   },
+  "{} minutes ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 9157,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 265,
+        "start_byte": 9141
+      }
+    ],
+    "status": "accepted"
+  },
+  "{} months ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 10305,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 295,
+        "start_byte": 10290
+      }
+    ],
+    "status": "accepted"
+  },
   "{} project rules": {
     "occurrences": [
       {
@@ -97761,6 +99422,19 @@
         "kind": "description",
         "line": 9069,
         "start_byte": 373456
+      }
+    ],
+    "status": "accepted"
+  },
+  "{} refused to respond to this request": {
+    "occurrences": [
+      {
+        "call": "notify_with_sound",
+        "end_byte": 61928,
+        "file": "crates/agent_ui/src/conversation_view.rs",
+        "kind": "notification",
+        "line": 1640,
+        "start_byte": 61889
       }
     ],
     "status": "accepted"
@@ -97873,6 +99547,19 @@
         "kind": "shared_string",
         "line": 976,
         "start_byte": 42263
+      }
+    ],
+    "status": "accepted"
+  },
+  "{} weeks ago": {
+    "occurrences": [
+      {
+        "call": "time_format",
+        "end_byte": 10029,
+        "file": "crates/time_format/src/time_format.rs",
+        "kind": "relative_time",
+        "line": 290,
+        "start_byte": 10015
       }
     ],
     "status": "accepted"

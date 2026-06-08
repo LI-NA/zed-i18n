@@ -118,6 +118,24 @@ EXCLUDED_PARTS = {
     "examples",
 }
 
+TIME_FORMAT_SOURCES = {
+    "Today",
+    "Yesterday",
+    "Today at {}",
+    "Yesterday at {}",
+    "Just now",
+    "1 minute ago",
+    "{} minutes ago",
+    "1 hour ago",
+    "{} hours ago",
+    "{} days ago",
+    "1 week ago",
+    "{} weeks ago",
+    "1 month ago",
+    "{} months ago",
+    "1 year ago",
+    "{years} years ago",
+}
 
 def should_skip_path(relative_path: str) -> bool:
     normalized = Path(relative_path).as_posix()
@@ -167,9 +185,12 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
                 allow_unwrap_or=kind == "placeholder",
             ):
                 literal = _node_text(source_bytes, literal_node)
+                parsed_source = parse_rust_string_literal(literal)
+                if _should_skip_contextual_call_source(parsed_source, call_name):
+                    continue
                 occurrences.append(
                     StringOccurrence(
-                        source=parse_rust_string_literal(literal),
+                        source=parsed_source,
                         file=relative_path,
                         line=literal_node.start_point[0] + 1,
                         call=call_name,
@@ -194,6 +215,7 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
     occurrences.extend(_extract_action_doc_comments(source, relative_path))
     occurrences.extend(_extract_line_candidates(source, relative_path))
     occurrences.extend(_extract_agent_dirty_buffer_prompt_occurrences(source_bytes, relative_path))
+    occurrences.extend(_extract_prompt_error_detail_occurrences(source_bytes, relative_path))
     occurrences.extend(_extract_settings_enum_variant_labels(source, relative_path))
     return _dedupe_occurrences(occurrences)
 
@@ -349,11 +371,55 @@ def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int
             (0, "skill_illustration_name", "skill_crease.name"),
             (1, "skill_illustration_source", "skill_crease.source"),
         )
+    if _is_agent_conversation_view_path(relative_path) and _is_method_call(
+        canonical, "notify_with_sound"
+    ):
+        return ((0, "notification", "notify_with_sound"),)
+    if _is_settings_ui_root_path(relative_path) and canonical == "banner":
+        return (
+            (0, "settings_warning_banner", "settings_warning_banner"),
+            (1, "settings_warning_detail", "settings_warning_banner"),
+        )
+    if _is_zed_root_path(relative_path) and canonical == "open_bundled_file":
+        return ((2, "bundled_file_title", "open_bundled_file"),)
+    if _is_add_llm_provider_modal_path(relative_path) and canonical == "single_line_input":
+        return (
+            (0, "input_label", "single_line_input"),
+            (1, "placeholder", "single_line_input.placeholder"),
+        )
+    if _is_prompt_error_call(canonical):
+        return ((0, "error_prompt", _prompt_error_call_name(canonical)),)
+    if _is_method_call(canonical, "show_error"):
+        return ((0, "error_prompt", "show_error"),)
+    if _is_git_panel_path(relative_path) and canonical == "error_spawn":
+        return ((0, "error_prompt", "error_spawn"),)
     return ()
 
 
 def _canonical_call(call: str) -> str:
     return call.strip()
+
+
+def _is_method_call(call: str, method_name: str) -> bool:
+    return call == method_name or call.endswith(f".{method_name}")
+
+
+def _is_prompt_error_call(call: str) -> bool:
+    return _is_method_call(call, "prompt_err") or _is_method_call(call, "detach_and_prompt_err")
+
+
+def _prompt_error_call_name(call: str) -> str:
+    if _is_method_call(call, "detach_and_prompt_err"):
+        return "detach_and_prompt_err"
+    return "prompt_err"
+
+
+def _should_skip_contextual_call_source(source: str, call_name: str) -> bool:
+    if source == "":
+        return True
+    if call_name == "single_line_input.placeholder" and source.strip().isdigit():
+        return True
+    return False
 
 
 def _is_bullet_items_push_call(call: str) -> bool:
@@ -448,6 +514,19 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
         and method_name == "creation_blocked_reason"
     ):
         rule = ("git_worktree_picker_disabled_reason", "creation_blocked_reason")
+    if rule is None and _is_editor_code_context_menus_path(relative_path):
+        if method_name == "completion_kind_name":
+            rule = ("completion_kind_tooltip", "completion_kind_name")
+    if rule is None and _is_time_format_path(relative_path) and method_name in {
+        "format_absolute_date",
+        "format_absolute_timestamp",
+        "format_absolute_date_medium",
+        "format_relative_time",
+        "format_relative_date",
+        "format_timestamp_naive_date",
+        "format_timestamp_naive",
+    }:
+        rule = ("relative_time", "time_format")
     if rule is None:
         return []
 
@@ -467,6 +546,8 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
             continue
         if call_name == "reveal_in_file_manager_label" and not source.startswith("Reveal in "):
             continue
+        if not _return_method_source_allowed(call_name, source):
+            continue
         occurrences.append(
             StringOccurrence(
                 source=source,
@@ -479,6 +560,12 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
             )
         )
     return occurrences
+
+
+def _return_method_source_allowed(call_name: str, source: str) -> bool:
+    if call_name == "time_format":
+        return source in TIME_FORMAT_SOURCES
+    return True
 
 
 def _string_literal_nodes(node) -> list:
@@ -511,7 +598,13 @@ def _node_contains(parent, child) -> bool:
     return parent.start_byte <= child.start_byte and child.end_byte <= parent.end_byte
 
 
-def _visible_literal_nodes(source_bytes: bytes, node, *, allow_unwrap_or: bool = False) -> list:
+def _visible_literal_nodes(
+    source_bytes: bytes,
+    node,
+    *,
+    allow_unwrap_or: bool = False,
+    allow_expression_statement: bool = False,
+) -> list:
     if node.type == "string_literal":
         return [node]
     if node.type == "identifier":
@@ -527,7 +620,7 @@ def _visible_literal_nodes(source_bytes: bytes, node, *, allow_unwrap_or: bool =
             first = _first_string_literal(node)
             return [first] if first is not None else []
         return []
-    if node.type in {
+    passthrough_node_types = {
         "if_expression",
         "match_expression",
         "block",
@@ -542,7 +635,10 @@ def _visible_literal_nodes(source_bytes: bytes, node, *, allow_unwrap_or: bool =
         "arguments",
         "tuple_expression",
         "field_expression",
-    }:
+    }
+    if allow_expression_statement:
+        passthrough_node_types = passthrough_node_types | {"expression_statement"}
+    if node.type in passthrough_node_types:
         return [
             literal
             for child in node.children
@@ -550,6 +646,7 @@ def _visible_literal_nodes(source_bytes: bytes, node, *, allow_unwrap_or: bool =
                 source_bytes,
                 child,
                 allow_unwrap_or=allow_unwrap_or,
+                allow_expression_statement=allow_expression_statement,
             )
         ]
     if node.type == "call_expression":
@@ -570,6 +667,7 @@ def _visible_literal_nodes(source_bytes: bytes, node, *, allow_unwrap_or: bool =
                     source_bytes,
                     child,
                     allow_unwrap_or=allow_unwrap_or,
+                    allow_expression_statement=allow_expression_statement,
                 )
             ]
     return []
@@ -833,6 +931,60 @@ def _extract_agent_dirty_buffer_prompt_occurrences(
             )
         )
     return occurrences
+
+
+def _extract_prompt_error_detail_occurrences(
+    source_bytes: bytes,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    parser = _rust_parser()
+    tree = parser.parse(source_bytes)
+    if tree is None:
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    for node in _walk(tree.root_node):
+        if node.type != "call_expression":
+            continue
+
+        function_node = node.child_by_field_name("function")
+        arguments_node = node.child_by_field_name("arguments")
+        if function_node is None or arguments_node is None:
+            continue
+
+        call = _canonical_call(_node_text(source_bytes, function_node))
+        if not _is_prompt_error_call(call):
+            continue
+
+        arguments = list(arguments_node.named_children)
+        if len(arguments) < 4:
+            continue
+
+        for literal_node in _visible_literal_nodes(
+            source_bytes,
+            arguments[3],
+            allow_expression_statement=True,
+        ):
+            literal = _node_text(source_bytes, literal_node)
+            source = parse_rust_string_literal(literal)
+            if source == "" or _is_placeholder_only_prompt_detail(source):
+                continue
+            occurrences.append(
+                StringOccurrence(
+                    source=source,
+                    file=relative_path,
+                    line=literal_node.start_point[0] + 1,
+                    call=f"{_prompt_error_call_name(call)}.detail",
+                    kind="error_detail",
+                    start_byte=literal_node.start_byte,
+                    end_byte=literal_node.end_byte,
+                )
+            )
+    return occurrences
+
+
+def _is_placeholder_only_prompt_detail(source: str) -> bool:
+    return re.fullmatch(r"\{[^{}]*\}", source.strip()) is not None
 
 
 def _extract_settings_enum_variant_labels(source: str, relative_path: str) -> list[StringOccurrence]:
@@ -1308,6 +1460,26 @@ def _is_announcement_path(relative_path: str) -> bool:
 
 def _is_skills_illustration_path(relative_path: str) -> bool:
     return relative_path == "crates/ui/src/components/ai/skills_illustration.rs"
+
+
+def _is_agent_conversation_view_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/conversation_view.rs"
+
+
+def _is_add_llm_provider_modal_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs"
+
+
+def _is_zed_root_path(relative_path: str) -> bool:
+    return relative_path == "crates/zed/src/zed.rs"
+
+
+def _is_editor_code_context_menus_path(relative_path: str) -> bool:
+    return relative_path == "crates/editor/src/code_context_menus.rs"
+
+
+def _is_time_format_path(relative_path: str) -> bool:
+    return relative_path == "crates/time_format/src/time_format.rs"
 
 
 def _is_title_bar_path(relative_path: str) -> bool:

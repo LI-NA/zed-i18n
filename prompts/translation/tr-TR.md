@@ -79,6 +79,7 @@ Use these manual project terms alongside the generated VS Code glossary.
 - **Skill / Skills** (Agent Skills feature): use `beceri` / `beceriler`. Inflect naturally while respecting vowel harmony. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
 - **Agent / Agents** (AI agent feature): use `aracı` / `aracılar`. Inflect naturally while respecting vowel harmony. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
 - **Provider / Providers** (AI/model provider feature): use `sağlayıcı` / `sağlayıcılar`. Inflect naturally while respecting vowel harmony. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
+- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `Yanıt Belirteci` for the model's generated-response token budget — distinct from `Max Output Tokens` = `Çıkış Belirteci`. Do NOT use the editor-completion term `tamamlama` here.
 
 ## DISAMBIGUATION RULES
 
