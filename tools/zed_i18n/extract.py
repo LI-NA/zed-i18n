@@ -83,6 +83,8 @@ STRUCT_FIELD_RULES: dict[tuple[str, str], tuple[str, str]] = {
     ("ActionLink", "title"): ("settings_action_title", "ActionLink.title"),
     ("ActionLink", "description"): ("settings_action_description", "ActionLink.description"),
     ("ActionLink", "button_text"): ("settings_action_button", "ActionLink.button_text"),
+    ("acp_thread::RetryStatus", "last_error"): ("retry_status_error", "RetryStatus.last_error"),
+    ("RetryStatus", "last_error"): ("retry_status_error", "RetryStatus.last_error"),
     ("SettingsPage", "title"): ("settings_page_title", "SettingsPage.title"),
     ("SubPageLink", "title"): ("settings_subpage_title", "SubPageLink.title"),
     ("SubPageLink", "description"): ("settings_subpage_description", "SubPageLink.description"),
@@ -305,6 +307,8 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
             (1, "notification", "show_etw_notification_with_action"),
             (2, "notification_action", "show_etw_notification_with_action"),
         )
+    if canonical.endswith(".on_click") and "Toast::new" in canonical:
+        return ((0, "toast_action", "Toast::on_click"),)
     if canonical.endswith(".link") or canonical == "link":
         return ((0, "link", "link"),)
     if canonical.endswith(".link_with_handler") or canonical == "link_with_handler":
@@ -1403,6 +1407,8 @@ def _line_patterns_for_path(
         patterns.extend(WORKSPACE_PANE_LINE_PATTERNS)
     if _is_agent_entry_view_state_path(relative_path):
         patterns.extend(AGENT_ENTRY_VIEW_STATE_LINE_PATTERNS)
+    if _is_agent_thread_view_path(relative_path):
+        patterns.extend(AGENT_THREAD_VIEW_LINE_PATTERNS)
     if _is_debugger_dap_log_path(relative_path):
         patterns.extend(DEBUGGER_DAP_LOG_LINE_PATTERNS)
     if _is_debugger_new_process_modal_path(relative_path):
@@ -1464,6 +1470,10 @@ def _is_skills_illustration_path(relative_path: str) -> bool:
 
 def _is_agent_conversation_view_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/conversation_view.rs"
+
+
+def _is_agent_thread_view_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/conversation_view/thread_view.rs"
 
 
 def _is_add_llm_provider_modal_path(relative_path: str) -> bool:
@@ -2505,6 +2515,16 @@ KEYMAP_EDITOR_MULTILINE_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
         re.compile(r'\.map\(add_filter\(\s*$'),
         "add_filter",
         "filter_label",
+    ),
+)
+
+
+AGENT_THREAD_VIEW_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'^\s*("\{\} is not available with Zero Data Retention\.")'),
+        "thread_error_message",
+        "thread_error_message",
+        1,
     ),
 )
 

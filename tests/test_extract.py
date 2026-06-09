@@ -2673,6 +2673,113 @@ class ExtractTests(unittest.TestCase):
             "settings_warning_detail",
         )
 
+    def test_extracts_agent_retry_status_errors(self) -> None:
+        source = "\n".join(
+            [
+                "fn retry() {",
+                "    event_stream.send_retry(acp_thread::RetryStatus {",
+                '        last_error: "Safety filter triggered".into(),',
+                "        attempt: 1,",
+                "        max_attempts: 1,",
+                "        started_at: Instant::now(),",
+                "        duration: Duration::MAX,",
+                "        meta: None,",
+                "    });",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/thread.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Safety filter triggered"})
+        self.assertEqual(by_source["Safety filter triggered"].call, "RetryStatus.last_error")
+        self.assertEqual(by_source["Safety filter triggered"].kind, "retry_status_error")
+
+    def test_extracts_thread_error_tuple_messages(self) -> None:
+        source = "\n".join(
+            [
+                "fn thread_error(&self, cx: &mut Context<Self>) {",
+                "    let message = format!(",
+                '        "{} is not available with Zero Data Retention.",',
+                "        self.current_model_name(cx)",
+                "    );",
+                '    ("data_retention_consent_required", None, message.into());',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/conversation_view/thread_view.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"{} is not available with Zero Data Retention."})
+        self.assertEqual(
+            by_source["{} is not available with Zero Data Retention."].call,
+            "thread_error_message",
+        )
+        self.assertEqual(
+            by_source["{} is not available with Zero Data Retention."].kind,
+            "thread_error_message",
+        )
+
+    def test_extracts_toast_action_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn toast_actions(workspace: &mut Workspace, cx: &mut Context<Self>) {",
+                "    workspace.show_toast(",
+                "        Toast::new(",
+                "            NotificationId::unique::<ThreadSharedToast>(),",
+                '            "Thread shared!",',
+                "        )",
+                "        .on_click(",
+                '            "Copy URL",',
+                "            move |_window, cx| {",
+                "                cx.write_to_clipboard(ClipboardItem::new_string(share_url.clone()));",
+                "            },",
+                "        ),",
+                "        cx,",
+                "    );",
+                "    workspace.show_toast(",
+                "        Toast::new(",
+                "            NotificationId::unique::<CopilotErrorToast>(),",
+                '            format!("Copilot can\'t be started: {}", e),',
+                "        )",
+                "        .on_click(",
+                '            "Reinstall Copilot",',
+                "            move |window, cx| reinstall(window, cx),",
+                "        ),",
+                "        cx,",
+                "    );",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/conversation_view/thread_view.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Thread shared!",
+                "Copy URL",
+                "Copilot can't be started: {}",
+                "Reinstall Copilot",
+            },
+        )
+        self.assertEqual(by_source["Copy URL"].call, "Toast::on_click")
+        self.assertEqual(by_source["Copy URL"].kind, "toast_action")
+        self.assertEqual(by_source["Reinstall Copilot"].call, "Toast::on_click")
+        self.assertEqual(by_source["Reinstall Copilot"].kind, "toast_action")
+
     def test_extracts_bundled_file_titles_only(self) -> None:
         source = "\n".join(
             [
