@@ -72,33 +72,15 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Korean form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `스킬`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `에이전트`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `프로바이더`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `생성 토큰` for the model's generated-response token budget — distinct from `Max Output Tokens` = `출력 토큰`. Do NOT use the editor-completion term `자동 완성` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: 통화 for voice/collaboration calls, 호출 for tool/function/API calls.
-- **Action**: 액션 for Zed/GPUI actions and code actions. 작업 for generic operations or tasks.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
 - **Task / Operation**: 작업. Use 태스크 only when the source explicitly refers to a named task-runner concept and the surrounding UI already uses 태스크.
-- **Panel**: 패널 for named Zed panels (Project Panel, Git Panel, Agent Panel).
-- **Pane**: 분할 영역 for split editor panes. NEVER translate pane as 패널 unless the source is a named panel.
-- **Outline**: 아웃라인 for the Zed outline feature/panel. NEVER use 개요.
-- **Completion / Suggestion**: 자동 완성 for editor completion features. 제안 for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use 참조 / 정의 / 선언 / 구현 for code navigation. Type Definition is 타입 정의.
-- **Stage / Unstage**: 스테이징 / 스테이징 해제 for Git index operations. Do not translate Stage as 단계 in Git contexts.
-- **Hunk**: 헝크 for diff hunks. Do not use 청크 unless the source is a generic data chunk.
-- **Extension**: 확장 프로그램 for software extensions (Zed extensions, browser extensions). 파일 확장자 for file name extensions (.rs, .json).
-- **View**: 보기 for UI views and display modes (e.g., "Diff View" -> "Diff 보기"). NEVER use 뷰.
-- **Issue / Problem**: 이슈 for GitHub/project tracker issues. 문제 for diagnostics, errors, and generic problems.
-- **Thread / Session / Chat**: 스레드 for conversation threads and programming threads. 세션 for session lifecycle/state. 채팅 for chat UI.
+- **Declaration / Implementation / Type Definition**: 선언 / 구현 / 타입 정의 for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

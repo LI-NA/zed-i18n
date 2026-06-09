@@ -472,7 +472,7 @@ class TranslationPipelineTests(unittest.TestCase):
         )
         (self.root / "prompts" / "translation" / "glossary").mkdir(parents=True)
         (self.root / "prompts" / "translation" / "glossary" / "ko-KR.md").write_text(
-            "# Glossary for ko-KR\n\n| English | Translation |\n|---------|-------------|\n| Settings | 설정 |\n",
+            "# Glossary for ko-KR (curated)\n\n| English | Context | Translation |\n|---------|---------|-------------|\n| Settings | | 설정 |\n",
             encoding="utf-8",
         )
         (self.zed_root / "crates" / "app" / "src").mkdir(parents=True)
@@ -496,8 +496,9 @@ class TranslationPipelineTests(unittest.TestCase):
             / "batch-001.md"
         ).read_text(encoding="utf-8")
         self.assertIn("Base ko-KR prompt", prompt)
-        self.assertIn("# Glossary for ko-KR", prompt)
-        self.assertIn("| Settings | 설정 |", prompt)
+        self.assertIn("# Glossary for ko-KR (curated)", prompt)
+        self.assertIn("| English | Context | Translation |", prompt)
+        self.assertIn("| Settings | | 설정 |", prompt)
 
     def test_prepare_translation_batches_does_not_append_glossary_when_prompt_has_internal_glossary(self) -> None:
         self._write_json(
@@ -524,7 +525,7 @@ class TranslationPipelineTests(unittest.TestCase):
         )
         (self.root / "prompts" / "translation" / "glossary").mkdir(parents=True)
         (self.root / "prompts" / "translation" / "glossary" / "ko.md").write_text(
-            "# Glossary for ko\n\n| English | Translation |\n|---------|-------------|\n| Workspace | 워크스페이스 |\n",
+            "# Glossary for ko (curated)\n\n| English | Context | Translation |\n|---------|---------|-------------|\n| Workspace | | 워크스페이스 |\n",
             encoding="utf-8",
         )
         (self.zed_root / "crates" / "app" / "src").mkdir(parents=True)
@@ -549,7 +550,7 @@ class TranslationPipelineTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("| Workspace | 작업 영역 |", prompt)
         self.assertNotIn("# Glossary for ko", prompt)
-        self.assertNotIn("| Workspace | 워크스페이스 |", prompt)
+        self.assertNotIn("| Workspace | | 워크스페이스 |", prompt)
 
     def test_prepare_translation_batches_uses_case_insensitive_glossary_locale(self) -> None:
         self._write_json(
@@ -576,7 +577,7 @@ class TranslationPipelineTests(unittest.TestCase):
         )
         (self.root / "prompts" / "translation" / "glossary").mkdir(parents=True)
         (self.root / "prompts" / "translation" / "glossary" / "pt-br.md").write_text(
-            "# Glossary for pt-br\n\n| English | Translation |\n|---------|-------------|\n| Settings | Configurações |\n",
+            "# Glossary for pt-br (curated)\n\n| English | Context | Translation |\n|---------|---------|-------------|\n| Settings | | Configurações |\n",
             encoding="utf-8",
         )
         (self.zed_root / "crates" / "app" / "src").mkdir(parents=True)
@@ -600,8 +601,8 @@ class TranslationPipelineTests(unittest.TestCase):
             / "batch-001.md"
         ).read_text(encoding="utf-8")
         self.assertIn("Base pt-BR prompt", prompt)
-        self.assertIn("# Glossary for pt-br", prompt)
-        self.assertIn("| Settings | Configurações |", prompt)
+        self.assertIn("# Glossary for pt-br (curated)", prompt)
+        self.assertIn("| Settings | | Configurações |", prompt)
 
     def test_prepare_translation_batches_removes_stale_agent_workspace(self) -> None:
         self._write_json(

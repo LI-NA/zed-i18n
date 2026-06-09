@@ -69,34 +69,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Italian form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. Italian VS Code conventions are the baseline; deviate when Zed UI context requires it.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `competenza` / `competenze`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `agente` / `agenti`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `provider` for both singular and plural. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `token di risposta` for the model's generated-response token budget — distinct from `Max Output Tokens` = `token di output`. Do NOT use the editor-completion term `completamento` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Chiamata` for tool/function/API calls (`Tool Call` → `Chiamata strumento`). `Chiamata vocale` for voice/collaboration calls when context calls for it. NEVER translate as `Telefonata`.
-- **Action**: `Azione` for Zed/GPUI actions and code actions (`Code Action` → `Azione codice`). `Operazione` for generic operations. `Attività` only for Task (background tasks, task runner) — do not use `Attività` for action.
-- **Panel**: `Pannello` for named Zed panels (Project Panel → `Pannello progetto`, Git Panel → `Pannello Git`, Agent Panel → `Pannello agente`).
-- **Pane**: `Riquadro` for split editor panes. NEVER translate pane as `Pannello` unless the source is a named panel. Note: VS Code uses `Riquadro comandi` for Command Palette specifically — that is an established term, but generic `pane` in editor split context is still `Riquadro`.
-- **Outline**: `Struttura` for the Zed outline feature/panel (matches VS Code Italian). NEVER use `Schema` or `Profilo` for code outline.
-- **Breadcrumbs**: `Percorsi di navigazione` for editor/navigation breadcrumbs (matches VS Code Italian). Use `Briciole di pane` only as last resort and never in formal UI.
-- **Completion / Suggestion**: `Completamento` for editor completion features (`Code Completion` → `Completamento codice`). `Suggerimento` for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation / Type Definition**: use `Riferimento` / `Definizione` / `Dichiarazione` / `Implementazione` for code navigation. Type Definition is `Definizione del tipo`.
-- **Stage / Unstage**: `Esegui staging` / `Annulla staging` for Git index operations (matches VS Code Italian conventions). Use noun forms `Staging` and `Annullamento staging` in column/section headers. Do NOT translate `Stage` as `Fase` or `Tappa` in Git contexts.
-- **Hunk**: `Blocco` for diff hunks. Preserve `hunk` only in code-like contexts (variable names, log strings, code spans).
-- **Extension**: `Estensione` for software extensions (Zed extensions, browser extensions). `Estensione del file` (or `Estensione di file`) for file name extensions (.rs, .json).
-- **Thread**: `Thread` (loanword, invariable) for OS/programming threads. `Conversazione` for AI/chat threads in the agent panel. When ambiguous, prefer `Thread` and disambiguate by surrounding context.
-- **View**: `Visualizzazione` for UI views and display modes (`Diff View` → `Visualizzazione differenze`). NEVER use `Vista` as a noun for named views.
-- **Diff**: `Differenze` for the noun concept (`Show Diff` → `Mostra differenze`). Preserve `diff` in code-like contexts (`git diff`, `diff` algorithm).
-- **Issue / Problem**: `Problema` for both GitHub/project tracker issues and diagnostics (matches VS Code Italian, where `Issue` and `Problem` are both rendered as `Problema`). Disambiguate by context only when needed (`GitHub Issue` may stay `Issue` if treated as proper noun in product UI).
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: `Dichiarazione` / `Implementazione` / `Definizione del tipo` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

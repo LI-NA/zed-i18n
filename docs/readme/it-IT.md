@@ -126,7 +126,7 @@ git clone https://github.com/microsoft/vscode .cache/vscode-upstream
 
 Per aggiungere una nuova lingua:
 
-1. Scrivere una guida di stile e un glossario in `prompts/translation/<language>.md`.
+1. Scrivere la guida di stile per la traduzione in `prompts/translation/<language>.md` e il glossario curato in `prompts/translation/glossary/<lang>.md`.
 2. Generare i batch con `prepare-translation`.
 3. Unire i risultati JSON prodotti dall'AI tramite `merge-translation`.
 4. Validare il risultato con `validate`.
@@ -182,6 +182,6 @@ Per maggiori dettagli sul processo di traduzione tramite AI, consultare i file p
 
 ## Licenza
 
-I contenuti derivati dai sorgenti di Zed (`catalog/`, `translations/`, `manifest/`, gli artefatti di rilascio, ecc.) sono rilasciati sotto licenza [GPL-3.0](../../LICENSE). Questo progetto distribuisce build modificate di Zed. Il codice sorgente di `zed-i18n` e i glossari di traduzione (`prompts/translation/glossary/`) estratti dai [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) sono rilasciati sotto licenza [MIT](../../LICENSE-MIT).
+I contenuti derivati dai sorgenti di Zed (`catalog/`, `translations/`, `manifest/`, gli artefatti di rilascio, ecc.) sono rilasciati sotto licenza [GPL-3.0](../../LICENSE). Questo progetto distribuisce build modificate di Zed. Il codice sorgente di `zed-i18n` e il materiale di riferimento dai [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) sono rilasciati sotto licenza [MIT](../../LICENSE-MIT).
 
 Zed e il logo Zed sono di proprietà di Zed Industries. I contenuti di VS Code e dei language pack di VS Code sono di proprietà di Microsoft Corporation.

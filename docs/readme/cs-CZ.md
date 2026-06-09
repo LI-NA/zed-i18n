@@ -126,7 +126,7 @@ git clone https://github.com/microsoft/vscode .cache/vscode-upstream
 
 Při přidávání nového jazyka:
 
-1. Napište překladový styl a glosář do `prompts/translation/<language>.md`.
+1. Napište překladový styl do `prompts/translation/<language>.md` a kurátorský glosář do `prompts/translation/glossary/<lang>.md`.
 2. Vygenerujte dávky příkazem `prepare-translation`.
 3. Výsledky JSON vytvořené AI slučte pomocí `merge-translation`.
 4. Výsledek ověřte příkazem `validate`.
@@ -182,6 +182,6 @@ Další informace o procesu AI překladu najdete v souborech ve složce `prompts
 
 ## Licence
 
-Obsah odvozený ze zdrojů Zed (`catalog/`, `translations/`, `manifest/`, artefakty vydání atd.) je licencován pod [GPL-3.0](../../LICENSE). Tento projekt distribuuje upravené buildy editoru Zed. Zdrojový kód `zed-i18n` a překladové glosáře (`prompts/translation/glossary/`) extrahované z [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) jsou licencovány pod [MIT](../../LICENSE-MIT).
+Obsah odvozený ze zdrojů Zed (`catalog/`, `translations/`, `manifest/`, artefakty vydání atd.) je licencován pod [GPL-3.0](../../LICENSE). Tento projekt distribuuje upravené buildy editoru Zed. Zdrojový kód `zed-i18n` a materiál odkazovaný z [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) jsou licencovány pod [MIT](../../LICENSE-MIT).
 
 Zed a logo Zed jsou majetkem společnosti Zed Industries; VS Code a obsah jazykových balíčků VS Code jsou chráněny autorskými právy společnosti Microsoft Corporation.

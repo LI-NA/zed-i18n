@@ -69,34 +69,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Traditional Chinese (Taiwan) form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. Prefer the VS Code zh-TW (Taiwan) form when one is available.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `技能`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `代理`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `提供者`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `生成權杖` for the model's generated-response token budget — distinct from `Max Output Tokens` = `輸出權杖`. Do NOT use the editor-completion term `補全`/`自動完成` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: 通話 for voice/collaboration calls, 呼叫 for tool/function/API calls (note: zh-TW uses 呼叫 where zh-CN uses 调用).
-- **Action**: 動作 for Zed/GPUI actions and code actions (note: zh-TW prefers 動作 where zh-CN often uses 操作). 操作 for generic operations. 工作 or 任務 only for Task (background tasks, task runner).
-- **Panel**: 面板 for named Zed panels (Project Panel → 專案面板, Git Panel → Git 面板).
-- **Pane**: 窗格 for split editor panes. NEVER translate pane as 面板 unless the source is a named panel.
-- **Outline**: 大綱 (matches VS Code zh-TW). NEVER use 概要 or 輪廓.
-- **Breadcrumbs**: 階層連結 (matches VS Code zh-TW) for editor/navigation breadcrumbs. Do NOT use 麵包屑 (which is the zh-CN/HK form) or 痕跡導航.
-- **Completion / Suggestion**: 自動完成 or 程式碼完成 for editor completion features. 建議 for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use 參考 / 定義 / 宣告 / 實作 for code navigation. Type Definition is 型別定義. (Note: zh-TW uses 宣告 for Declaration and 實作 for Implementation, distinct from zh-CN's 声明 / 实现.)
-- **Stage / Unstage**: 預存 / 取消預存, or `加入暫存` / `移出暫存` per VS Code zh-TW Git conventions, for Git index operations. Do not translate Stage as 階段 in Git contexts.
-- **Hunk**: 區塊 for diff hunks (or 變更區塊 when extra disambiguation is needed). Avoid 大塊 or 塊.
-- **Extension**: 擴充功能 for software extensions (Zed extensions, browser extensions; matches VS Code zh-TW). 副檔名 for file name extensions (.rs, .json) — do NOT use 文件擴展名 or 擴展名.
-- **Thread**: 會話 or 對話 for AI/chat threads. 執行緒 only when referring to OS/programming threads (note: zh-TW uses 執行緒 where zh-CN uses 线程).
-- **View**: 檢視 for UI views and display modes (e.g., `Diff View` → `差異檢視`). NEVER use 視圖 (zh-CN form) or 表示.
-- **Diff**: 差異 for the noun concept (e.g., `Diff View` → `差異檢視`). Preserve `diff` in code-like contexts.
-- **Issue / Problem**: 問題 for both diagnostics/errors and GitHub/project tracker issues, matching VS Code zh-TW. 議題 may be acceptable for GitHub-specific tracker issues if the surrounding UI requires it, but prefer 問題 for consistency with VS Code.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: 宣告 / 實作 / 型別定義 for code navigation. (Note: zh-TW uses 宣告 for Declaration and 實作 for Implementation, distinct from zh-CN's 声明 / 实现. Reference and Definition are in the glossary.)
 - **Save / Open / Close**: 儲存 / 開啟 / 關閉 (Taiwan); never 保存 / 打开 / 关闭 (Mainland).
 - **Search / Find**: 搜尋 / 尋找 (Taiwan); never 搜索 / 查找 (Mainland).
 - **Settings / Default**: 設定 / 預設 (Taiwan); never 设置 / 默认 (Mainland).

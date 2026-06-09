@@ -21,13 +21,6 @@ from .translation_pipeline import (
     prepare_translation_batches,
 )
 from .validate import validate_translations
-from .vscode_loc import (
-    extract_glossary_terms_from_prompt,
-    generate_prompt_glossary_markdown,
-    generate_vscode_glossary_markdown,
-    is_vscode_pseudo_language,
-    list_vscode_languages,
-)
 from .zed_source import build_clone_command, ensure_inside_workspace, verify_checkout_revision
 
 
@@ -137,37 +130,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Defaults to reports/context-groups/<language>.",
     )
 
-    vscode_glossary_parser = subparsers.add_parser("generate-vscode-glossary")
-    vscode_glossary_parser.add_argument(
-        "--language",
-        required=True,
-        help="Target language such as ko-KR, ja-JP, or 'all'.",
-    )
-    vscode_glossary_parser.add_argument(
-        "--vscode-loc-root",
-        default=".cache/vscode-loc",
-        help="VS Code localization checkout. Defaults to .cache/vscode-loc.",
-    )
-    vscode_glossary_parser.add_argument(
-        "--vscode-source-root",
-        default=".cache/vscode-upstream",
-        help="VS Code source checkout used to recover English source strings.",
-    )
-    vscode_glossary_parser.add_argument(
-        "--prompt",
-        default="prompts/translation/vscode-glossary-terms.md",
-        help="Markdown file containing glossary source terms.",
-    )
-    vscode_glossary_parser.add_argument(
-        "--output",
-        help="Markdown output path. Defaults to reports/vscode-glossary/<language>.md.",
-    )
-    vscode_glossary_parser.add_argument(
-        "--prompt-glossary-output-dir",
-        default="prompts/translation/glossary",
-        help="Directory for generated prompt glossary files.",
-    )
-
     packaging_parser = subparsers.add_parser("generate-packaging")
     packaging_parser.add_argument("--manifest", required=True, help="Release manifest.json path.")
     packaging_parser.add_argument(
@@ -227,16 +189,6 @@ def main(argv: list[str] | None = None) -> int:
             args.zed_root,
             args.group_type,
             args.output_dir,
-        )
-    if args.command == "generate-vscode-glossary":
-        return run_generate_vscode_glossary(
-            root,
-            args.language,
-            args.vscode_loc_root,
-            args.vscode_source_root,
-            args.prompt,
-            args.output,
-            args.prompt_glossary_output_dir,
         )
     if args.command == "generate-packaging":
         return run_generate_packaging(
@@ -416,89 +368,6 @@ def run_prepare_translation(
     return 0
 
 
-def run_generate_vscode_glossary(
-    root: Path,
-    language: str,
-    vscode_loc_root: str,
-    vscode_source_root: str,
-    prompt: str,
-    output: str | None,
-    prompt_glossary_output_dir: str | None,
-) -> int:
-    vscode_loc_path = _resolve_optional_workspace_path(root, vscode_loc_root)
-    vscode_source_path = _resolve_optional_workspace_path(root, vscode_source_root)
-    prompt_path = _resolve_optional_workspace_path(root, prompt)
-    prompt_glossary_output_path = _resolve_optional_workspace_path(
-        root,
-        prompt_glossary_output_dir,
-    )
-    if vscode_loc_path is None or not vscode_loc_path.exists():
-        raise ValueError("VS Code localization checkout does not exist")
-    if prompt_path is None or not prompt_path.exists():
-        raise ValueError("glossary source prompt does not exist")
-    if vscode_source_path is not None and not vscode_source_path.exists():
-        vscode_source_path = None
-    if language.lower() != "all" and is_vscode_pseudo_language(language):
-        raise ValueError(f"{language} is a pseudo-localization language, not a glossary target")
-
-    terms = extract_glossary_terms_from_prompt(prompt_path)
-    if not terms:
-        raise ValueError("no glossary terms found in prompt")
-
-    if language.lower() == "all":
-        languages = list_vscode_languages(vscode_loc_path)
-        default_output = root / "reports" / "vscode-glossary" / "all-languages.md"
-        output_path = _resolve_optional_workspace_path(root, output) or default_output
-        sections = [
-            generate_vscode_glossary_markdown(vscode_loc_path, target_language, terms).strip()
-            if vscode_source_path is None
-            else generate_vscode_glossary_markdown(
-                vscode_loc_path,
-                target_language,
-                terms,
-                vscode_source_path,
-            ).strip()
-            for target_language in languages
-        ]
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text("\n\n".join(sections) + "\n", encoding="utf-8")
-        prompt_glossary_count = _write_prompt_glossaries(
-            vscode_loc_path,
-            vscode_source_path,
-            prompt_glossary_output_path,
-            languages,
-            terms,
-        )
-        print(
-            f"Generated VS Code glossary candidates for {len(languages)} languages: {output_path}"
-        )
-        if prompt_glossary_count:
-            print(f"Generated prompt glossaries for {prompt_glossary_count} languages")
-        return 0
-
-    default_output = root / "reports" / "vscode-glossary" / f"{language}.md"
-    output_path = _resolve_optional_workspace_path(root, output) or default_output
-    markdown = generate_vscode_glossary_markdown(
-        vscode_loc_path,
-        language,
-        terms,
-        vscode_source_path,
-    )
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(markdown, encoding="utf-8")
-    prompt_glossary_count = _write_prompt_glossaries(
-        vscode_loc_path,
-        vscode_source_path,
-        prompt_glossary_output_path,
-        [language],
-        terms,
-    )
-    print(f"Generated VS Code glossary candidates for {language}: {output_path}")
-    if prompt_glossary_count:
-        print(f"Generated prompt glossaries for {prompt_glossary_count} languages")
-    return 0
-
-
 def run_generate_packaging(
     root: Path,
     manifest: str,
@@ -541,31 +410,6 @@ def run_extract_context_groups(
         f"{_relative_to_root(root, output_path)}"
     )
     return 0
-
-
-def _write_prompt_glossaries(
-    vscode_loc_path: Path,
-    vscode_source_path: Path | None,
-    output_dir: Path | None,
-    languages: Iterable[str],
-    terms: Iterable[str],
-) -> int:
-    if output_dir is None:
-        return 0
-    output_dir.mkdir(parents=True, exist_ok=True)
-    count = 0
-    for language in languages:
-        if is_vscode_pseudo_language(language):
-            continue
-        markdown = generate_prompt_glossary_markdown(
-            vscode_loc_path,
-            language,
-            terms,
-            vscode_source_path,
-        )
-        (output_dir / f"{language}.md").write_text(markdown, encoding="utf-8")
-        count += 1
-    return count
 
 
 def run_merge_translation(

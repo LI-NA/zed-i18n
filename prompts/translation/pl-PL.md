@@ -70,53 +70,15 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Polish form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. VS Code Polish conventions are the baseline — follow them unless a Zed-specific disambiguation rule below requires otherwise.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `umiejętność` / `umiejętności`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `agent` / `agenci`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `dostawca` / `dostawcy`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `tokeny odpowiedzi` for the model's generated-response token budget — distinct from `Max Output Tokens` = `tokeny wyjściowe`. Do NOT use the editor-completion term `uzupełnianie` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Połączenie` for voice/collaboration calls. `Wywołanie` for tool/function/API calls (e.g., `Tool Call` → `Wywołanie narzędzia`).
-- **Action**: `Akcja` for Zed/GPUI actions and code actions. `Operacja` for generic operations. `Zadanie` only for Task (background tasks, task runner) — never for generic "Action".
-- **Panel**: `Panel` for named Zed panels (`Project Panel` → `Panel projektu`, `Git Panel` → `Panel Git`, `Agent Panel` → `Panel agenta`).
-- **Pane**: `Okienko` for split editor panes. NEVER translate Pane as `Panel` unless the source is a named panel.
-- **Outline**: `Konspekt` (matches VS Code). NEVER use `Zarys` or `Schemat`.
-- **Breadcrumbs**: `Linki do stron nadrzędnych` for editor/navigation breadcrumbs (matches VS Code). Use `Okruszki` only when the source clearly refers to generic web breadcrumbs and the surrounding UI already uses that term.
-- **Completion / Suggestion**: `Uzupełnianie` for editor completion features (autocomplete). `Sugestia` (or `Propozycja`) for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use `Odwołanie` (or `Referencja` when context is generic) / `Definicja` / `Deklaracja` / `Implementacja` for code navigation. `Type Definition` is `Definicja typu`.
-- **Stage / Unstage**: `Przygotuj` / `Cofnij przygotowanie` for Git index operations (alternatively `Zatwierdź indeks` / `Cofnij indeksowanie` when the surrounding UI already uses that wording). Align with VS Code Polish conventions for Git operations (`Przygotuj zmiany`). Do NOT translate Stage as `Etap` or `Faza` in Git contexts.
-- **Hunk**: `Fragment zmian` for diff hunks. Preserve `hunk` only in code-like contexts (variable names, command IDs).
-- **Extension**: `Rozszerzenie` for software extensions (Zed extensions, browser extensions). `Rozszerzenie pliku` for file name extensions (.rs, .json).
-- **Thread**: `Wątek` for both AI/chat threads and OS/programming threads. Context determines meaning.
-- **View**: `Widok` for UI views and display modes (e.g., `Diff View` → `Widok różnic`).
-- **Diff**: `Różnice` for the noun concept (`Show Diff` → `Pokaż różnice`). Preserve `diff` in code-like contexts (commands, identifiers).
-- **Issue / Problem**: `Zgłoszenie` for GitHub/project tracker issues (the Zed-specific choice — note that VS Code uses `Problem` for both). `Problem` for diagnostics, errors, and generic problems.
+The glossary table handles the term choices; only rules it cannot carry remain here.
 
-### VS Code pl-PL key terms (baseline)
-
-Apply these consistently unless source context overrides:
-- Settings → `Ustawienia`
-- Workspace → `Obszar roboczy`
-- Window → `Okno`
-- Editor → `edytor`
-- File → `plik`
-- Folder → `Folder`
-- Path → `Ścieżka`
-- Command Palette → `Paleta poleceń`
-- Outline → `Konspekt`
-- Breadcrumbs → `Linki do stron nadrzędnych`
-- Snippet → `Fragment kodu`
-- Branch → `Gałąź`
-- Pull Request → `Żądanie ściągnięcia`
-- Repository → `Repozytorium`
-- Tool Call → `Wywołanie narzędzia`
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Task / Operation**: `Zadanie` / `Operacja`. Use `Zadanie` only for named task-runner and background-task concepts.
+- **Declaration / Implementation / Type Definition**: `Deklaracja` / `Implementacja` / `Definicja typu` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

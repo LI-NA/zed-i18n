@@ -4,11 +4,7 @@ import unittest
 from pathlib import Path
 
 from tools.zed_i18n.vscode_loc import (
-    extract_glossary_terms_from_prompt,
     find_vscode_references,
-    generate_prompt_glossary_markdown,
-    generate_vscode_glossary_markdown,
-    list_vscode_languages,
     load_vscode_translation_memory,
 )
 
@@ -117,24 +113,6 @@ class VscodeLocTests(unittest.TestCase):
         self.assertEqual(by_source["Command Palette"], "명령 팔레트")
         self.assertNotIn("git.command.stage", by_source)
 
-    def test_list_vscode_languages_excludes_pseudo_localization(self) -> None:
-        qps_pack_root = self.vscode_loc_root / "i18n" / "vscode-language-pack-qps-ploc"
-        self._write_json(
-            qps_pack_root / "package.json",
-            {
-                "contributes": {
-                    "localizations": [
-                        {
-                            "languageId": "qps-ploc",
-                            "translations": [],
-                        }
-                    ]
-                }
-            },
-        )
-
-        self.assertEqual(list_vscode_languages(self.vscode_loc_root), ["ko"])
-
     def test_load_translation_memory_can_recover_english_sources_from_vscode(self) -> None:
         memory = load_vscode_translation_memory(
             self.vscode_loc_root,
@@ -155,53 +133,6 @@ class VscodeLocTests(unittest.TestCase):
         self.assertEqual(references[0]["source"], "Open Settings")
         self.assertEqual(references[0]["translation"], "설정 열기")
         self.assertEqual(references[0]["score"], 1.0)
-
-    def test_generate_glossary_markdown_lists_terms_from_vscode_loc(self) -> None:
-        markdown = generate_vscode_glossary_markdown(
-            self.vscode_loc_root,
-            "ko-KR",
-            ["Settings", "Command Palette", "Breadcrumbs"],
-            self.vscode_source_root,
-        )
-
-        self.assertIn("# VS Code Glossary Candidates for ko-KR", markdown)
-        self.assertIn("| Command Palette | 명령 팔레트 |", markdown)
-        self.assertIn("| Breadcrumbs | 이동 경로 |", markdown)
-
-    def test_generate_prompt_glossary_markdown_uses_exact_candidates(self) -> None:
-        markdown = generate_prompt_glossary_markdown(
-            self.vscode_loc_root,
-            "ko-KR",
-            ["Command Palette", "Breadcrumbs", "Pane", "Search", "Task", "Extension"],
-            self.vscode_source_root,
-        )
-
-        self.assertIn("# Glossary for ko-KR", markdown)
-        self.assertIn("| Command Palette | 명령 팔레트 |", markdown)
-        self.assertIn("| Breadcrumbs | 이동 경로 |", markdown)
-        self.assertNotIn("| Pane |", markdown)
-        self.assertNotIn("| Search |", markdown)
-        self.assertNotIn("| Task |", markdown)
-        self.assertNotIn("| Extension |", markdown)
-
-    def test_extract_glossary_terms_accepts_bullet_lists(self) -> None:
-        terms_path = self.root / "terms.md"
-        terms_path.write_text(
-            "\n".join(
-                [
-                    "# Terms",
-                    "",
-                    "- Settings",
-                    "- Command Palette",
-                ]
-            ),
-            encoding="utf-8",
-        )
-
-        self.assertEqual(
-            extract_glossary_terms_from_prompt(terms_path),
-            ["Settings", "Command Palette"],
-        )
 
     def _write_json(self, path: Path, value: object) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)

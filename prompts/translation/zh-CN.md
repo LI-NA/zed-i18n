@@ -68,32 +68,15 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Simplified Chinese form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `技能`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `智能体`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `提供商`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `生成 Token` for the model's generated-response token budget — distinct from `Max Output Tokens` = `输出 Token`. Do NOT use the editor-completion term `补全` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: 通话 for voice/collaboration calls, 调用 for tool/function/API calls.
-- **Action**: 操作 for both Zed/GPUI actions and generic operations. Use 任务 only for Task (background tasks, task runner).
-- **Panel**: 面板 for named Zed panels (Project Panel -> 项目面板, Git Panel -> Git 面板).
-- **Pane**: 窗格 for split editor panes. NEVER translate pane as 面板 unless the source is a named panel.
-- **Outline**: 大纲. NEVER use 概要.
-- **Breadcrumbs**: 痕迹导航 for editor/navigation breadcrumbs. Use 面包屑 only for generic web breadcrumbs if context clearly calls for it.
-- **Completion / Suggestion**: 补全 for editor completion features. 建议 for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use 引用 / 定义 / 声明 / 实现 for code navigation. Type Definition is 类型定义.
-- **Stage / Unstage**: 暂存 / 取消暂存 for Git index operations. Do not translate Stage as 阶段 in Git contexts.
-- **Hunk**: 区块 for diff hunks. Use 块 only for generic blocks/chunks outside diff context.
-- **Extension**: 扩展 for software extensions (Zed extensions, browser extensions). 文件扩展名 for file name extensions (.rs, .json).
-- **Thread**: 会话 for AI/chat threads. 线程 only when referring to OS/programming threads.
-- **Issue / Problem**: 议题 for GitHub/project tracker issues. 问题 for diagnostics, errors, and generic problems.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Task / Operation**: 任务. Use 任务 for background tasks and the task-runner concept. (Action → 操作 is in the glossary.)
+- **Declaration / Implementation / Type Definition**: 声明 / 实现 / 类型定义 for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

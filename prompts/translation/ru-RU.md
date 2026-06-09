@@ -72,41 +72,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Russian form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `навык` / `навыки`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `агент` / `агенты`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `поставщик` / `поставщики`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `токены завершения` for the model's generated-response token budget — distinct from `Max Output Tokens` = `выходные токены`. Do NOT use the editor-completion term `автозавершение` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Звонок` for voice/collaboration calls. `Вызов` for tool/function/API calls (e.g., Tool Call → `Вызов инструмента`).
-- **Action**: `Действие` for Zed/GPUI actions and code actions. `Операция` for generic operations. `Задача` only for Task (background tasks, task runner).
-- **Panel**: `Панель` for named Zed panels (Project Panel → `Панель проекта`, Git Panel → `Панель Git`).
-- **Pane**: `Область` for split editor panes. NEVER translate pane as `Панель` unless the source is a named panel.
-- **Outline**: `Структура` (per VS Code). NEVER use `Контур` or `Обзор`.
-- **Breadcrumbs**: `Элементы навигации` for editor/navigation breadcrumbs (per VS Code). Use `Хлебные крошки` only for generic web breadcrumbs if context clearly calls for it.
-- **Completion / Suggestion**: `Автозавершение` for editor completion features. `Предложение` for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use `Ссылка` / `Определение` / `Объявление` / `Реализация` for code navigation. Type Definition is `Определение типа`.
-- **Stage / Unstage**: `Внести в индекс` / `Удалить из индекса` for Git index operations. Do not translate Stage as `Этап` in Git contexts.
-- **Hunk**: `Блок изменений` for diff hunks. Preserve `hunk` only in developer-facing code-like contexts where the surrounding text references the term verbatim.
-- **Extension**: `Расширение` for software extensions (Zed extensions, browser extensions). `Расширение файла` for file name extensions (.rs, .json).
-- **Thread**: `Поток` for OS/programming threads. `Цепочка` or `Беседа` for AI/chat threads — pick the one that matches the surrounding Zed UI tone.
-- **View**: `Представление` for UI views and display modes (e.g., "Diff View" → `Представление различий`). `Просмотр` is acceptable for verbal/menu forms (e.g., "View" as a top-level menu).
-- **Diff**: `Различия` for the noun concept (e.g., "Show Diff" → `Показать различия`). Preserve `diff` only in code-like contexts.
-- **Issue / Problem**: `Проблема` for both GitHub/project tracker issues and diagnostics/errors (matches VS Code). Use `Задача` for tracker issues only when the Zed UI explicitly prefers it.
-- **Symbol**: keep as `Symbol` (per VS Code Russian convention — untranslated).
-- **Settings / Workspace / Window / Editor / File / Folder / Path**: follow the appended glossary — `Параметры` / `Рабочая область` / `Окно` / `редактор` / `файл` / `Папка` / `Путь`.
-- **Command Palette**: `Палитра команд`.
-- **Snippet**: `Фрагмент`.
-- **Branch**: `Ветвь`.
-- **Repository**: `Репозиторий`.
-- **Pull Request**: `Запрос на вытягивание`. Preserve `Pull Request` as a loanword only when the Zed UI clearly prefers a developer-friendly form in a given string.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: `Объявление` / `Реализация` / `Определение типа` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

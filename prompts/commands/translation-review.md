@@ -8,7 +8,7 @@ MODEL_B: [MODEL_B]
 ## Read first (in this order, before touching any output)
 1. `AGENTS.md` and `README.md` — confirm pipeline rules. Note: DO NOT COMMIT. No staging, no branches, no worktrees.
 2. `prompts/translation/[LOCALE].md` — language-specific prompt. If missing, fall back to `prompts/translation/TEMPLATE.md`.
-3. `prompts/translation/glossary/<lang>.md` — the auto-generated glossary (uses a shorter code than the locale, e.g., `ko.md`, `ja.md`, `zh-cn.md`, `pt-br.md`). This is the baseline terminology.
+3. `prompts/translation/glossary/<lang>.md` — the curated glossary (uses a shorter code than the locale, e.g., `ko.md`, `ja.md`, `zh-cn.md`, `pt-br.md`). This is the baseline terminology.
 4. `manifest/ui-strings.json` — read `occurrences`, `kind`, and `call` for any ambiguous or short string.
 5. `reports/context-groups/[LOCALE]/` if it already exists — use grouped setting title/description, connected-line, and prompt-component reports to review sibling consistency, multi-line flow, and composed prompt/message flow.
 6. `.cache/zed/<version>-clean-extract/...` — open ONLY the source files referenced by `occurrences` for entries you cannot disambiguate from the manifest or context-group reports alone.

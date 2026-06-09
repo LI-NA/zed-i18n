@@ -70,34 +70,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Turkish form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. VS Code Turkish conventions are the baseline for terminology.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `beceri` / `beceriler`. Inflect naturally while respecting vowel harmony. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `aracı` / `aracılar`. Inflect naturally while respecting vowel harmony. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `sağlayıcı` / `sağlayıcılar`. Inflect naturally while respecting vowel harmony. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `Yanıt Belirteci` for the model's generated-response token budget — distinct from `Max Output Tokens` = `Çıkış Belirteci`. Do NOT use the editor-completion term `tamamlama` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Sesli görüşme` for voice/collaboration calls. `Çağrı` for tool/function/API calls (e.g., Tool Call -> Araç Çağrısı).
-- **Action**: `Eylem` for Zed/GPUI actions and code actions. `İşlem` for generic operations. `Görev` only for Task (background tasks, task runner) — never for generic actions.
-- **Panel**: `Panel` for named Zed panels (Project Panel -> Proje Paneli, Git Panel -> Git Paneli, Agent Panel -> Aracı Paneli).
-- **Pane**: `Bölme` for split editor panes. NEVER translate pane as `Panel` unless the source is a named panel.
-- **Outline**: `Anahat` for the Zed outline feature/panel (per VS Code). NEVER use `Genel görünüm` or `Özet`.
-- **Breadcrumbs**: `İçerik haritaları` for editor/navigation breadcrumbs (per VS Code). Avoid `ekmek kırıntıları` or other literal renderings.
-- **Completion / Suggestion**: `Tamamlama` for editor completion features (autocomplete, code completion). `Öneri` for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use `Başvuru` / `Tanım` / `Bildirim` / `Uygulama` for code navigation. Type Definition is `Tür tanımı`.
-- **Stage / Unstage**: `Hazırla` / `Hazırlığı geri al` for Git index operations. Do not translate Stage as `Aşama` in Git contexts.
-- **Hunk**: `Değişiklik bloğu` for diff hunks. Preserve `hunk` only in code-like contexts (identifiers, code spans).
-- **Extension**: `Uzantı` for software extensions (Zed extensions, browser extensions). `Dosya uzantısı` for file name extensions (.rs, .json).
-- **Thread**: `İş parçacığı` for OS/programming threads. `Konuşma` or `Sohbet` for AI/chat threads — context determines meaning.
-- **View**: `Görünüm` for UI views and display modes (e.g., "Diff View" -> "Fark Görünümü").
-- **Diff**: `Fark` for the noun concept (e.g., "View Diff" -> "Farkı görüntüle"). Preserve `diff` in code-like contexts.
-- **Issue / Problem**: `Sorun` for both GitHub/project tracker issues and diagnostics/errors (matches VS Code, which uses `Sorun` for both). Disambiguate via context only when truly ambiguous.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: `Bildirim` / `Uygulama` / `Tür tanımı` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

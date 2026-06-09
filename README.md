@@ -126,7 +126,7 @@ git clone https://github.com/microsoft/vscode .cache/vscode-upstream
 
 When adding a new language:
 
-1. Write a style guide and glossary in `prompts/translation/<language>.md`.
+1. Write the translation style guide in `prompts/translation/<language>.md` and the curated glossary in `prompts/translation/glossary/<lang>.md`.
 2. Generate batches with `prepare-translation`.
 3. Merge the AI-produced JSON results using `merge-translation`.
 4. Validate the result with `validate`.
@@ -182,6 +182,6 @@ For more on the AI translation process, see the files under `prompts\commands`.
 
 ## License
 
-Content derived from Zed sources (`catalog/`, `translations/`, `manifest/`, release artifacts, etc.) is licensed under [GPL-3.0](LICENSE). This project distributes modified builds of Zed. The `zed-i18n` source code and the translation glossaries (`prompts/translation/glossary/`) extracted from [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) are licensed under [MIT](LICENSE-MIT).
+Content derived from Zed sources (`catalog/`, `translations/`, `manifest/`, release artifacts, etc.) is licensed under [GPL-3.0](LICENSE). This project distributes modified builds of Zed. The `zed-i18n` source code and the material referenced from [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) are licensed under [MIT](LICENSE-MIT).
 
 Zed and the Zed logo are the property of Zed Industries. VS Code and the VS Code language pack content are copyrighted by Microsoft Corporation.

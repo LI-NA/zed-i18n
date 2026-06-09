@@ -9,7 +9,6 @@ from tools.zed_i18n.cli import (
     preserve_manifest_statuses,
     resolve_zed_root,
     run_fetch_zed,
-    run_generate_vscode_glossary,
     run_validate,
 )
 from tools.zed_i18n.config import ProjectConfig
@@ -116,24 +115,6 @@ class CliTests(unittest.TestCase):
             ).group_type,
             "prompt",
         )
-        glossary_args = parser.parse_args(
-            [
-                "generate-vscode-glossary",
-                "--language",
-                "ko-KR",
-                "--vscode-loc-root",
-                ".cache/vscode-loc",
-                "--vscode-source-root",
-                ".cache/vscode-upstream",
-                "--output",
-                "reports/vscode-glossary/ko-KR.md",
-            ]
-        )
-        self.assertEqual(glossary_args.command, "generate-vscode-glossary")
-        self.assertEqual(glossary_args.language, "ko-KR")
-        self.assertEqual(glossary_args.vscode_loc_root, ".cache/vscode-loc")
-        self.assertEqual(glossary_args.vscode_source_root, ".cache/vscode-upstream")
-        self.assertEqual(glossary_args.output, "reports/vscode-glossary/ko-KR.md")
         packaging_args = parser.parse_args(
             [
                 "generate-packaging",
@@ -151,19 +132,6 @@ class CliTests(unittest.TestCase):
         self.assertEqual(packaging_args.cask_out, "packaging/homebrew/Casks/zed-i18n.rb")
         self.assertEqual(packaging_args.bucket_out, "packaging/scoop/bucket")
         self.assertTrue(packaging_args.require_all_translations)
-        prompt_glossary_args = parser.parse_args(
-            [
-                "generate-vscode-glossary",
-                "--language",
-                "ko-KR",
-                "--prompt-glossary-output-dir",
-                "prompts/translation/glossary",
-            ]
-        )
-        self.assertEqual(
-            prompt_glossary_args.prompt_glossary_output_dir,
-            "prompts/translation/glossary",
-        )
 
     def test_preserves_existing_manifest_statuses_when_extracting_again(self) -> None:
         manifest = {
@@ -340,46 +308,6 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 1)
         self.assertTrue(translation_workspace.exists())
-
-    def test_generate_vscode_glossary_rejects_pseudo_localization(self) -> None:
-        qps_package_path = (
-            self.tmp
-            / ".cache"
-            / "vscode-loc"
-            / "i18n"
-            / "vscode-language-pack-qps-ploc"
-            / "package.json"
-        )
-        self._write_json(
-            qps_package_path,
-            {
-                "contributes": {
-                    "localizations": [
-                        {
-                            "languageId": "qps-ploc",
-                            "translations": [],
-                        }
-                    ]
-                }
-            },
-        )
-        prompt_path = self.tmp / "prompts" / "translation" / "vscode-glossary-terms.md"
-        prompt_path.parent.mkdir(parents=True, exist_ok=True)
-        prompt_path.write_text("- Command Palette\n", encoding="utf-8")
-
-        with self.assertRaisesRegex(ValueError, "pseudo-localization"):
-            run_generate_vscode_glossary(
-                self.tmp,
-                "qps-ploc",
-                ".cache/vscode-loc",
-                ".cache/vscode-upstream",
-                "prompts/translation/vscode-glossary-terms.md",
-                None,
-                "prompts/translation/glossary",
-            )
-        self.assertFalse(
-            (self.tmp / "prompts" / "translation" / "glossary" / "qps-ploc.md").exists()
-        )
 
     def _write_json(self, path: Path, value: object) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)

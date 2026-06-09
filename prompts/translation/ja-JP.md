@@ -71,36 +71,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Japanese form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `スキル`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `エージェント`. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `プロバイダー`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `生成トークン` for the model's generated-response token budget — distinct from `Max Output Tokens` = `出力トークン`. Do NOT use the editor-completion term `補完` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: 通話 for voice/collaboration calls, 呼び出し for tool/function/API calls.
-- **Action**: アクション for Zed/GPUI actions and code actions. 操作 for generic operations. タスク only for Task (background tasks, task runner).
-- **Panel**: パネル for named Zed panels (Project Panel -> プロジェクトパネル, Git Panel -> Git パネル).
-- **Pane**: ペイン for split editor panes. NEVER translate pane as パネル unless the source is a named panel.
-- **Outline**: アウトライン. NEVER use 概要.
-- **Breadcrumbs**: 階層リンク for editor/navigation breadcrumbs. Use パンくずリスト only for generic web breadcrumbs if context clearly calls for it.
-- **Completion / Suggestion**: 補完 for editor completion features. 提案 for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use 参照 / 定義 / 宣言 / 実装 for code navigation. Type Definition is 型定義.
-- **Formatting**: フォーマット for commands such as "Format Document". 書式設定 for the concept/settings category. フォーマッター for formatter providers/tools.
-- **Formatter**: フォーマッター for formatter providers/tools.
-- **Stage / Unstage**: ステージ / ステージング解除 for Git index operations. Use ステージする / ステージング解除する naturally in verb phrases.
-- **Hunk**: ハンク for diff hunks. Use チャンク only for generic data chunks.
-- **Extension**: 拡張機能 for software extensions (Zed extensions, browser extensions). ファイル拡張子 for file name extensions (.rs, .json).
-- **Thread**: スレッド for both AI/chat threads and OS/programming threads. Context determines meaning.
-- **View**: ビュー for UI views and display modes (e.g., "Diff View" -> "差分ビュー"). NEVER use 表示 as a noun for named views.
-- **Diff**: 差分 for the concept. Preserve `diff` in code-like contexts.
-- **Issue / Problem**: イシュー for GitHub/project tracker issues. 問題 for diagnostics, errors, and generic problems.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: 宣言 / 実装 / 型定義 for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

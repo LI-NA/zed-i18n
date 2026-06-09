@@ -71,34 +71,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard French form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `compétence` / `compétences`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `agent` / `agents`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `fournisseur` / `fournisseurs`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `jetons de génération` for the model's generated-response token budget — distinct from `Max Output Tokens` = `jetons de sortie`. Do NOT use the editor-completion term `complétion` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Appel` for tool/function/API calls. For voice/collaboration calls, qualify by context (e.g., `Appel vocal`).
-- **Action**: `Action` for Zed/GPUI actions and code actions. `Opération` for generic operations. `Tâche` only for Task (background tasks, task runner).
-- **Panel**: `Panneau` for named Zed panels (Project Panel → `Panneau de projet`, Git Panel → `Panneau Git`).
-- **Pane**: `Volet` for split editor panes. NEVER translate pane as `Panneau` unless the source is a named panel.
-- **Outline**: `Structure` (per VS Code). NEVER use `Plan` or `Aperçu`.
-- **Breadcrumbs**: `Barres de navigation` for editor/navigation breadcrumbs (per VS Code). Use `Fil d'Ariane` only if the surrounding Zed UI clearly already uses that wording.
-- **Completion / Suggestion**: `Saisie semi-automatique` or `Complétion` for editor completion features. `Suggestion` for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use `Référence` / `Définition` / `Déclaration` / `Implémentation` for code navigation. Type Definition is `Définition de type`.
-- **Stage / Unstage**: `Indexer` / `Désindexer` for Git index operations. Do not translate Stage as `Étape` in Git contexts.
-- **Hunk**: `Bloc` for diff hunks. Preserve `hunk` only in code-like contexts.
-- **Extension**: `Extension` for software extensions (Zed extensions, browser extensions). `Extension de fichier` for file name extensions (.rs, .json).
-- **Thread**: `Thread` (loanword, common in French software) for OS/programming threads. `Conversation` for AI/chat threads. Document the choice in context.
-- **View**: `Vue` for UI views and display modes (e.g., "Diff View" → `Vue des différences`). NEVER use `Affichage` as a noun for named views.
-- **Diff**: `Différences` for the noun concept. Preserve `diff` in code-like contexts.
-- **Issue / Problem**: `Problème` for both GitHub/project tracker issues and diagnostics (matches VS Code). If the Zed UI clearly distinguishes a tracker issue from a diagnostic, document the convention and adapt accordingly.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: `Déclaration` / `Implémentation` / `Définition de type` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

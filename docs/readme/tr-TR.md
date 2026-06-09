@@ -126,7 +126,7 @@ git clone https://github.com/microsoft/vscode .cache/vscode-upstream
 
 Yeni bir dil eklerken:
 
-1. `prompts/translation/<language>.md` dosyasına çeviri üslubunu ve terimler sözlüğünü yazın.
+1. Çeviri üslup rehberini `prompts/translation/<language>.md` dosyasına, düzenlenmiş terimler sözlüğünü ise `prompts/translation/glossary/<lang>.md` dosyasına yazın.
 2. `prepare-translation` komutuyla toplu işlemleri oluşturun.
 3. Yapay zekanın ürettiği JSON sonuçlarını `merge-translation` ile birleştirin.
 4. Sonucu `validate` komutuyla doğrulayın.
@@ -182,6 +182,6 @@ Yapay zeka çeviri süreciyle ilgili daha fazla ayrıntı için `prompts\command
 
 ## Lisans
 
-Zed kaynaklarından türetilen içerikler (`catalog/`, `translations/`, `manifest/`, yayın çıktıları vb.) [GPL-3.0](../../LICENSE) lisansı kapsamındadır. Bu proje, Zed'in değiştirilmiş derlemelerini dağıtır. `zed-i18n` kaynak kodu ve [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) kaynaklı çeviri sözlükleri (`prompts/translation/glossary/`) [MIT](../../LICENSE-MIT) lisansı kapsamındadır.
+Zed kaynaklarından türetilen içerikler (`catalog/`, `translations/`, `manifest/`, yayın çıktıları vb.) [GPL-3.0](../../LICENSE) lisansı kapsamındadır. Bu proje, Zed'in değiştirilmiş derlemelerini dağıtır. `zed-i18n` kaynak kodu ve [Visual Studio Code Localization Packs](https://github.com/microsoft/vscode-loc) üzerinden başvurulan materyaller [MIT](../../LICENSE-MIT) lisansı kapsamındadır.
 
 Zed ve Zed logosu Zed Industries'in mülkiyetindedir; VS Code ve VS Code dil paketi içeriğinin telif hakkı Microsoft Corporation'a aittir.

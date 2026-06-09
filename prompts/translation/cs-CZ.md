@@ -68,40 +68,16 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Do not add explanations that are not present in the source.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `dovednost` / `dovednosti`. Inflect naturally. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `agent` / `agenti`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `poskytovatel` / `poskytovatelé`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `vygenerované tokeny` for the model's generated-response token budget — distinct from `Max Output Tokens` = `výstupní tokeny`. Do NOT use the editor-completion term `dokončování` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `hovor` for voice/collaboration calls (Zed call/Live Share style). `volání` for tool/function/API calls (`Tool Call` → `Volání nástroje`).
-- **Action**: `akce` for Zed/GPUI actions and code actions. `operace` for generic operations. Use `úloha` only for Task (background tasks, task runner) — never translate Action as `úloha`.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
 - **Task / Operation**: `úloha` for named task-runner tasks and background tasks. `operace` for generic short-lived operations. Do not use `úkol` for Zed Task.
-- **Panel**: `Panel` for named Zed panels (Project Panel → `Panel projektu`, Git Panel → `Panel Gitu`, Agent Panel → `Panel agenta`). Matches VS Code Czech.
-- **Pane**: `Podokno` for split editor panes. NEVER translate Pane as `Panel` unless the source explicitly refers to a named panel.
-- **Outline**: `Osnova` (per VS Code Czech). NEVER use `Přehled` or `Obrys`.
-- **Breadcrumbs**: `Popis cesty` for editor/navigation breadcrumbs (per VS Code Czech). Do not invent alternatives like `drobečková navigace` unless the surrounding context already uses it.
-- **Completion / Suggestion**: `dokončování` (or `automatické dokončování`) for editor completion features. `návrh` for suggestions, inline suggestions, and AI/code suggestions. Do not interchange them.
-- **Reference / Definition / Declaration / Implementation**: use `Odkaz` (or `Reference`) / `Definice` / `Deklarace` / `Implementace` for code navigation. Type Definition is `Definice typu`. Match the VS Code term `Odkaz` for Reference navigation.
-- **Stage / Unstage**: `Připravit ke commitu` / `Odebrat z přípravy` for Git index operations. Shorter form `Přidat ke stage` / `Odebrat ze stage` is acceptable when space is tight. NEVER translate Stage as `Fáze` or `Etapa` in Git contexts.
-- **Hunk**: `Blok změn` for diff hunks. The bare form `hunk` may be preserved when the surrounding UI is clearly developer-facing (e.g., short Git toolbar labels). NEVER use generic `Kus` or `Část`.
-- **Extension**: `Rozšíření` for software extensions (Zed extensions, browser extensions). `Přípona souboru` for file name extensions (.rs, .json). Disambiguate by `kind` and surrounding context.
-- **Thread**: `Vlákno` for both AI/chat threads and OS/programming threads. Czech `vlákno` covers both meanings; let context determine sense.
-- **View**: `Zobrazení` for UI views and display modes (e.g., "Diff View" → `Zobrazení rozdílů`). Avoid `Pohled` for named views.
-- **Diff**: `Rozdíl` for the noun concept (`Diff View` → `Zobrazení rozdílů`). Preserve the literal `diff` only inside backticks or in clearly code-like contexts.
-- **Issue / Problem**: `Problém` for both GitHub/project tracker issues and diagnostics, matching VS Code Czech (which uses `Problém` for both). When Zed UI labels them differently, keep `Problém` consistent and rely on `kind`/context for the user-visible distinction.
-- **Workspace / Window**: `Pracovní prostor` for Workspace, `Okno` for Window. Do not collapse them into one term.
+- **Declaration / Implementation / Type Definition**: `Deklarace` / `Implementace` / `Definice typu` for code navigation. (Reference and Definition are in the glossary.)
 - **Folder vs Directory**: `Složka` for Folder (UI-facing), `Adresář` for Directory (CLI/code-facing). Default to `Složka` in UI strings.
-- **Path**: `Cesta`. When followed by a placeholder, prefer `cesta {path}` (nominative) over forced declension.
-- **Sign In / Sign Out**: `Přihlásit se` / `Odhlásit se`. Use reflexive `se` consistently.
-- **Settings**: `Nastavení` (uncountable singular). Do not pluralize.
 
 ## INPUT FORMAT
 

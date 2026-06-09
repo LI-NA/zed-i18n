@@ -31,19 +31,6 @@ PSEUDO_LOCALIZATION_LANGUAGE_IDS = {"qps-ploc"}
 _CAMEL_CASE_RE = re.compile(r"^[a-z]+(?:[A-Z][a-z0-9]+)+$")
 _SOURCE_KEY_RE = re.compile(r"^[A-Za-z][A-Za-z0-9 &'’(),:;!?+\-/]*$")
 _WORD_RE = re.compile(r"[a-z0-9]+")
-_UNSAFE_PROMPT_GLOSSARY_TERMS = {
-    "Action",
-    "Extension",
-    "Focus",
-    "Format",
-    "Formatting",
-    "Formatter",
-    "Operation",
-    "Search",
-    "Task",
-    "View",
-}
-_UNSAFE_PROMPT_TRANSLATION_SUFFIXES = ("...", "…", ":", "：")
 
 
 @dataclass(frozen=True)
@@ -171,18 +158,6 @@ class VscodeTranslationIndex:
         return references
 
 
-def list_vscode_languages(vscode_loc_root: Path) -> list[str]:
-    i18n_root = vscode_loc_root / "i18n"
-    if not i18n_root.exists():
-        return []
-    languages: list[str] = []
-    for pack_root in sorted(i18n_root.glob("vscode-language-pack-*")):
-        language = _language_id_from_pack(pack_root)
-        if language and not is_vscode_pseudo_language(language):
-            languages.append(language)
-    return languages
-
-
 def is_vscode_pseudo_language(language: str) -> bool:
     return language.strip().lower() in PSEUDO_LOCALIZATION_LANGUAGE_IDS
 
@@ -263,117 +238,6 @@ def find_vscode_references(
     return index.find_references(source, limit, min_score)
 
 
-def generate_vscode_glossary_markdown(
-    vscode_loc_root: Path,
-    language: str,
-    terms: Iterable[str],
-    vscode_source_root: Path | None = None,
-) -> str:
-    memory = load_vscode_translation_memory(vscode_loc_root, language, vscode_source_root)
-    memory_index = _translation_memory_index(memory)
-    lines = [
-        f"# VS Code Glossary Candidates for {language}",
-        "",
-        "Generated from `vscode-loc` language-pack translation keys that look like English UI strings.",
-        "Treat these as candidates, not automatic replacements.",
-        "",
-        "| English | VS Code candidate | Score | VS Code source key | Resource |",
-        "|---------|-------------------|-------|--------------------|----------|",
-    ]
-    for term in terms:
-        references = _find_glossary_references(term, memory_index)
-        if references:
-            best = references[0]
-            lines.append(
-                "| "
-                + " | ".join(
-                    [
-                        _markdown_cell(term),
-                        _markdown_cell(str(best["translation"])),
-                        f"{float(best['score']):.3f}",
-                        _markdown_cell(str(best["source"])),
-                        _markdown_cell(str(best["resource"])),
-                    ]
-                )
-                + " |"
-            )
-        else:
-            lines.append(
-                "| "
-                + " | ".join(
-                    [
-                        _markdown_cell(term),
-                        "",
-                        "",
-                        "",
-                        "",
-                    ]
-                )
-                + " |"
-            )
-    lines.append("")
-    return "\n".join(lines)
-
-
-def generate_prompt_glossary_markdown(
-    vscode_loc_root: Path,
-    language: str,
-    terms: Iterable[str],
-    vscode_source_root: Path | None = None,
-) -> str:
-    memory = load_vscode_translation_memory(vscode_loc_root, language, vscode_source_root)
-    memory_index = _translation_memory_index(memory)
-    lines = [
-        f"# Glossary for {language}",
-        "",
-        "Generated from VS Code language-pack exact, context-stable matches. Use as translation-memory hints; language-specific prompts and source context override these entries.",
-        "",
-        "| English | Translation |",
-        "|---------|-------------|",
-    ]
-    seen: set[str] = set()
-    for term in terms:
-        if term in seen:
-            continue
-        seen.add(term)
-        reference = _find_prompt_glossary_reference(term, memory_index)
-        if reference is None:
-            continue
-        translation = str(reference["translation"])
-        lines.append(f"| {_markdown_cell(term)} | {_markdown_cell(translation)} |")
-    lines.append("")
-    return "\n".join(lines)
-
-
-def extract_glossary_terms_from_prompt(prompt_path: Path) -> list[str]:
-    if not prompt_path.exists():
-        return []
-    terms: list[str] = []
-    seen: set[str] = set()
-    for line in prompt_path.read_text(encoding="utf-8").splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("|") or stripped.startswith("|---"):
-            continue
-        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
-        if len(cells) < 2 or cells[0].lower() == "english":
-            continue
-        term = cells[0]
-        if term and term not in seen:
-            seen.add(term)
-            terms.append(term)
-    if terms:
-        return terms
-    for line in prompt_path.read_text(encoding="utf-8").splitlines():
-        stripped = line.strip()
-        if not stripped.startswith("- "):
-            continue
-        term = stripped.removeprefix("- ").strip()
-        if term and term not in seen:
-            seen.add(term)
-            terms.append(term)
-    return terms
-
-
 @lru_cache(maxsize=4)
 def load_vscode_source_messages(vscode_source_root: Path) -> dict[tuple[str, str, str], str]:
     messages: dict[tuple[str, str, str], str] = {}
@@ -382,101 +246,9 @@ def load_vscode_source_messages(vscode_source_root: Path) -> dict[tuple[str, str
     return messages
 
 
-def _find_glossary_references(
-    term: str,
-    memory_index: dict[str, list[VscodeTranslationEntry]],
-) -> list[dict[str, object]]:
-    for alternative in _term_alternatives(term):
-        matches = memory_index.get(_normalize_source(alternative), [])
-        if matches:
-            entry = sorted(
-                matches,
-                key=lambda item: (
-                    _is_vscode_menu_item_key(item.key),
-                    item.resource != "package",
-                    item.extension_id,
-                    item.resource,
-                    item.key,
-                ),
-            )[0]
-            return [
-                {
-                    "source": entry.source,
-                    "translation": entry.translation,
-                    "score": 1.0,
-                    "extension": entry.extension_id,
-                    "resource": entry.resource,
-                    "key": entry.key,
-                }
-            ]
-    return []
-
-
-def _find_prompt_glossary_reference(
-    term: str,
-    memory_index: dict[str, list[VscodeTranslationEntry]],
-) -> dict[str, object] | None:
-    if term in _UNSAFE_PROMPT_GLOSSARY_TERMS:
-        return None
-    for alternative in _term_alternatives(term):
-        matches = [
-            entry
-            for entry in memory_index.get(_normalize_source(alternative), [])
-            if _source_matches_prompt_term(entry.source, alternative)
-            and _translation_is_prompt_glossary_safe(entry.translation)
-        ]
-        if not matches:
-            continue
-        entry = sorted(
-            matches,
-            key=lambda item: (
-                _is_vscode_menu_item_key(item.key),
-                item.resource != "package",
-                item.extension_id,
-                item.resource,
-                item.key,
-            ),
-        )[0]
-        return {
-            "source": entry.source,
-            "translation": entry.translation,
-            "score": 1.0,
-            "extension": entry.extension_id,
-            "resource": entry.resource,
-            "key": entry.key,
-        }
-    return None
-
-
-def _source_matches_prompt_term(source: str, term: str) -> bool:
-    return _clean_vscode_text(source).casefold() == term.strip().casefold()
-
-
 def _is_vscode_menu_item_key(key: str) -> bool:
     # VS Code `mi*` keys are menu-item aliases; rank them after source/package keys.
     return key.lower().startswith("mi")
-
-
-def _translation_is_prompt_glossary_safe(translation: str) -> bool:
-    stripped = translation.strip()
-    return bool(stripped) and not stripped.endswith(_UNSAFE_PROMPT_TRANSLATION_SUFFIXES)
-
-
-def _translation_memory_index(
-    memory: Iterable[VscodeTranslationEntry],
-) -> dict[str, list[VscodeTranslationEntry]]:
-    index: dict[str, list[VscodeTranslationEntry]] = {}
-    for entry in memory:
-        index.setdefault(_normalize_source(entry.source), []).append(entry)
-    return index
-
-
-def _term_alternatives(term: str) -> list[str]:
-    alternatives = [term]
-    for part in re.split(r"\s*/\s*", term):
-        if part and part not in alternatives:
-            alternatives.append(part)
-    return alternatives
 
 
 def _find_language_pack(vscode_loc_root: Path, language: str) -> Path | None:

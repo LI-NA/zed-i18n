@@ -70,33 +70,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Brazilian Portuguese form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `habilidade` / `habilidades`. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `agente` / `agentes`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `provedor` / `provedores`. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `tokens de resposta` for the model's generated-response token budget — distinct from `Max Output Tokens` = `tokens de saída`. Do NOT use the editor-completion term `conclusão` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Chamada` for tool/function/API calls (`Tool Call` → `Chamada de Ferramenta`). `Chamada de voz` for voice/collaboration calls when the distinction is required by context.
-- **Action**: `Ação` for Zed/GPUI actions and code actions. `Operação` for generic operations. Use `Tarefa` only for Task (background tasks, task runner concept).
-- **Panel vs Pane**: VS Code pt-BR uses `Painel` for both, but Zed needs the distinction. Use `Painel` for named Zed panels (`Project Panel` → `Painel do projeto`, `Git Panel` → `Painel do Git`, `Agent Panel` → `Painel do agente`). Use `Subpainel` or `Painel dividido` for split editor panes when the UI requires distinction. NEVER translate pane as `Painel` when the source clearly refers to a split editor pane.
-- **Outline**: `Estrutura do código` for the Zed outline feature/panel (matches VS Code pt-BR). Use `Estrutura` for short forms when space is tight. NEVER use `Esboço`.
-- **Breadcrumbs**: `Trilhas` for editor/navigation breadcrumbs (matches VS Code pt-BR). Avoid `Migalhas de pão` and other literal translations.
-- **Completion / Suggestion**: `Conclusão` for editor completion features. `Sugestão` for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation**: use `Referência` / `Definição` / `Declaração` / `Implementação` for code navigation. Type Definition is `Definição de tipo`.
-- **Stage / Unstage**: `Preparar` / `Reverter preparação` for Git index operations on buttons and short labels. Use the verbose `Adicionar à área de preparação` / `Remover da área de preparação` only when the surrounding UI already uses that wording. Do NOT translate Stage as `Etapa` in Git contexts.
-- **Hunk**: `Trecho` for diff hunks. Preserve `hunk` only in developer-facing code-like contexts where the term is referenced as code.
-- **Extension**: `Extensão` for software extensions (Zed extensions, browser extensions). `Extensão de arquivo` for file name extensions (.rs, .json).
-- **Thread**: `Thread` (loanword) for OS/programming threads. `Conversa` for AI/chat threads. Context determines meaning.
-- **View**: `Exibição` for UI views and display modes (e.g., `Diff View` → `Exibição de diferenças`). NEVER use `Visualização` as a noun for named views.
-- **Diff**: `Diferença` for the noun concept (e.g., `Diff View` → `Exibição de diferenças`). Preserve `diff` in code-like contexts where it appears as a tool name or command.
-- **Issue / Problem**: `Problema` for both GitHub/project tracker issues and diagnostics, errors, and generic problems (matches VS Code pt-BR).
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: `Declaração` / `Implementação` / `Definição de tipo` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

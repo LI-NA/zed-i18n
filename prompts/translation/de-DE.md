@@ -69,33 +69,14 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard German form.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements. The VS Code German pack is the established baseline — follow it unless a disambiguation rule or local Zed UI context requires a different choice.
-- Use the appended generated glossary as baseline terminology. When it conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
-
-## PROJECT GLOSSARY
-
-Use these manual project terms alongside the generated VS Code glossary.
-
-- **Skill / Skills** (Agent Skills feature): use `Skill` / `Skills`. Use natural German compounds with hyphens where needed. Preserve `SKILL.md`, skill IDs, folder names, and example skill names unchanged.
-- **Agent / Agents** (AI agent feature): use `Agent` / `Agenten`. Inflect naturally. Preserve product and protocol names such as `Agent Client Protocol`, `Agent Server`, and `Claude Agent`.
-- **Provider / Providers** (AI/model provider feature): use `Anbieter` / `Anbieter`. Inflect naturally. Preserve provider names such as `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter`.
-- **Completion Tokens** (LLM `max_completion_tokens`, o1 models): use `Antwort-Token` for the model's generated-response token budget — distinct from `Max Output Tokens` = `Ausgabe-Token`. Do NOT use the editor-completion term `Vervollständigung` here.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
 
 ## DISAMBIGUATION RULES
 
-- **Call**: `Anruf` for voice/collaboration calls. `Aufruf` for tool/function/API calls (e.g., Tool Call → `Toolaufruf`, Function Call → `Funktionsaufruf`).
-- **Action**: `Aktion` for Zed/GPUI actions and code actions. `Vorgang` for generic operations. Reserve `Aufgabe` only for Task (background tasks, task runner).
-- **Panel vs Pane**: `Panel` for named Zed panels (Project Panel → `Projektpanel`, Git Panel → `Git-Panel`, Agent Panel → `Agent-Panel`). `Bereich` for split editor panes — NEVER translate Pane as `Panel` unless the source is a named panel.
-- **Outline**: `Gliederung` for the Zed outline feature/panel (matches VS Code). NEVER use `Übersicht` or `Umriss`.
-- **Breadcrumbs**: `Breadcrumbs` (loanword, matches VS Code). Use `Brotkrumen` only if the surrounding UI clearly favors a localized form; the default is `Breadcrumbs`.
-- **Completion / Suggestion**: `Vervollständigung` for editor completion features (autocomplete). `Vorschlag` for suggestions, inline suggestions, and AI/code suggestions.
-- **Reference / Definition / Declaration / Implementation / Type Definition**: use `Referenz` / `Definition` / `Deklaration` / `Implementierung` for code navigation. Type Definition is `Typdefinition`.
-- **Stage / Unstage**: prefer verb forms `Stagen` / `Vom Stage entfernen` (or `Stage zurücksetzen`) for Git index operations. Use noun forms (`Stage`, `Staging-Bereich`) only when the source is a noun. Do not translate Stage as `Phase` or `Stufe` in Git contexts.
-- **Hunk**: `Hunk` (loanword) for diff hunks. NEVER use `Stück` or `Block`.
-- **Extension**: `Erweiterung` for software extensions (Zed extensions, browser extensions). `Dateierweiterung` for file name extensions (.rs, .json).
-- **Thread**: `Thread` (loanword) for both AI/chat threads and OS/programming threads. Context determines meaning. Do not translate as `Strang` or `Faden`.
-- **View**: `Ansicht` for UI views and display modes (e.g., "Diff View" → `Diff-Ansicht`). NEVER use `Anzeige` as a noun for named views.
-- **Diff**: `Diff` (loanword) or `Vergleich` based on UI context — prefer `Diff` for short labels and named features (Diff View → `Diff-Ansicht`), `Vergleich` for descriptive prose. Preserve `diff` unchanged in code-like contexts.
-- **Issue / Problem**: VS Code uses `Problem` for both diagnostics and tracker entries — default to `Problem` for diagnostics, errors, and generic problems. Use `Issue` (loanword) only when the source unambiguously refers to a GitHub/project tracker entry and consistency with surrounding UI requires it.
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
+- **Declaration / Implementation / Type Definition**: `Deklaration` / `Implementierung` / `Typdefinition` for code navigation. (Reference and Definition are in the glossary.)
 
 ## INPUT FORMAT
 

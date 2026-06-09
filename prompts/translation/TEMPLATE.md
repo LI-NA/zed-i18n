@@ -55,21 +55,27 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard localized form in the target language.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended generated glossary as baseline terminology. When it conflicts with disambiguation rules or local Zed UI context, follow the rules and source context.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with disambiguation rules or local Zed UI context, follow the rules and source context.
 
-## AUTOMATIC GLOSSARY AND DISAMBIGUATION
+## CURATED GLOSSARY AND DISAMBIGUATION
 
-The translation pipeline may append a generated glossary from `prompts/translation/glossary/<language>.md` after this prompt.
+The translation pipeline appends a curated glossary table (`English | Context | Translation`) from `prompts/translation/glossary/<language>.md` after this prompt. The `Context` column is filled only for overloaded terms; pick the row whose `Context` matches the string's `kind`/`code_context`.
 
-Do not add an inline `## GLOSSARY` table to language-specific prompt files. If a language needs extra guidance, add a `## DISAMBIGUATION RULES` section with translation tips for overloaded terms whose wording depends on context.
+Do not add an inline `## GLOSSARY` table to language-specific prompt files; terminology belongs in the curated glossary table. Use a `## DISAMBIGUATION RULES` section only for guidance the table cannot carry, including preserve-only rules for product names, protocol names, provider names, file literals, skill IDs, and broad orthography/grammar rules.
 
-Generated glossary files should stay compact and focus on terms that are easy to mistranslate or must stay consistent across batches, such as:
-- UI structure: Panel, Pane, Sidebar, Tab, Buffer, Workspace
-- Editor concepts: Completion, Suggestion, Reference, Definition, Declaration, Implementation, Type Definition
-- Git concepts: Stage, Unstage, Hunk, Patch, Rebase, Checkout, Fetch, Push, Worktree, Pull Request
-- AI/collaboration concepts: Thread, Session, Message, Chat, Tool Call, Function Call, Provider
+The glossary covers terms that are easy to mistranslate or must stay consistent across batches:
+- UI structure: Panel, Pane, Workspace
+- Editor concepts: Completion, Suggestion, Reference, Definition
+- Git concepts: Stage, Unstage, Hunk, Patch, Rebase, Fetch, Push, Worktree, Pull Request
+- AI/collaboration concepts: Thread, Session, Message, Chat, Tool Call, Provider
 
-Do not force a generated glossary term when the source context or a disambiguation rule clearly requires a different translation.
+Do not force a glossary term when the source context or a disambiguation rule clearly requires a different translation.
+
+## DISAMBIGUATION RULES
+
+The glossary table handles the term choices; only rules it cannot carry remain here.
+
+- **Preserve product/protocol names**: Keep product names, provider names, protocol names, skill IDs, folder names, and filename literals unchanged unless source context explicitly asks to localize them. Preserve `SKILL.md`, `Agent Client Protocol`, `Agent Server`, `Claude Agent`, `OpenAI`, `Anthropic`, `GitHub Copilot`, and `OpenRouter` byte-for-byte.
 
 ## INPUT FORMAT
 
@@ -115,6 +121,6 @@ When `vscode_references` are present, use them to understand established develop
 2. Every key matches its `source` exactly.
 3. Every placeholder, backtick span, URL, path, and product name is preserved unchanged.
 4. Translations match the UI role implied by `kind` and `code_context`.
-5. Appended glossary terms and disambiguation rules are applied consistently, with source context taking priority.
+5. Appended glossary table rows and disambiguation rules are applied consistently, with source context taking priority.
 6. VS Code references were considered as hints only, not mandatory replacements.
 7. When in doubt, the value is `null`, not a guess.

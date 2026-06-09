@@ -16,7 +16,6 @@ If `uv` cannot launch on Windows, fall back to `.\.venv\Scripts\python.exe -m to
 | `merge-translation --language <lang>` | Merge agent result JSONs into `translations/<lang>.json` |
 | `validate --language <lang>` | Validate translations against manifest; on success cleans the workspace unless `--no-cleanup` is passed |
 | `apply --language <lang>` | Patch translated strings into the Zed checkout |
-| `generate-vscode-glossary --language <lang>` | Generate VS Code terminology references to `reports/vscode-glossary/` and `prompts/translation/glossary/` |
 
 Key flags for `prepare-translation`: `--zed-root`, `--batch-size` (default 40), `--context-lines` (default 12), `--missing-only` (explicit default), `--all` (include already-translated strings), `--output-dir`, `--prompt`, `--vscode-loc-root`, `--vscode-source-root`, `--vscode-reference-count` (default 3).
 Key flags for `extract-context-groups`: `--language`, `--zed-root`, `--group-type` (`all`, `settings`, `connected`, `prompt`, `prompt-components`; default `all`), `--output-dir`.
@@ -24,7 +23,6 @@ Key flags for `validate`: `--no-cleanup` (preserve `reports/translation/<lang>` 
 
 Key flags for `merge-translation`: `--results-dir` (agent JSON results), `--output` (write to a custom path instead of `translations/<lang>.json`).
 
-Key flags for `generate-vscode-glossary`: `--vscode-loc-root`, `--vscode-source-root`, `--prompt`, `--output`, `--prompt-glossary-output-dir`; `--language all` processes every non-pseudo VS Code locale.
 
 ## Pipeline Sequence
 
@@ -53,7 +51,7 @@ fetch-zed
 ## Translation Workflow
 
 - Language-specific style guides live in `prompts/translation/<language>.md`; fallback is `prompts/translation/TEMPLATE.md`.
-- Auto-generated VS Code glossaries are in `prompts/translation/glossary/`.
+- Curated terminology glossaries are in `prompts/translation/glossary/` (`English | Context | Translation` tables; field-verified, not auto-generated).
 - `prepare-translation` writes batch prompts to `reports/translation/<language>/` (default) or a custom `--output-dir`.
 - `prepare-translation` keeps grouped setting title/description entries, adjacent connected-line entries, and prompt-component entries in the same batch where possible. Batch entries may include a `context_group` object with sibling strings and existing translations for review context; sub-agents still output only the exact source keys assigned in `entries`.
 - Use `extract-context-groups --language <language>` when you need review-only reports that pair setting titles with descriptions, show connected multi-line strings, or group composed prompt/message box pieces without running a translation batch.

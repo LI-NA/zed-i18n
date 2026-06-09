@@ -1,64 +1,90 @@
-# Glossary for ko
+# Glossary for ko (curated)
 
-Generated from VS Code language-pack exact, context-stable matches. Use as translation-memory hints; language-specific prompts and source context override these entries.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
 
-| English | Translation |
-|---------|-------------|
-| Settings | 설정 |
-| Workspace | 작업 영역 |
-| Window | 창 |
-| Panel | 패널 |
-| Editor | 편집기 |
-| File | 파일 |
-| Folder | 폴더 |
-| Path | 경로 |
-| Command Palette | 명령 팔레트 |
-| Keybinding | 키 바인딩 |
-| Selection | 선택 영역 |
-| Cursor | 커서 |
-| Filter | 필터 |
-| Language Server | 언어 서버 |
-| Status Bar | 상태 표시줄 |
-| Title Bar | 제목 표시줄 |
-| Breadcrumbs | 이동 경로 |
-| Outline | 개요 |
-| Snippet | 코드 조각 |
-| Symbol | 기호 |
-| Preview | 미리 보기 |
-| Reference | 참조 |
-| Branch | 분기 |
-| Commit | 커밋 |
-| Stash | 스태시 |
-| Patch | 패치 |
-| Rebase | 기준 주소 다시 지정 |
-| Checkout | 체크 아웃 |
-| Fetch | 페치 |
-| Push | 푸시 |
-| Tag | 태그 |
-| Worktree | 작업 트리 |
-| Remote | 원격 |
-| Pull Request | 끌어오기 요청 |
-| Merge Conflict | 충돌 병합 |
-| Session | 세션 |
-| Message | 메시지 |
-| Chat | 채팅 |
-| Problem | 문제 |
-| Issue | 문제 |
-| Context | 컨텍스트 |
-| Prompt | 프롬프트 |
-| Model | 모델 |
-| Server | 서버 |
-| Tool | 도구 |
-| Tool Call | 도구 호출 |
-| Profile | 프로필 |
-| Repository | 저장소 |
-| Sign In | 로그인 |
-| Sign Out | 로그아웃 |
-| Account | 계정 |
-| Authentication | 인증 |
-| Variable | 변수 |
-| Debug | 디버그 |
-| Breakpoint | 중단점 |
-| Terminal | 터미널 |
-| Inline | 인라인 |
-| Subagent | 하위 에이전트 |
+For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Korean developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+
+| English | Context | Translation |
+|---------|---------|-------------|
+| Account | | 계정 |
+| Action | Zed/GPUI / code action | 액션 |
+| Action | generic operation / task | 작업 |
+| Agent | AI agent feature | 에이전트 |
+| Authentication | | 인증 |
+| Branch | | 브랜치 |
+| Breadcrumbs | | 브레드크럼 |
+| Breakpoint | | 중단점 |
+| Buffer | editor buffer | 버퍼 |
+| Call | voice / collaboration | 통화 |
+| Call | tool / function / API | 호출 |
+| Chat | | 채팅 |
+| Command Palette | | 명령 팔레트 |
+| Commit | | 커밋 |
+| Completion | editor autocomplete | 자동 완성 |
+| Completion Tokens | LLM token budget (max_completion_tokens) | 생성 토큰 |
+| Context | | 컨텍스트 |
+| Cursor | | 커서 |
+| Debug | | 디버그 |
+| Definition | code navigation | 정의 |
+| Diagnostics | | 진단 |
+| Diff | | Diff |
+| Editor | | 편집기 |
+| Extension | software / plugin | 확장 프로그램 |
+| Extension | file name suffix | 확장자 |
+| Fetch | Git remote operation | 페치 |
+| Fetch | data / network / completion retrieval | 가져오기 |
+| File | | 파일 |
+| Filter | | 필터 |
+| Folder | | 폴더 |
+| Hunk | diff hunk | 헝크 |
+| Inline | | 인라인 |
+| Issue | GitHub / project tracker | 이슈 |
+| Issue | diagnostics / generic | 문제 |
+| Keybinding | | 키 바인딩 |
+| Language Server | | 언어 서버 |
+| Merge Conflict | | 병합 충돌 |
+| Message | | 메시지 |
+| Model | | 모델 |
+| Outline | | 아웃라인 |
+| Pane | split editor pane | 분할 영역 |
+| Panel | named Zed panel | 패널 |
+| Patch | | 패치 |
+| Path | | 경로 |
+| Preview | | 미리 보기 |
+| Problem | diagnostics / generic | 문제 |
+| Profile | | 프로필 |
+| Prompt | | 프롬프트 |
+| Provider | AI / model provider | 프로바이더 |
+| Pull | Git remote operation | 풀 |
+| Pull Request | | 풀 리퀘스트 |
+| Push | Git remote operation | 푸시 |
+| Rebase | | 리베이스 |
+| Reference | code navigation | 참조 |
+| Remote | | 원격 |
+| Repository | | 저장소 |
+| Selection | | 선택 영역 |
+| Server | | 서버 |
+| Session | | 세션 |
+| Settings | | 설정 |
+| Sign In | | 로그인 |
+| Sign Out | | 로그아웃 |
+| Skill | Agent Skills feature | 스킬 |
+| Snippet | | 스니펫 |
+| Stage | Git index | 스테이징 |
+| Stash | | 스태시 |
+| Status Bar | | 상태 표시줄 |
+| Subagent | | 하위 에이전트 |
+| Suggestion | inline / AI suggestion | 제안 |
+| Symbol | | 심볼 |
+| Tag | | 태그 |
+| Terminal | | 터미널 |
+| Thread | | 스레드 |
+| Title Bar | | 제목 표시줄 |
+| Tool | | 도구 |
+| Tool Call | | 도구 호출 |
+| Unstage | Git index | 스테이징 해제 |
+| Variable | | 변수 |
+| View | UI view / display mode | 보기 |
+| Window | | 창 |
+| Workspace | | 작업 영역 |
+| Worktree | | 워크트리 |
