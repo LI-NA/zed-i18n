@@ -60,6 +60,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | 引用 |
 | Remote | | 远程 |
 | Repository | | 仓库 |
+| Sandbox | | 沙盒 |
 | Selection | | 选择 |
 | Server | | 服务器 |
 | Session | | 会话 |

@@ -64,6 +64,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | 参照 |
 | Remote | | リモート |
 | Repository | | リポジトリ |
+| Sandbox | | サンドボックス |
 | Selection | | 選択 |
 | Server | | サーバー |
 | Session | | セッション |

@@ -61,6 +61,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | 參考 |
 | Remote | | 遠端 |
 | Repository | | 儲存庫 |
+| Sandbox | | 沙箱 |
 | Selection | | 選取項目 |
 | Server | | 伺服器 |
 | Session | | 工作階段 |

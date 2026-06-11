@@ -60,6 +60,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | Riferimento |
 | Remote | | Remoto |
 | Repository | | Repository |
+| Sandbox | | sandbox |
 | Selection | | Selezione |
 | Server | | Server |
 | Session | | Sessione |

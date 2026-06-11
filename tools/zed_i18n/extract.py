@@ -38,6 +38,9 @@ class LinePattern:
     rust_literal: bool = True
 
 
+RUST_STRING_LITERAL_PATTERN = re.compile(r'"(?:\\.|[^"\\])*"')
+
+
 CALL_RULES: dict[str, tuple[int, str, str]] = {
     "MenuItem::action": (0, "menu_item", "MenuItem::action"),
     "Menu::new": (0, "menu", "Menu::new"),
@@ -104,6 +107,7 @@ STRUCT_FIELD_RULES: dict[tuple[str, str], tuple[str, str]] = {
         "fast_mode_confirmation_message",
         "FastModeConfirmation.message",
     ),
+    ("SkillLoadError", "message"): ("skill_load_error", "SkillLoadError.message"),
 }
 
 UI_RETURN_METHODS: dict[str, tuple[str, str]] = {
@@ -137,7 +141,83 @@ TIME_FORMAT_SOURCES = {
     "{} months ago",
     "1 year ago",
     "{years} years ago",
+    "year",
+    "years",
+    "month",
+    "months",
+    "{years} {year_unit} ago",
+    "{years} {year_unit}, {months} {month_unit} ago",
 }
+
+SANDBOX_APPROVAL_TITLE_SOURCES = {
+    "Allow this command to run outside the sandbox?",
+    "network access",
+    "unrestricted filesystem writes",
+    "write access to {}",
+    "Allow this command extra permissions?",
+    "Allow {only}?",
+    "Allow {first} and {second}?",
+    "Allow {}?",
+}
+
+SANDBOX_WRITE_PATH_SUMMARY_SOURCES = {
+    "0 paths",
+    "{} paths",
+}
+
+GIT_GRAPH_TIMESTAMP_FALLBACK_SOURCES = {
+    "Unknown",
+}
+
+TERMINAL_TOOL_DENIAL_OUTPUT_SOURCES = {
+    "Command cancelled: user denied permission to run outside the sandbox ({error}).",
+    "Command cancelled: user denied the requested sandbox permissions ({error}).",
+}
+
+AGENT_THREAD_TOOL_ERROR_SOURCES = {
+    "Resuming subagent sessions is not supported",
+    "Creating sibling threads is not supported in this environment",
+    "Listing available agents is not supported in this environment",
+    "Permission to run tool denied by user",
+}
+
+AGENT_SKILL_SHARE_LINK_ERROR_SOURCES = {
+    "skill share link is not a valid URL",
+    "not a skill share link",
+    "skill share link is missing the `data` parameter",
+    "skill share link `data` is not valid base64",
+    "shared skill exceeds the maximum size of {MAX_SKILL_FILE_SIZE} bytes",
+    "skill share link `data` is not valid UTF-8",
+}
+
+AGENT_PANEL_TOOL_ERROR_SOURCES = {
+    "Unknown agent id {id:?}. Call `list_agents_and_models` to see the agents available for `create_thread`.",
+    "Source workspace is no longer available",
+    "failed to create worktree workspace",
+    "new workspace did not register an agent panel",
+    "Agent panel is no longer available",
+}
+
+AGENT_PANEL_TOOL_WARNING_SOURCES = {
+    "The project contained multiple worktrees backed by the same git repository, so they were consolidated into a single new worktree. The new thread's worktree is based on one of them and may not reflect the exact state of the others.",
+}
+
+GIT_NOTIFY_ERROR_SOURCES = {
+    "No active repository",
+    "Could not determine default branch",
+    "failed to stage file",
+    "failed to unstage file",
+}
+
+GIT_GRAPH_CHANGED_FILES_COUNT_SOURCES = {
+    "{} Changed {}",
+}
+
+GIT_GRAPH_CHANGED_FILES_COUNT_FRAGMENT_SOURCES = {
+    "File",
+    "Files",
+}
+
 
 def should_skip_path(relative_path: str) -> bool:
     normalized = Path(relative_path).as_posix()
@@ -164,6 +244,7 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
         return []
 
     occurrences: list[StringOccurrence] = []
+    occurrences.extend(_extract_allowed_literal_occurrences(source_bytes, relative_path))
     for node in _walk(tree.root_node):
         if node.type != "call_expression":
             continue
@@ -217,6 +298,9 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
     occurrences.extend(_extract_action_doc_comments(source, relative_path))
     occurrences.extend(_extract_line_candidates(source, relative_path))
     occurrences.extend(_extract_agent_dirty_buffer_prompt_occurrences(source_bytes, relative_path))
+    occurrences.extend(_extract_agent_permission_option_occurrences(source, relative_path))
+    occurrences.extend(_extract_exact_line_literal_occurrences(source, relative_path))
+    occurrences.extend(_extract_text_for_keystroke_occurrences(source, relative_path))
     occurrences.extend(_extract_prompt_error_detail_occurrences(source_bytes, relative_path))
     occurrences.extend(_extract_settings_enum_variant_labels(source, relative_path))
     return _dedupe_occurrences(occurrences)
@@ -265,6 +349,8 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
         return ((0, "context_menu_header", "header"),)
     if canonical.endswith(".button_label") or canonical == "button_label":
         return ((0, "button_label", "button_label"),)
+    if canonical.endswith(".tooltip") or canonical == "tooltip":
+        return ((0, "tooltip", "tooltip"),)
     if canonical.endswith(".with_link_button") or canonical == "with_link_button":
         return ((0, "link_button", "with_link_button"),)
     if canonical.endswith(".primary_message") or canonical == "primary_message":
@@ -371,10 +457,7 @@ def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int
     if _is_announcement_path(relative_path) and _is_bullet_items_push_call(canonical):
         return ((0, "announcement_bullet", "announcement_bullet"),)
     if _is_skills_illustration_path(relative_path) and canonical == "skill_crease":
-        return (
-            (0, "skill_illustration_name", "skill_crease.name"),
-            (1, "skill_illustration_source", "skill_crease.source"),
-        )
+        return ((1, "skill_illustration_source", "skill_crease.source"),)
     if _is_agent_conversation_view_path(relative_path) and _is_method_call(
         canonical, "notify_with_sound"
     ):
@@ -384,6 +467,19 @@ def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int
             (0, "settings_warning_banner", "settings_warning_banner"),
             (1, "settings_warning_detail", "settings_warning_banner"),
         )
+    if _is_agent_permission_options_path(relative_path) and canonical.endswith(
+        "PermissionOption::new"
+    ):
+        return ((1, "permission_option", "PermissionOption::new"),)
+    if _is_agent_config_options_path(relative_path) and canonical == "action_tooltip_container":
+        return ((0, "tooltip", "action_tooltip_container"),)
+    if (
+        _is_agent_ui_root_path(relative_path)
+        and canonical == "show_rules_to_skills_migration_toast"
+    ):
+        return ((1, "toast", "show_rules_to_skills_migration_toast"),)
+    if _is_git_graph_path(relative_path) and canonical.endswith(".header"):
+        return ((0, "context_menu_header", "header"),)
     if _is_zed_root_path(relative_path) and canonical == "open_bundled_file":
         return ((2, "bundled_file_title", "open_bundled_file"),)
     if _is_add_llm_provider_modal_path(relative_path) and canonical == "single_line_input":
@@ -487,6 +583,19 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
             rule = ("agent_tool_output", "UpdateTitleTool.run")
         elif method_name == "normalize_title":
             rule = ("agent_tool_error", "UpdateTitleTool.normalize_title")
+    if rule is None and _is_terminal_tool_path(relative_path):
+        if method_name == "sandbox_approval_title":
+            rule = ("sandbox_permission_title", "sandbox_approval_title")
+        elif method_name == "write_path_summary":
+            rule = ("sandbox_permission_path_summary", "write_path_summary")
+    if rule is None and _is_git_graph_path(relative_path) and method_name == "format_timestamp":
+        rule = ("git_timestamp_fallback", "git_graph.format_timestamp")
+    if (
+        rule is None
+        and _is_agent_draft_prompt_store_path(relative_path)
+        and method_name == "empty_draft_placeholder_label"
+    ):
+        rule = ("agent_thread_title", "empty_draft_placeholder_label")
     if rule is None and _is_git_panel_path(relative_path):
         if method_name == "title":
             rule = ("git_section_title", "GitHeaderEntry.title")
@@ -527,10 +636,13 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
         "format_absolute_date_medium",
         "format_relative_time",
         "format_relative_date",
+        "format_compound_year_month",
         "format_timestamp_naive_date",
         "format_timestamp_naive",
     }:
         rule = ("relative_time", "time_format")
+    if rule is None and _is_workspace_welcome_path(relative_path) and method_name == "project_name":
+        rule = ("project_name_fallback", "project_name")
     if rule is None:
         return []
 
@@ -569,6 +681,14 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
 def _return_method_source_allowed(call_name: str, source: str) -> bool:
     if call_name == "time_format":
         return source in TIME_FORMAT_SOURCES
+    if call_name == "project_name":
+        return source == "Untitled"
+    if call_name == "sandbox_approval_title":
+        return source in SANDBOX_APPROVAL_TITLE_SOURCES
+    if call_name == "write_path_summary":
+        return source in SANDBOX_WRITE_PATH_SUMMARY_SOURCES
+    if call_name == "git_graph.format_timestamp":
+        return source in GIT_GRAPH_TIMESTAMP_FALLBACK_SOURCES
     return True
 
 
@@ -934,6 +1054,333 @@ def _extract_agent_dirty_buffer_prompt_occurrences(
                 end_byte=node.end_byte,
             )
         )
+    return occurrences
+
+
+def _extract_agent_permission_option_occurrences(
+    source: str,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    if not _is_agent_permission_options_path(relative_path):
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    byte_offset = 0
+    pending_literals: list[tuple[str, int, int, int]] | None = None
+    pending_depth = 0
+    pending_kind_line: int | None = None
+    for line_index, line in enumerate(source.splitlines(keepends=True), start=1):
+        search_start = 0
+        while pending_literals is None:
+            start = line.find("PermissionOption::new(", search_start)
+            if start == -1:
+                break
+            pending_literals = []
+            pending_depth = _paren_delta(line[start:])
+            pending_kind_line = line_index if "PermissionOptionKind::" in line[start:] else None
+            _append_permission_option_line_literals(
+                pending_literals,
+                line,
+                byte_offset,
+                line_index,
+                start,
+            )
+            search_start = start + len("PermissionOption::new(")
+            if pending_depth <= 0:
+                _append_permission_option_occurrence(
+                    occurrences,
+                    pending_literals,
+                    pending_kind_line,
+                    relative_path,
+                )
+                pending_literals = None
+                pending_kind_line = None
+
+        if pending_literals is not None and "PermissionOption::new(" not in line:
+            if "PermissionOptionKind::" in line:
+                pending_kind_line = line_index
+            _append_permission_option_line_literals(
+                pending_literals,
+                line,
+                byte_offset,
+                line_index,
+                0,
+            )
+            pending_depth += _paren_delta(line)
+            if pending_depth <= 0:
+                _append_permission_option_occurrence(
+                    occurrences,
+                    pending_literals,
+                    pending_kind_line,
+                    relative_path,
+                )
+                pending_literals = None
+                pending_kind_line = None
+
+        byte_offset += len(line.encode("utf-8"))
+    return occurrences
+
+
+def _append_permission_option_line_literals(
+    literals: list[tuple[str, int, int, int]],
+    line: str,
+    byte_offset: int,
+    line_index: int,
+    start_column: int,
+) -> None:
+    for match in RUST_STRING_LITERAL_PATTERN.finditer(line, start_column):
+        literals.append(
+            (
+                match.group(0),
+                line_index,
+                byte_offset + len(line[: match.start()].encode("utf-8")),
+                byte_offset + len(line[: match.end()].encode("utf-8")),
+            )
+        )
+
+
+def _append_permission_option_occurrence(
+    occurrences: list[StringOccurrence],
+    literals: list[tuple[str, int, int, int]],
+    kind_line: int | None,
+    relative_path: str,
+) -> None:
+    if not literals:
+        return
+    candidate_literals = literals
+    if kind_line is not None:
+        before_kind = [literal for literal in literals if literal[1] < kind_line]
+        if before_kind:
+            label_line = max(literal[1] for literal in before_kind)
+            candidate_literals = [literal for literal in before_kind if literal[1] == label_line]
+    elif len(literals) >= 2:
+        candidate_literals = [literals[1]]
+
+    raw, line_index, start_byte, end_byte = candidate_literals[0]
+    occurrences.append(
+        StringOccurrence(
+            source=parse_rust_string_literal(raw),
+            file=relative_path,
+            line=line_index,
+            call="PermissionOption::new",
+            kind="permission_option",
+            start_byte=start_byte,
+            end_byte=end_byte,
+        )
+    )
+
+
+def _extract_exact_line_literal_occurrences(
+    source: str,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    rules: list[tuple[re.Pattern[str], str, str, set[str]]] = []
+    if _is_agent_conversation_view_path(relative_path):
+        rules.append(
+            (
+                re.compile(r'("(?:\\.|[^"\\])*")\.into\(\)'),
+                "loading_label",
+                "loading_fallback",
+                {"Loading…"},
+            )
+        )
+    if _is_git_graph_path(relative_path):
+        rules.append(
+            (
+                re.compile(r'("(?:\\.|[^"\\])*")\.into\(\)'),
+                "loading_label",
+                "git_graph_loading_fallback",
+                {"Loading…"},
+            )
+        )
+    if _is_editor_header_path(relative_path):
+        rules.append(
+            (
+                re.compile(r'("(?:\\.|[^"\\])*")\.into\(\)'),
+                "path_fallback_label",
+                "editor_header_fallback",
+                {"untitled"},
+            )
+        )
+    if not rules:
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    byte_offset = 0
+    for line_index, line in enumerate(source.splitlines(keepends=True), start=1):
+        for pattern, kind, call, allowed_sources in rules:
+            for match in pattern.finditer(line):
+                raw = match.group(1)
+                parsed = parse_rust_string_literal(raw)
+                if parsed not in allowed_sources:
+                    continue
+                occurrences.append(
+                    StringOccurrence(
+                        source=parsed,
+                        file=relative_path,
+                        line=line_index,
+                        call=call,
+                        kind=kind,
+                        start_byte=byte_offset
+                        + len(line[: match.start(1)].encode("utf-8")),
+                        end_byte=byte_offset + len(line[: match.end(1)].encode("utf-8")),
+                    )
+                )
+        byte_offset += len(line.encode("utf-8"))
+    return occurrences
+
+
+def _extract_allowed_literal_occurrences(
+    source_bytes: bytes,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    rules = _allowed_literal_rules_for_path(relative_path)
+    if not rules:
+        return []
+
+    parser = _rust_parser()
+    tree = parser.parse(source_bytes)
+    if tree is None:
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    for node in _walk(tree.root_node):
+        if node.type != "string_literal":
+            continue
+
+        literal = _node_text(source_bytes, node)
+        source = parse_rust_string_literal(_collapse_rust_string_line_continuations(literal))
+        for allowed_sources, kind, call in rules:
+            if source not in allowed_sources:
+                continue
+            occurrences.append(
+                StringOccurrence(
+                    source=source,
+                    file=relative_path,
+                    line=node.start_point[0] + 1,
+                    call=call,
+                    kind=kind,
+                    start_byte=node.start_byte,
+                    end_byte=node.end_byte,
+                )
+            )
+            break
+    return occurrences
+
+
+def _allowed_literal_rules_for_path(
+    relative_path: str,
+) -> list[tuple[set[str], str, str]]:
+    rules: list[tuple[set[str], str, str]] = []
+    if _is_terminal_tool_path(relative_path):
+        rules.append(
+            (
+                TERMINAL_TOOL_DENIAL_OUTPUT_SOURCES,
+                "agent_tool_output",
+                "terminal_tool.permission_denied_output",
+            )
+        )
+    if _is_agent_thread_path(relative_path):
+        rules.append(
+            (
+                AGENT_THREAD_TOOL_ERROR_SOURCES,
+                "agent_tool_error",
+                "AgentThread.tool_error",
+            )
+        )
+    if _is_agent_skills_path(relative_path):
+        rules.append(
+            (
+                AGENT_SKILL_SHARE_LINK_ERROR_SOURCES,
+                "skill_share_link_error",
+                "decode_skill_share_link",
+            )
+        )
+    if _is_agent_panel_path(relative_path):
+        rules.append(
+            (
+                AGENT_PANEL_TOOL_ERROR_SOURCES,
+                "agent_tool_error",
+                "AgentPanel.agent_tool_error",
+            )
+        )
+        rules.append(
+            (
+                AGENT_PANEL_TOOL_WARNING_SOURCES,
+                "agent_tool_warning",
+                "AgentPanel.agent_tool_warning",
+            )
+        )
+    if _is_git_user_error_path(relative_path):
+        rules.append((GIT_NOTIFY_ERROR_SOURCES, "notification_error", "git_user_error"))
+    if _is_git_graph_path(relative_path):
+        rules.append(
+            (
+                GIT_GRAPH_CHANGED_FILES_COUNT_SOURCES,
+                "git_changed_files_count",
+                "git_graph.changed_files_count",
+            )
+        )
+        rules.append(
+            (
+                GIT_GRAPH_CHANGED_FILES_COUNT_FRAGMENT_SOURCES,
+                "git_changed_files_count_fragment",
+                "git_graph.changed_files_count",
+            )
+        )
+    return rules
+
+
+def _extract_text_for_keystroke_occurrences(
+    source: str,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    if not _is_editor_header_path(relative_path):
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    byte_offset = 0
+    pending_literals: list[tuple[str, int, int, int]] | None = None
+    pending_depth = 0
+    for line_index, line in enumerate(source.splitlines(keepends=True), start=1):
+        if pending_literals is None:
+            start = line.find("text_for_keystroke(")
+            if start == -1:
+                byte_offset += len(line.encode("utf-8"))
+                continue
+            pending_literals = []
+            pending_depth = _paren_delta(line[start:])
+            start_column = start
+        else:
+            start_column = 0
+
+        for match in RUST_STRING_LITERAL_PATTERN.finditer(line, start_column):
+            pending_literals.append(
+                (
+                    match.group(0),
+                    line_index,
+                    byte_offset + len(line[: match.start()].encode("utf-8")),
+                    byte_offset + len(line[: match.end()].encode("utf-8")),
+                )
+            )
+        if start_column == 0:
+            pending_depth += _paren_delta(line)
+        if pending_literals is not None and pending_depth <= 0:
+            if pending_literals:
+                raw, literal_line, start_byte, end_byte = pending_literals[0]
+                occurrences.append(
+                    StringOccurrence(
+                        source=parse_rust_string_literal(raw),
+                        file=relative_path,
+                        line=literal_line,
+                        call="text_for_keystroke",
+                        kind="keystroke_label",
+                        start_byte=start_byte,
+                        end_byte=end_byte,
+                    )
+                )
+            pending_literals = None
+        byte_offset += len(line.encode("utf-8"))
     return occurrences
 
 
@@ -1373,6 +1820,8 @@ def _line_patterns_for_path(
         patterns.extend(COPILOT_SIGN_IN_LINE_PATTERNS)
     if _is_workspace_welcome_path(relative_path):
         patterns.extend(WORKSPACE_WELCOME_LINE_PATTERNS)
+    if _is_outline_panel_path(relative_path):
+        patterns.extend(OUTLINE_PANEL_LINE_PATTERNS)
     if _is_app_menus_path(relative_path):
         patterns.extend(APP_MENU_LINE_PATTERNS)
     if _is_git_panel_path(relative_path):
@@ -1409,6 +1858,8 @@ def _line_patterns_for_path(
         patterns.extend(AGENT_ENTRY_VIEW_STATE_LINE_PATTERNS)
     if _is_agent_thread_view_path(relative_path):
         patterns.extend(AGENT_THREAD_VIEW_LINE_PATTERNS)
+    if _is_agent_skill_load_error_path(relative_path):
+        patterns.extend(AGENT_SKILL_LOAD_ERROR_LINE_PATTERNS)
     if _is_debugger_dap_log_path(relative_path):
         patterns.extend(DEBUGGER_DAP_LOG_LINE_PATTERNS)
     if _is_debugger_new_process_modal_path(relative_path):
@@ -1472,6 +1923,18 @@ def _is_agent_conversation_view_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/conversation_view.rs"
 
 
+def _is_agent_panel_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/agent_panel.rs"
+
+
+def _is_agent_config_options_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/config_options.rs"
+
+
+def _is_agent_ui_root_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/agent_ui.rs"
+
+
 def _is_agent_thread_view_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/conversation_view/thread_view.rs"
 
@@ -1486,6 +1949,10 @@ def _is_zed_root_path(relative_path: str) -> bool:
 
 def _is_editor_code_context_menus_path(relative_path: str) -> bool:
     return relative_path == "crates/editor/src/code_context_menus.rs"
+
+
+def _is_editor_header_path(relative_path: str) -> bool:
+    return relative_path == "crates/editor/src/element/header.rs"
 
 
 def _is_time_format_path(relative_path: str) -> bool:
@@ -1506,6 +1973,10 @@ def _is_copilot_sign_in_path(relative_path: str) -> bool:
 
 def _is_workspace_welcome_path(relative_path: str) -> bool:
     return relative_path == "crates/workspace/src/welcome.rs"
+
+
+def _is_outline_panel_path(relative_path: str) -> bool:
+    return relative_path == "crates/outline_panel/src/outline_panel.rs"
 
 
 def _is_app_menus_path(relative_path: str) -> bool:
@@ -1536,8 +2007,38 @@ def _is_agent_tool_path(relative_path: str) -> bool:
     return relative_path.startswith("crates/agent/src/tools/")
 
 
+def _is_agent_permission_options_path(relative_path: str) -> bool:
+    return relative_path in {
+        "crates/agent/src/thread.rs",
+        "crates/agent/src/tools/tool_permissions.rs",
+    }
+
+
+def _is_agent_thread_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent/src/thread.rs"
+
+
 def _is_agent_tool_permissions_path(relative_path: str) -> bool:
     return relative_path == "crates/agent/src/tools/tool_permissions.rs"
+
+
+def _is_terminal_tool_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent/src/tools/terminal_tool.rs"
+
+
+def _is_agent_draft_prompt_store_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/draft_prompt_store.rs"
+
+
+def _is_agent_skill_load_error_path(relative_path: str) -> bool:
+    return relative_path in {
+        "crates/agent/src/agent.rs",
+        "crates/agent_skills/agent_skills.rs",
+    }
+
+
+def _is_agent_skills_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_skills/agent_skills.rs"
 
 
 def _is_update_title_tool_path(relative_path: str) -> bool:
@@ -1554,6 +2055,20 @@ def _is_debugger_new_process_modal_path(relative_path: str) -> bool:
 
 def _is_git_panel_path(relative_path: str) -> bool:
     return relative_path == "crates/git_ui/src/git_panel.rs"
+
+
+def _is_git_graph_path(relative_path: str) -> bool:
+    return relative_path == "crates/git_ui/src/git_graph.rs"
+
+
+def _is_git_user_error_path(relative_path: str) -> bool:
+    return relative_path in {
+        "crates/agent_ui/src/message_editor.rs",
+        "crates/git_ui/src/branch_picker.rs",
+        "crates/git_ui/src/git_panel.rs",
+        "crates/git_ui/src/project_diff.rs",
+        "crates/git_ui/src/solo_diff_view.rs",
+    }
 
 
 def _is_git_blame_or_commit_tooltip_path(relative_path: str) -> bool:
@@ -2093,6 +2608,16 @@ WORKSPACE_WELCOME_LINE_PATTERNS: tuple[LinePattern, ...] = (
 )
 
 
+OUTLINE_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\bNone\s*=>\s*\(None,\s*("(?:\\.|[^"\\])*")\.to_string\(\)'),
+        "outline_external_file_name",
+        "outline_external_file_label",
+        1,
+    ),
+)
+
+
 APP_MENU_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
         re.compile(r'\bname:\s*("(?:\\.|[^"\\])*")\.into\(\)'),
@@ -2524,6 +3049,16 @@ AGENT_THREAD_VIEW_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'^\s*("\{\} is not available with Zero Data Retention\.")'),
         "thread_error_message",
         "thread_error_message",
+        1,
+    ),
+)
+
+
+AGENT_SKILL_LOAD_ERROR_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\bmessage:\s*format!\(\s*("(?:\\.|[^"\\])*")'),
+        "SkillLoadError.message",
+        "skill_load_error",
         1,
     ),
 )

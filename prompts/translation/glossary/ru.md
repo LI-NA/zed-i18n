@@ -61,6 +61,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | Ссылка |
 | Remote | | Удалённый репозиторий |
 | Repository | | Репозиторий |
+| Sandbox | | песочница |
 | Selection | | Выделение |
 | Server | | Сервер |
 | Session | | Сеанс |

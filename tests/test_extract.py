@@ -548,6 +548,527 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(set(by_source), {"Select a Model", "Current Call", "Offline"})
         self.assertEqual(by_source["Select a Model"].kind, "shared_string")
 
+    def test_extracts_agent_permission_option_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn build_permission_options(tool_name: &str, display_name: &str) {",
+                "    vec![",
+                "        acp::PermissionOption::new(",
+                '            acp::PermissionOptionId::new("allow"),',
+                '            "Only this time",',
+                "            acp::PermissionOptionKind::AllowOnce,",
+                "        ),",
+                "        acp::PermissionOption::new(",
+                '            acp::PermissionOptionId::new(format!("always_allow:{tool_name}")),',
+                '            format!("Always for {}", tool_name.replace(\'_\', " ")),',
+                "            acp::PermissionOptionKind::AllowAlways,",
+                "        ),",
+                "        acp::PermissionOption::new(",
+                '            acp::PermissionOptionId::new(format!("always_allow_mcp:{tool_name}")),',
+                '            format!("Always for {display_name} MCP tool"),',
+                "            acp::PermissionOptionKind::AllowAlways,",
+                "        ),",
+                "    ];",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/thread.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Only this time",
+                "Always for {}",
+                "Always for {display_name} MCP tool",
+            },
+        )
+        self.assertEqual(by_source["Only this time"].kind, "permission_option")
+        self.assertEqual(by_source["Always for {}"].call, "PermissionOption::new")
+
+    def test_extracts_agent_sandbox_permission_strings(self) -> None:
+        source = "\n".join(
+            [
+                "fn authorize_sandbox() {",
+                "    acp::PermissionOption::new(",
+                '        acp::PermissionOptionId::new("allow"),',
+                '        "Allow once",',
+                "        acp::PermissionOptionKind::AllowOnce,",
+                "    );",
+                "    acp::PermissionOption::new(",
+                '        acp::PermissionOptionId::new("allow_thread"),',
+                '        "Allow for this thread",',
+                "        acp::PermissionOptionKind::AllowAlways,",
+                "    );",
+                "    acp::PermissionOption::new(",
+                '        acp::PermissionOptionId::new("allow_always"),',
+                '        "Allow always",',
+                "        acp::PermissionOptionKind::AllowAlways,",
+                "    );",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/thread.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {"Allow once", "Allow for this thread", "Allow always"},
+        )
+        self.assertEqual(by_source["Allow always"].kind, "permission_option")
+
+    def test_extracts_terminal_sandbox_approval_title_fragments(self) -> None:
+        source = "\n".join(
+            [
+                "fn sandbox_approval_title(request: &SandboxRequest) -> String {",
+                "    if request.unsandboxed {",
+                '        return "Allow this command to run outside the sandbox?".to_string();',
+                "    }",
+                "    let mut parts = Vec::new();",
+                "    if request.network {",
+                '        parts.push("network access".to_string());',
+                "    }",
+                "    if request.allow_fs_write_all {",
+                '        parts.push("unrestricted filesystem writes".to_string());',
+                "    } else if !request.write_paths.is_empty() {",
+                '        parts.push(format!("write access to {}", write_path_summary(&request.write_paths)));',
+                "    }",
+                "    match parts.as_slice() {",
+                '        [] => "Allow this command extra permissions?".to_string(),',
+                '        [only] => format!("Allow {only}?"),',
+                '        [first, second] => format!("Allow {first} and {second}?"),',
+                '        _ => format!("Allow {}?", parts.join(", ")),',
+                "    }",
+                "}",
+                "fn write_path_summary(paths: &[PathBuf]) -> String {",
+                "    match paths {",
+                '        [] => "0 paths".to_string(),',
+                '        paths => format!("{} paths", paths.len()),',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/tools/terminal_tool.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "Allow this command to run outside the sandbox?",
+                "network access",
+                "unrestricted filesystem writes",
+                "write access to {}",
+                "Allow this command extra permissions?",
+                "Allow {only}?",
+                "Allow {first} and {second}?",
+                "Allow {}?",
+                "0 paths",
+                "{} paths",
+            },
+        )
+
+    def test_extracts_empty_agent_draft_placeholder_label(self) -> None:
+        source = "\n".join(
+            [
+                "pub fn empty_draft_placeholder_label(agent_name: &str) -> SharedString {",
+                '    format!("New {} Thread", agent_name).into()',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/draft_prompt_store.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"New {} Thread"})
+        self.assertEqual(by_source["New {} Thread"].kind, "agent_thread_title")
+
+    def test_extracts_agent_config_action_tooltip_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn render() {",
+                "    content = content",
+                "        .child(action_tooltip_container(",
+                '            "Cycle Favorite Models",',
+                "            KeyBinding::for_action(&CycleFavoriteModels, cx),",
+                "        ));",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/config_options.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Cycle Favorite Models"})
+        self.assertEqual(by_source["Cycle Favorite Models"].kind, "tooltip")
+
+    def test_extracts_rules_to_skills_migration_toast(self) -> None:
+        source = "\n".join(
+            [
+                "fn rerun_rules_to_skills_migration() {",
+                "    show_rules_to_skills_migration_toast(",
+                "        &workspace,",
+                '        "Rules-to-skills migration rerun. Please double-check AGENTS.md and Skills for missing or duplicated prompts.",',
+                "        cx,",
+                "    );",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/agent_ui.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Rules-to-skills migration rerun. Please double-check AGENTS.md and Skills for missing or duplicated prompts.",
+            },
+        )
+        self.assertEqual(
+            by_source[
+                "Rules-to-skills migration rerun. Please double-check AGENTS.md and Skills for missing or duplicated prompts."
+            ].kind,
+            "toast",
+        )
+
+    def test_extracts_agent_loading_fallbacks(self) -> None:
+        source = "\n".join(
+            [
+                "fn render() {",
+                '    let label_text = self.loading_status.clone().unwrap_or_else(|| "Loading…".into());',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/conversation_view.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Loading…"})
+        self.assertEqual(by_source["Loading…"].kind, "loading_label")
+
+    def test_extracts_skill_load_error_messages(self) -> None:
+        source = "\n".join(
+            [
+                "fn load(error: anyhow::Error) {",
+                "    SkillLoadError {",
+                "        path: path.clone(),",
+                '        message: format!("Failed to scan project skills: {}", error),',
+                "    };",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/agent.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Failed to scan project skills: {}"})
+        self.assertEqual(by_source["Failed to scan project skills: {}"].kind, "skill_load_error")
+
+    def test_extracts_git_and_editor_header_refactor_patterns(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(context_menu: ContextMenu, count: usize, text: SharedString) {",
+                '    context_menu.header(format!("Commit {sha_short}"));',
+                '    ui::DiffStat::new("changes", 1, 2).tooltip("Total tracked changes");',
+                '    let filename = filename.unwrap_or_else(|| "untitled".into());',
+                '    let subject: SharedString = "Loading…".into();',
+                "    Tooltip::with_meta_in(",
+                '        "Fold Excerpt",',
+                "        Some(&ToggleFold),",
+                '        format!("{} to toggle all", text_for_keystroke(&Modifiers::alt(), "click", cx)),',
+                "        &focus_handle,",
+                "        cx,",
+                "    );",
+                "}",
+                "fn format_timestamp(timestamp: i64) -> String {",
+                '    return "Unknown".to_string();',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/git_graph.rs",
+        ) + extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/git_panel.rs",
+        ) + extract_ui_strings_from_source(
+            source,
+            relative_path="crates/editor/src/element/header.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertTrue(
+            {
+                "Commit {sha_short}",
+                "Total tracked changes",
+                "untitled",
+                "Loading…",
+                "Unknown",
+                "click",
+            }.issubset(by_source)
+        )
+        self.assertEqual(by_source["Commit {sha_short}"].kind, "context_menu_header")
+        self.assertEqual(by_source["Total tracked changes"].kind, "tooltip")
+
+    def test_extracts_deferred_terminal_permission_denial_outputs(self) -> None:
+        source = "\n".join(
+            [
+                "async fn run(want_unsandboxed: bool) -> Result<String> {",
+                "    if let Err(error) = approve.await {",
+                "        if want_unsandboxed {",
+                "            return Ok(format!(",
+                '                "Command cancelled: user denied permission to run outside the sandbox ({error})."',
+                "            ));",
+                "        }",
+                "        return Ok(format!(",
+                '            "Command cancelled: user denied the requested sandbox permissions ({error})."',
+                "        ));",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent/src/tools/terminal_tool.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Command cancelled: user denied permission to run outside the sandbox ({error}).",
+                "Command cancelled: user denied the requested sandbox permissions ({error}).",
+            },
+        )
+        self.assertEqual(
+            by_source[
+                "Command cancelled: user denied permission to run outside the sandbox ({error})."
+            ].kind,
+            "agent_tool_output",
+        )
+
+    def test_extracts_deferred_skill_share_link_errors(self) -> None:
+        source = "\n".join(
+            [
+                "pub fn decode_skill_share_link(link: &str) -> Result<String> {",
+                '    let url = Url::parse(link).context("skill share link is not a valid URL")?;',
+                "    anyhow::ensure!(",
+                "        url.scheme() == SKILL_SHARE_LINK_SCHEME,",
+                '        "not a skill share link"',
+                "    );",
+                "    let data = url",
+                "        .query_pairs()",
+                "        .find_map(|(key, value)| (key == SKILL_SHARE_LINK_DATA_PARAM).then_some(value))",
+                '        .context("skill share link is missing the `data` parameter")?;',
+                "    let bytes = base64::engine::general_purpose::URL_SAFE_NO_PAD",
+                "        .decode(data.as_bytes())",
+                '        .context("skill share link `data` is not valid base64")?;',
+                "    anyhow::ensure!(",
+                "        bytes.len() <= MAX_SKILL_FILE_SIZE,",
+                '        "shared skill exceeds the maximum size of {MAX_SKILL_FILE_SIZE} bytes"',
+                "    );",
+                '    String::from_utf8(bytes).context("skill share link `data` is not valid UTF-8")?;',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_skills/agent_skills.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "skill share link is not a valid URL",
+                "not a skill share link",
+                "skill share link is missing the `data` parameter",
+                "skill share link `data` is not valid base64",
+                "shared skill exceeds the maximum size of {MAX_SKILL_FILE_SIZE} bytes",
+                "skill share link `data` is not valid UTF-8",
+            },
+        )
+        self.assertEqual(
+            by_source["skill share link is not a valid URL"].kind,
+            "skill_share_link_error",
+        )
+
+    def test_extracts_deferred_git_notify_errors(self) -> None:
+        source = "\n".join(
+            [
+                "fn deploy(stage: bool) -> Result<()> {",
+                '    let result: Result<()> = Err(anyhow!("No active repository"));',
+                '    let base_ref = default_branch.await??.context("Could not determine default branch")?;',
+                "    repository.stage_entries(vec![repo_path], cx).await.with_context(|| {",
+                "        if stage {",
+                '            "failed to stage file"',
+                "        } else {",
+                '            "failed to unstage file"',
+                "        }",
+                "    })?;",
+                "    Ok(())",
+                "}",
+            ]
+        )
+
+        occurrences = (
+            extract_ui_strings_from_source(
+                source,
+                relative_path="crates/git_ui/src/project_diff.rs",
+            )
+            + extract_ui_strings_from_source(
+                source,
+                relative_path="crates/git_ui/src/solo_diff_view.rs",
+            )
+            + extract_ui_strings_from_source(
+                'base_ref.ok_or_else(|| anyhow!("Could not determine default branch"))?;',
+                relative_path="crates/agent_ui/src/message_editor.rs",
+            )
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "No active repository",
+                "Could not determine default branch",
+                "failed to stage file",
+                "failed to unstage file",
+            },
+        )
+        self.assertEqual(by_source["No active repository"].kind, "notification_error")
+
+    def test_extracts_deferred_agent_thread_tool_errors_and_warnings(self) -> None:
+        panel_source = "\n".join(
+            [
+                "fn create_sibling_thread(request: Request) -> Result<Info> {",
+                "    return Err(anyhow!(",
+                '        "Unknown agent id {id:?}. Call `list_agents_and_models` \\',
+                '         to see the agents available for `create_thread`."',
+                "    ));",
+                '    let workspace = workspace.upgrade().ok_or_else(|| anyhow!("Source workspace is no longer available"))?;',
+                '    let created = creation.await.context("failed to create worktree workspace")?;',
+                "    worktree_warning = Some(",
+                '        "The project contained multiple worktrees backed by the same git \\',
+                '         repository, so they were consolidated into a single new worktree. \\',
+                '         The new thread\'s worktree is based on one of them and may not \\',
+                '         reflect the exact state of the others."',
+                "            .to_string(),",
+                "    );",
+                '    created.workspace.read_with(cx, |workspace, cx| workspace.panel::<AgentPanel>(cx)).ok_or_else(|| anyhow!("new workspace did not register an agent panel"))?;',
+                '    self.panel.upgrade().ok_or_else(|| anyhow!("Agent panel is no longer available"))?;',
+                "}",
+            ]
+        )
+        thread_source = "\n".join(
+            [
+                "impl AgentEnvironment for Env {",
+                "    fn resume_subagent(&self) -> Result<()> {",
+                '        Err(anyhow::anyhow!("Resuming subagent sessions is not supported"))',
+                "    }",
+                "    fn create_sibling_thread(&self) -> Task<Result<SiblingThreadInfo>> {",
+                '        Task::ready(Err(anyhow::anyhow!("Creating sibling threads is not supported in this environment")))',
+                "    }",
+                "    fn list_available_agents(&self) -> Result<AvailableAgents> {",
+                '        Err(anyhow::anyhow!("Listing available agents is not supported in this environment"))',
+                "    }",
+                "    fn authorize_sandbox(&self) -> Result<()> {",
+                '        Err(anyhow!("Permission to run tool denied by user"))',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            panel_source,
+            relative_path="crates/agent_ui/src/agent_panel.rs",
+        ) + extract_ui_strings_from_source(
+            thread_source,
+            relative_path="crates/agent/src/thread.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Unknown agent id {id:?}. Call `list_agents_and_models` to see the agents available for `create_thread`.",
+                "Source workspace is no longer available",
+                "failed to create worktree workspace",
+                "The project contained multiple worktrees backed by the same git repository, so they were consolidated into a single new worktree. The new thread's worktree is based on one of them and may not reflect the exact state of the others.",
+                "new workspace did not register an agent panel",
+                "Agent panel is no longer available",
+                "Resuming subagent sessions is not supported",
+                "Creating sibling threads is not supported in this environment",
+                "Listing available agents is not supported in this environment",
+                "Permission to run tool denied by user",
+            },
+        )
+        self.assertEqual(
+            by_source[
+                "The project contained multiple worktrees backed by the same git repository, so they were consolidated into a single new worktree. The new thread's worktree is based on one of them and may not reflect the exact state of the others."
+            ].kind,
+            "agent_tool_warning",
+        )
+        self.assertEqual(
+            by_source["Permission to run tool denied by user"].kind,
+            "agent_tool_error",
+        )
+
+    def test_extracts_deferred_git_graph_changed_file_count_fragments(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(changed_files_count: usize) {",
+                "    Label::new(format!(",
+                '        "{} Changed {}",',
+                "        changed_files_count,",
+                "        if changed_files_count == 1 {",
+                '            "File"',
+                "        } else {",
+                '            "Files"',
+                "        }",
+                "    ));",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/git_graph.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"{} Changed {}", "File", "Files"})
+        self.assertEqual(by_source["{} Changed {}"].kind, "git_changed_files_count")
+        self.assertEqual(by_source["File"].kind, "git_changed_files_count_fragment")
+
     def test_extracts_context_menu_actions_and_action_tooltips(self) -> None:
         source = "\n".join(
             [
@@ -2158,7 +2679,7 @@ class ExtractTests(unittest.TestCase):
             },
         )
 
-    def test_extracts_skills_illustration_badge_literals(self) -> None:
+    def test_extracts_skills_illustration_source_badge_literals(self) -> None:
         source = "\n".join(
             [
                 "fn render() {",
@@ -2188,18 +2709,11 @@ class ExtractTests(unittest.TestCase):
             set(by_source),
             {
                 "({source})",
-                "img-gen",
                 "studio",
-                "frontend-design",
                 "global",
-                "brainstorming",
-                "borrow-checker-expert",
                 "zed",
-                "grill-with-docs",
-                "video-edit",
             },
         )
-        self.assertEqual(by_source["img-gen"].kind, "skill_illustration_name")
         self.assertEqual(by_source["global"].call, "skill_crease.source")
 
     def test_extracts_settings_content_doc_comments_used_as_ui_descriptions(self) -> None:
@@ -2953,6 +3467,12 @@ class ExtractTests(unittest.TestCase):
                 '    format!("{} days ago", days);',
                 '    format!("{years} years ago");',
                 "}",
+                "fn format_compound_year_month(month_diff: usize) -> String {",
+                '    let year_unit = if years == 1 { "year" } else { "years" };',
+                '    let month_unit = if months == 1 { "month" } else { "months" };',
+                '    format!("{years} {year_unit} ago");',
+                '    format!("{years} {year_unit}, {months} {month_unit} ago");',
+                "}",
                 "#[cfg(test)]",
                 "mod tests {",
                 "    fn test_format_timestamp() {",
@@ -2980,8 +3500,75 @@ class ExtractTests(unittest.TestCase):
                 "Yesterday",
                 "{} days ago",
                 "{years} years ago",
+                "year",
+                "years",
+                "month",
+                "months",
+                "{years} {year_unit} ago",
+                "{years} {year_unit}, {months} {month_unit} ago",
             },
         )
+
+    def test_extracts_workspace_welcome_untitled_project_name(self) -> None:
+        source = "\n".join(
+            [
+                "fn project_name(paths: &PathList) -> String {",
+                '    let joined = paths.paths().join(", ");',
+                "    if joined.is_empty() {",
+                '        "Untitled".to_string()',
+                "    } else {",
+                "        joined",
+                "    }",
+                "}",
+                "#[cfg(test)]",
+                "mod tests {",
+                "    fn test_project_name_empty() {",
+                '        assert_eq!(project_name(&paths), "Untitled");',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/workspace/src/welcome.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Untitled"})
+        self.assertEqual(by_source["Untitled"].call, "project_name")
+        self.assertEqual(by_source["Untitled"].kind, "project_name_fallback")
+
+    def test_extracts_outline_external_file_fallback_names(self) -> None:
+        source = "\n".join(
+            [
+                "fn render_external_file(buffer_snapshot: Option<BufferSnapshot>) {",
+                "    let (icon, name) = match buffer_snapshot {",
+                '        Some(buffer_snapshot) => (None, "main.rs".to_string()),',
+                '        None => (None, "Untitled".to_string()),',
+                "    };",
+                "    let (icon, name) = match self.buffer_snapshot_for_id(buffer_id, cx) {",
+                "        Some(buffer_snapshot) => match buffer_snapshot.file() {",
+                '            Some(file) => (None, "main.rs".to_string()),',
+                '            None => (None, "Untitled".to_string()),',
+                "        },",
+                '        None => (None, "Unknown buffer".to_string()),',
+                "    };",
+                "    HighlightedLabel::new(name, vec![]);",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/outline_panel/src/outline_panel.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Untitled", "Unknown buffer"})
+        self.assertEqual(by_source["Untitled"].call, "outline_external_file_name")
+        self.assertEqual(by_source["Untitled"].kind, "outline_external_file_label")
+        self.assertEqual(by_source["Unknown buffer"].kind, "outline_external_file_label")
 
     def test_ignores_format_distance_composition_strings(self) -> None:
         source = "\n".join(

@@ -62,6 +62,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | Référence |
 | Remote | | Distant |
 | Repository | | Dépôt |
+| Sandbox | | bac à sable |
 | Selection | | Sélection |
 | Server | | Serveur |
 | Session | | Session |

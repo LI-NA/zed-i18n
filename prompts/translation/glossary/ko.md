@@ -62,6 +62,7 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Reference | code navigation | 참조 |
 | Remote | | 원격 |
 | Repository | | 저장소 |
+| Sandbox | | 샌드박스 |
 | Selection | | 선택 영역 |
 | Server | | 서버 |
 | Session | | 세션 |
