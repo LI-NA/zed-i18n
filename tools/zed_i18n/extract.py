@@ -51,12 +51,14 @@ CALL_RULES: dict[str, tuple[int, str, str]] = {
     "Headline::new": (0, "headline", "Headline::new"),
     "Button::new": (1, "button", "Button::new"),
     "ButtonLink::new": (0, "button_link", "ButtonLink::new"),
+    "QuickActionBarButton::new": (5, "tooltip", "QuickActionBarButton::new"),
     "InputField::new": (2, "placeholder", "InputField::new"),
     "Tooltip::text": (0, "tooltip", "Tooltip::text"),
     "Tooltip::simple": (0, "tooltip", "Tooltip::simple"),
     "Tooltip::new": (0, "tooltip", "Tooltip::new"),
     "Toast::new": (1, "toast", "Toast::new"),
     "StatusToast::new": (0, "status_toast", "StatusToast::new"),
+    "Notification::new": (0, "notification", "Notification::new"),
     "MessageNotification::new": (0, "notification", "MessageNotification::new"),
     "ErrorMessagePrompt::new": (0, "error_prompt", "ErrorMessagePrompt::new"),
     "LoadingLabel::new": (0, "loading_label", "LoadingLabel::new"),
@@ -80,6 +82,7 @@ CALL_RULES: dict[str, tuple[int, str, str]] = {
         "project_empty_state_label",
         "ProjectEmptyState::new",
     ),
+    "render_mermaid_tab_button": (0, "tab_title", "render_mermaid_tab_button"),
 }
 
 STRUCT_FIELD_RULES: dict[tuple[str, str], tuple[str, str]] = {
@@ -347,6 +350,11 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
         return ((0, "headline", "headline"),)
     if canonical.endswith(".header") and _looks_like_context_menu_header_call(canonical):
         return ((0, "context_menu_header", "header"),)
+    if (
+        canonical == "submenu_with_colored_icon"
+        or canonical.endswith(".submenu_with_colored_icon")
+    ):
+        return ((0, "context_menu_submenu", "submenu_with_colored_icon"),)
     if canonical.endswith(".button_label") or canonical == "button_label":
         return ((0, "button_label", "button_label"),)
     if canonical.endswith(".tooltip") or canonical == "tooltip":
@@ -380,6 +388,10 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
         return ((0, "feature_upsell", "render_feature_upsell_banner"),)
     if canonical.endswith("render_action_button"):
         return ((3, "tooltip", "render_action_button"),)
+    if canonical.endswith("render_edit_prediction_end_of_line_popover"):
+        return ((0, "edit_prediction_popover", "render_edit_prediction_end_of_line_popover"),)
+    if canonical.endswith("render_edit_prediction_line_popover"):
+        return ((0, "edit_prediction_popover", "render_edit_prediction_line_popover"),)
     if (
         canonical == "show_deferred_toast"
         or canonical.endswith(".show_deferred_toast")
@@ -493,6 +505,8 @@ def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int
         return ((0, "error_prompt", "show_error"),)
     if _is_git_panel_path(relative_path) and canonical == "error_spawn":
         return ((0, "error_prompt", "error_spawn"),)
+    if _is_git_commit_view_path(relative_path) and canonical.endswith("Self::stash_action"):
+        return ((1, "prompt_answer", "stash_action"),)
     return ()
 
 
@@ -1814,6 +1828,12 @@ def _line_patterns_for_path(
         patterns.extend(ANNOUNCEMENT_LINE_PATTERNS)
         if in_announcement_bullets:
             patterns.extend(ANNOUNCEMENT_BULLET_LINE_PATTERNS)
+    if _is_alert_modal_path(relative_path):
+        patterns.extend(ALERT_MODAL_LINE_PATTERNS)
+    if _is_gpui_linux_platform_path(relative_path):
+        patterns.extend(GPUI_LINUX_PLATFORM_LINE_PATTERNS)
+    if _is_repl_notebook_ui_path(relative_path):
+        patterns.extend(REPL_NOTEBOOK_UI_LINE_PATTERNS)
     if _is_title_bar_path(relative_path):
         patterns.extend(TITLE_BAR_LINE_PATTERNS)
     if _is_copilot_sign_in_path(relative_path):
@@ -1828,6 +1848,10 @@ def _line_patterns_for_path(
         patterns.extend(GIT_PANEL_LINE_PATTERNS)
     if _is_project_panel_path(relative_path):
         patterns.extend(PROJECT_PANEL_LINE_PATTERNS)
+    if _is_agent_model_selector_path(relative_path):
+        patterns.extend(AGENT_MODEL_SELECTOR_LINE_PATTERNS)
+    if _is_agent_manage_profiles_modal_path(relative_path):
+        patterns.extend(AGENT_MANAGE_PROFILES_MODAL_LINE_PATTERNS)
     if _is_git_blame_or_commit_tooltip_path(relative_path):
         patterns.extend(GIT_COMMIT_TOOLTIP_LINE_PATTERNS)
     if _is_git_branch_picker_path(relative_path):
@@ -1844,6 +1868,8 @@ def _line_patterns_for_path(
         patterns.extend(ACTIVITY_INDICATOR_LINE_PATTERNS)
     if _is_language_selector_path(relative_path):
         patterns.extend(LANGUAGE_SELECTOR_LINE_PATTERNS)
+    if _is_lsp_button_path(relative_path):
+        patterns.extend(LSP_BUTTON_LINE_PATTERNS)
     if _is_inline_prompt_editor_path(relative_path):
         patterns.extend(INLINE_PROMPT_EDITOR_LINE_PATTERNS)
     if _is_keymap_editor_path(relative_path):
@@ -1852,12 +1878,26 @@ def _line_patterns_for_path(
         patterns.extend(RUST_LANGUAGE_LINE_PATTERNS)
     if _is_language_model_provider_path(relative_path):
         patterns.extend(LANGUAGE_MODEL_PROVIDER_LINE_PATTERNS)
+    if _is_language_model_registry_path(relative_path):
+        patterns.extend(LANGUAGE_MODEL_REGISTRY_LINE_PATTERNS)
+    if _is_debugger_breakpoint_list_path(relative_path):
+        patterns.extend(DEBUGGER_BREAKPOINT_LIST_LINE_PATTERNS)
+    if _is_lsp_log_view_path(relative_path):
+        patterns.extend(LSP_LOG_VIEW_LINE_PATTERNS)
+    if _is_workspace_multi_workspace_path(relative_path):
+        patterns.extend(WORKSPACE_MULTI_WORKSPACE_LINE_PATTERNS)
     if _is_workspace_pane_path(relative_path):
         patterns.extend(WORKSPACE_PANE_LINE_PATTERNS)
+    if _is_sidebar_path(relative_path):
+        patterns.extend(SIDEBAR_LINE_PATTERNS)
+    if _is_zed_move_to_applications_path(relative_path):
+        patterns.extend(ZED_MOVE_TO_APPLICATIONS_LINE_PATTERNS)
     if _is_agent_entry_view_state_path(relative_path):
         patterns.extend(AGENT_ENTRY_VIEW_STATE_LINE_PATTERNS)
     if _is_agent_thread_view_path(relative_path):
         patterns.extend(AGENT_THREAD_VIEW_LINE_PATTERNS)
+    if _is_agent_thread_path(relative_path):
+        patterns.extend(AGENT_THREAD_LINE_PATTERNS)
     if _is_agent_skill_load_error_path(relative_path):
         patterns.extend(AGENT_SKILL_LOAD_ERROR_LINE_PATTERNS)
     if _is_debugger_dap_log_path(relative_path):
@@ -1881,6 +1921,8 @@ def _pending_multiline_pattern_for_line(line: str, relative_path: str) -> LinePa
         starts.extend(GIT_PANEL_MULTILINE_STARTS)
     if _is_keymap_editor_path(relative_path):
         starts.extend(KEYMAP_EDITOR_MULTILINE_STARTS)
+    if _is_agent_diff_path(relative_path):
+        starts.extend(AGENT_DIFF_MULTILINE_STARTS)
     for start_pattern, call, kind in starts:
         if start_pattern.search(line):
             return LinePattern(
@@ -1915,6 +1957,18 @@ def _is_announcement_path(relative_path: str) -> bool:
     }
 
 
+def _is_alert_modal_path(relative_path: str) -> bool:
+    return relative_path == "crates/ui/src/components/notification/alert_modal.rs"
+
+
+def _is_gpui_linux_platform_path(relative_path: str) -> bool:
+    return relative_path == "crates/gpui_linux/src/linux/platform.rs"
+
+
+def _is_repl_notebook_ui_path(relative_path: str) -> bool:
+    return relative_path == "crates/repl/src/notebook/notebook_ui.rs"
+
+
 def _is_skills_illustration_path(relative_path: str) -> bool:
     return relative_path == "crates/ui/src/components/ai/skills_illustration.rs"
 
@@ -1943,8 +1997,23 @@ def _is_add_llm_provider_modal_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs"
 
 
+def _is_agent_model_selector_path(relative_path: str) -> bool:
+    return relative_path in {
+        "crates/agent_ui/src/language_model_selector.rs",
+        "crates/agent_ui/src/model_selector.rs",
+    }
+
+
+def _is_agent_manage_profiles_modal_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs"
+
+
 def _is_zed_root_path(relative_path: str) -> bool:
     return relative_path == "crates/zed/src/zed.rs"
+
+
+def _is_zed_move_to_applications_path(relative_path: str) -> bool:
+    return relative_path == "crates/zed/src/zed/move_to_applications.rs"
 
 
 def _is_editor_code_context_menus_path(relative_path: str) -> bool:
@@ -1985,6 +2054,14 @@ def _is_app_menus_path(relative_path: str) -> bool:
 
 def _is_workspace_pane_path(relative_path: str) -> bool:
     return relative_path == "crates/workspace/src/pane.rs"
+
+
+def _is_sidebar_path(relative_path: str) -> bool:
+    return relative_path == "crates/sidebar/src/sidebar.rs"
+
+
+def _is_workspace_multi_workspace_path(relative_path: str) -> bool:
+    return relative_path == "crates/workspace/src/multi_workspace.rs"
 
 
 def _is_project_panel_path(relative_path: str) -> bool:
@@ -2053,8 +2130,16 @@ def _is_debugger_new_process_modal_path(relative_path: str) -> bool:
     return relative_path == "crates/debugger_ui/src/new_process_modal.rs"
 
 
+def _is_debugger_breakpoint_list_path(relative_path: str) -> bool:
+    return relative_path == "crates/debugger_ui/src/session/running/breakpoint_list.rs"
+
+
 def _is_git_panel_path(relative_path: str) -> bool:
     return relative_path == "crates/git_ui/src/git_panel.rs"
+
+
+def _is_git_commit_view_path(relative_path: str) -> bool:
+    return relative_path == "crates/git_ui/src/commit_view.rs"
 
 
 def _is_git_graph_path(relative_path: str) -> bool:
@@ -2106,6 +2191,10 @@ def _is_language_selector_path(relative_path: str) -> bool:
     return relative_path == "crates/language_selector/src/language_selector.rs"
 
 
+def _is_lsp_button_path(relative_path: str) -> bool:
+    return relative_path == "crates/language_tools/src/lsp_button.rs"
+
+
 def _is_inline_prompt_editor_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/inline_prompt_editor.rs"
 
@@ -2120,6 +2209,18 @@ def _is_rust_language_path(relative_path: str) -> bool:
 
 def _is_language_model_provider_path(relative_path: str) -> bool:
     return relative_path.startswith("crates/language_models/src/provider/")
+
+
+def _is_language_model_registry_path(relative_path: str) -> bool:
+    return relative_path == "crates/language_model/src/registry.rs"
+
+
+def _is_lsp_log_view_path(relative_path: str) -> bool:
+    return relative_path == "crates/language_tools/src/lsp_log_view.rs"
+
+
+def _is_agent_diff_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/agent_diff.rs"
 
 
 ACTION_DOC_COMMENT_PATTERN = re.compile(r"^\s*///\s+(.+\S)\s*$")
@@ -2180,7 +2281,7 @@ LINE_PATTERNS: tuple[LinePattern, ...] = (
         1,
     ),
     LinePattern(
-        re.compile(r'\bButton::new\s*\(\s*[^,\n]+,\s*("(?:\\.|[^"\\])*")'),
+        re.compile(r'\bButton::new\s*\(\s*(?:\([^)\n]*\)|[^,\n]+),\s*("(?:\\.|[^"\\])*")'),
         "Button::new",
         "button",
         1,
@@ -2218,6 +2319,12 @@ LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
         re.compile(r'\bTooltip::for_action(?:_in)?\s*\(\s*("(?:\\.|[^"\\])*")'),
         "Tooltip::for_action",
+        "tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bTooltip::for_action_title(?:_in)?\s*\(\s*("(?:\\.|[^"\\])*")'),
+        "Tooltip::for_action_title",
         "tooltip",
         1,
     ),
@@ -2387,6 +2494,15 @@ MULTILINE_CALL_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
         re.compile(r'\.action\s*\(\s*$'),
         "action",
         "context_menu_action",
+    ),
+)
+
+
+AGENT_DIFF_MULTILINE_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
+    (
+        re.compile(r'\bTooltip::for_action_title(?:_in)?\s*\(\s*$'),
+        "Tooltip::for_action_title",
+        "tooltip",
     ),
 )
 
@@ -2579,6 +2695,35 @@ ANNOUNCEMENT_BULLET_LINE_PATTERNS: tuple[LinePattern, ...] = (
     ),
 )
 
+ALERT_MODAL_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(
+            r'\b(?:primary_action|dismiss_label)\.unwrap_or_else\(\|\|\s*("(?:Ok|Cancel)")\.into\(\)\)'
+        ),
+        "AlertModal::default_footer",
+        "button",
+        1,
+    ),
+)
+
+GPUI_LINUX_PLATFORM_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'^\s*("(?:Open Folder|Open File)")\s*$'),
+        "PlatformWindow::prompt_for_paths",
+        "file_dialog_title",
+        1,
+    ),
+)
+
+REPL_NOTEBOOK_UI_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\.unwrap_or_else\(\|\|\s*("Select Kernel")\.to_string\(\)\)'),
+        "kernel_name_fallback",
+        "kernel_selector_label",
+        1,
+    ),
+)
+
 ICON_LABEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
         re.compile(r'\bSelf::new\s*\(\s*IconName::[A-Za-z0-9_]+,\s*("(?:\\.|[^"\\])*")'),
@@ -2653,6 +2798,34 @@ WORKSPACE_PANE_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'\bformat!\(\s*("\{path\} contains unsaved edits\. Do you want to save it\?")'),
         "dirty_message_for",
         "prompt_message",
+        1,
+    ),
+)
+
+
+SIDEBAR_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\bshow_thread_title_toast\([^,\n]+,\s*("(?:\\.|[^"\\])*")'),
+        "show_thread_title_toast",
+        "toast",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("No model is configured for summarizing thread titles\."),?\s*$'
+        ),
+        "show_thread_title_toast",
+        "toast",
+        1,
+    ),
+)
+
+
+ZED_MOVE_TO_APPLICATIONS_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\bPromptButton::(?:ok|cancel|new)\(\s*("(?:\\.|[^"\\])*")'),
+        "move_to_applications_prompt_answer",
+        "prompt_answer",
         1,
     ),
 )
@@ -2743,6 +2916,30 @@ PROJECT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
         "prompt_message",
         1,
     ),
+    LinePattern(
+        re.compile(r'&\[\s*("(?:Restore|Replace)")'),
+        "project_panel_prompt_answer",
+        "prompt_answer",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'&\[\s*[^,\n]+,\s*("Cancel")'),
+        "project_panel_prompt_answer",
+        "prompt_answer",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\blet\s+operation\s*=\s*if\s+trash\s*\{\s*("Trash")'),
+        "project_panel_prompt_answer",
+        "prompt_answer",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\blet\s+operation\s*=\s*if\s+trash\s*\{[^}]+\}\s*else\s*\{\s*("Delete")'),
+        "project_panel_prompt_answer",
+        "prompt_answer",
+        1,
+    ),
 )
 
 
@@ -2801,6 +2998,12 @@ GIT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'^\s*("(?:Changes|History)")\.into\(\),\s*$'),
         "git_panel_tab",
         "tab_title",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*Some\(\s*("(?:Delete|Create|Update)")\s*\),?\s*$'),
+        "suggest_commit_message_action",
+        "commit_message_prefix",
         1,
     ),
 )
@@ -2955,6 +3158,18 @@ LANGUAGE_SELECTOR_LINE_PATTERNS: tuple[LinePattern, ...] = (
 )
 
 
+LSP_BUTTON_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(
+            r'(?:Some\(\s*)?\(?\s*Color::[A-Za-z]+,\s*("(?:Starting…|Stopped|Error|Running|Warning)")'
+        ),
+        "lsp_status_label",
+        "status_label",
+        1,
+    ),
+)
+
+
 INLINE_PROMPT_EDITOR_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
         re.compile(r"^\s*(\"(?:Changes will be discarded|Changes won't be discarded)\"),?\s*$"),
@@ -3044,11 +3259,59 @@ KEYMAP_EDITOR_MULTILINE_STARTS: tuple[tuple[re.Pattern[str], str, str], ...] = (
 )
 
 
+AGENT_MODEL_SELECTOR_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(
+            r'\b(?:LanguageModelPickerEntry|ModelPickerEntry)::Separator\(\s*("(?:Favorite|Recommended|All)")\.into\(\)\s*\)'
+        ),
+        "model_selector_separator",
+        "picker_separator",
+        1,
+    ),
+)
+
+
+AGENT_MANAGE_PROFILES_MODAL_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\.unwrap_or_else\(\|\|\s*("Unknown")\.into\(\)\)'),
+        "profile_name_fallback",
+        "profile_name_fallback",
+        1,
+    ),
+)
+
+
+AGENT_THREAD_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(
+            r'\bformat!\(\s*("(?:Always for `\{\}` commands|Always for `\{\}`)")'
+        ),
+        "permission_option_label",
+        "permission_option",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'("(?:Only this time)")\.to_string\(\)'),
+        "permission_option_label",
+        "permission_option",
+        1,
+    ),
+)
+
+
 AGENT_THREAD_VIEW_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
         re.compile(r'^\s*("\{\} is not available with Zero Data Retention\.")'),
         "thread_error_message",
         "thread_error_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'\bformat!\(\s*("(?:Stop Following the \{\}|Stop Following \{\}|Follow the \{\}|Follow \{\})")'
+        ),
+        "agent_follow_tooltip",
+        "tooltip",
         1,
     ),
 )
@@ -3088,6 +3351,100 @@ LANGUAGE_MODEL_PROVIDER_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'^\s*name:\s*("(?:Low|Medium|High|Max|Minimal|Extra High)")\.into\(\),'),
         "LanguageModelEffortLevel.name",
         "language_model_effort_label",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'("(?:API key configured|Signed in)")\.to_string\(\)'),
+        "ConfiguredApiCard::new",
+        "configured_api_card_label",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bformat!\(\s*("(?:API key configured for \{\}|Signed in as \{e\})")'),
+        "ConfiguredApiCard::new",
+        "configured_api_card_label",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\bsection_header\(\s*("(?:Static Credentials|Using the an API key)")\.into\(\)'),
+        "section_header",
+        "section_header",
+        1,
+    ),
+)
+
+
+LANGUAGE_MODEL_REGISTRY_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'^\s*#\[error\(\s*("(?:\\.|[^"\\])*")'),
+        "ConfigurationError",
+        "configuration_error",
+        1,
+    ),
+)
+
+
+DEBUGGER_BREAKPOINT_LIST_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'SelectedBreakpointKind::[A-Za-z]+\s*=>\s*("(?:\\.|[^"\\])*")'),
+        "breakpoint_control_tooltip",
+        "tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("Exception Breakpoints cannot be removed from the breakpoint list"),?\s*$'
+        ),
+        "breakpoint_control_tooltip",
+        "tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'\(\s*("(?:Disable Breakpoint|Enable Breakpoint)")\s*,'),
+        "breakpoint_control_tooltip",
+        "tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("(?:Disable Breakpoint|Enable Breakpoint)"),?\s*$'),
+        "breakpoint_control_tooltip",
+        "tooltip",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'\(\s*"(?:Disable Breakpoint|Enable Breakpoint)"\s*,\s*("(?:Disable a breakpoint without removing it from the list|Re-enable a breakpoint)")'
+        ),
+        "breakpoint_control_tooltip",
+        "tooltip_meta",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*("(?:Disable a breakpoint without removing it from the list|Re-enable a breakpoint)"),?\s*$'
+        ),
+        "breakpoint_control_tooltip",
+        "tooltip_meta",
+        1,
+    ),
+)
+
+
+LSP_LOG_VIEW_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\((?:TraceValue::[A-Za-z]+|MessageType::[A-Z]+),\s*("(?:\\.|[^"\\])*")\)'),
+        "lsp_log_menu",
+        "context_menu_entry",
+        1,
+    ),
+)
+
+
+WORKSPACE_MULTI_WORKSPACE_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\(SidebarDockPosition::(?:Left|Right),\s*("(?:Left|Right)")\)'),
+        "sidebar_side_context_menu",
+        "context_menu_entry",
         1,
     ),
 )

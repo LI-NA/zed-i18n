@@ -3647,6 +3647,30 @@
     "occurrences": [
       {
         "call": "ConfiguredApiCard::new",
+        "end_byte": 21899,
+        "file": "crates/language_models/src/provider/anthropic.rs",
+        "kind": "configured_api_card_label",
+        "line": 636,
+        "start_byte": 21879
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 24621,
+        "file": "crates/language_models/src/provider/deepseek.rs",
+        "kind": "configured_api_card_label",
+        "line": 719,
+        "start_byte": 24601
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 15090,
+        "file": "crates/language_models/src/provider/google.rs",
+        "kind": "configured_api_card_label",
+        "line": 466,
+        "start_byte": 15070
+      },
+      {
+        "call": "ConfiguredApiCard::new",
         "end_byte": 31984,
         "file": "crates/language_models/src/provider/lmstudio.rs",
         "kind": "configured_api_card_label",
@@ -3655,11 +3679,59 @@
       },
       {
         "call": "ConfiguredApiCard::new",
+        "end_byte": 31405,
+        "file": "crates/language_models/src/provider/mistral.rs",
+        "kind": "configured_api_card_label",
+        "line": 833,
+        "start_byte": 31385
+      },
+      {
+        "call": "ConfiguredApiCard::new",
         "end_byte": 31704,
         "file": "crates/language_models/src/provider/ollama.rs",
         "kind": "configured_api_card_label",
         "line": 854,
         "start_byte": 31684
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 21056,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "configured_api_card_label",
+        "line": 642,
+        "start_byte": 21036
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 30166,
+        "file": "crates/language_models/src/provider/open_router.rs",
+        "kind": "configured_api_card_label",
+        "line": 841,
+        "start_byte": 30146
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 29603,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "configured_api_card_label",
+        "line": 852,
+        "start_byte": 29583
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 22118,
+        "file": "crates/language_models/src/provider/vercel_ai_gateway.rs",
+        "kind": "configured_api_card_label",
+        "line": 681,
+        "start_byte": 22098
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 18034,
+        "file": "crates/language_models/src/provider/x_ai.rs",
+        "kind": "configured_api_card_label",
+        "line": 573,
+        "start_byte": 18014
       }
     ],
     "status": "accepted"
@@ -3667,12 +3739,84 @@
   "API key configured for {}": {
     "occurrences": [
       {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 21984,
+        "file": "crates/language_models/src/provider/anthropic.rs",
+        "kind": "configured_api_card_label",
+        "line": 638,
+        "start_byte": 21957
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 24706,
+        "file": "crates/language_models/src/provider/deepseek.rs",
+        "kind": "configured_api_card_label",
+        "line": 721,
+        "start_byte": 24679
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 15175,
+        "file": "crates/language_models/src/provider/google.rs",
+        "kind": "configured_api_card_label",
+        "line": 468,
+        "start_byte": 15148
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 31490,
+        "file": "crates/language_models/src/provider/mistral.rs",
+        "kind": "configured_api_card_label",
+        "line": 835,
+        "start_byte": 31463
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 21141,
+        "file": "crates/language_models/src/provider/open_ai.rs",
+        "kind": "configured_api_card_label",
+        "line": 644,
+        "start_byte": 21114
+      },
+      {
         "call": "Label::new",
         "end_byte": 17990,
         "file": "crates/language_models/src/provider/open_ai_compatible.rs",
         "kind": "label",
         "line": 546,
         "start_byte": 17963
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 30251,
+        "file": "crates/language_models/src/provider/open_router.rs",
+        "kind": "configured_api_card_label",
+        "line": 843,
+        "start_byte": 30224
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 29688,
+        "file": "crates/language_models/src/provider/opencode.rs",
+        "kind": "configured_api_card_label",
+        "line": 854,
+        "start_byte": 29661
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 22203,
+        "file": "crates/language_models/src/provider/vercel_ai_gateway.rs",
+        "kind": "configured_api_card_label",
+        "line": 683,
+        "start_byte": 22176
+      },
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 18119,
+        "file": "crates/language_models/src/provider/x_ai.rs",
+        "kind": "configured_api_card_label",
+        "line": 575,
+        "start_byte": 18092
       }
     ],
     "status": "accepted"
@@ -3907,6 +4051,14 @@
         "kind": "button",
         "line": 119,
         "start_byte": 4250
+      },
+      {
+        "call": "render_edit_prediction_end_of_line_popover",
+        "end_byte": 42918,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1154,
+        "start_byte": 42910
       },
       {
         "call": "Button::new",
@@ -5855,6 +6007,14 @@
         "start_byte": 22178
       },
       {
+        "call": "model_selector_separator",
+        "end_byte": 14633,
+        "file": "crates/agent_ui/src/model_selector.rs",
+        "kind": "picker_separator",
+        "line": 411,
+        "start_byte": 14628
+      },
+      {
         "call": "ToggleButtonSimple::new",
         "end_byte": 67401,
         "file": "crates/extensions_ui/src/extensions_ui.rs",
@@ -6679,8 +6839,29 @@
     ],
     "status": "accepted"
   },
+  "Always for `{}`": {
+    "occurrences": [
+      {
+        "call": "permission_option_label",
+        "end_byte": 39942,
+        "file": "crates/agent/src/thread.rs",
+        "kind": "permission_option",
+        "line": 1048,
+        "start_byte": 39925
+      }
+    ],
+    "status": "accepted"
+  },
   "Always for `{}` commands": {
     "occurrences": [
+      {
+        "call": "permission_option_label",
+        "end_byte": 39861,
+        "file": "crates/agent/src/thread.rs",
+        "kind": "permission_option",
+        "line": 1046,
+        "start_byte": 39835
+      },
       {
         "call": "SharedString::from",
         "end_byte": 330998,
@@ -7461,6 +7642,14 @@
         "kind": "button",
         "line": 8137,
         "start_byte": 338180
+      },
+      {
+        "call": "stash_action",
+        "end_byte": 28869,
+        "file": "crates/git_ui/src/commit_view.rs",
+        "kind": "prompt_answer",
+        "line": 746,
+        "start_byte": 28862
       },
       {
         "call": "Button::new",
@@ -9916,6 +10105,14 @@
         "kind": "tooltip",
         "line": 1306,
         "start_byte": 46924
+      },
+      {
+        "call": "QuickActionBarButton::new",
+        "end_byte": 6731,
+        "file": "crates/zed/src/zed/quick_action_bar.rs",
+        "kind": "tooltip",
+        "line": 148,
+        "start_byte": 6716
       }
     ],
     "status": "accepted"
@@ -10344,6 +10541,22 @@
         "start_byte": 173534
       },
       {
+        "call": "project_panel_prompt_answer",
+        "end_byte": 88561,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_answer",
+        "line": 2247,
+        "start_byte": 88553
+      },
+      {
+        "call": "project_panel_prompt_answer",
+        "end_byte": 96979,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_answer",
+        "line": 2455,
+        "start_byte": 96971
+      },
+      {
         "call": "prompt",
         "end_byte": 12376,
         "file": "crates/recent_projects/src/remote_connections.rs",
@@ -10382,6 +10595,14 @@
         "kind": "button",
         "line": 1105,
         "start_byte": 41339
+      },
+      {
+        "call": "AlertModal::default_footer",
+        "end_byte": 4475,
+        "file": "crates/ui/src/components/notification/alert_modal.rs",
+        "kind": "button",
+        "line": 145,
+        "start_byte": 4467
       },
       {
         "call": "prompt",
@@ -12811,6 +13032,19 @@
     ],
     "status": "accepted"
   },
+  "Code": {
+    "occurrences": [
+      {
+        "call": "render_mermaid_tab_button",
+        "end_byte": 16698,
+        "file": "crates/markdown/src/mermaid.rs",
+        "kind": "tab_title",
+        "line": 471,
+        "start_byte": 16692
+      }
+    ],
+    "status": "accepted"
+  },
   "Code Actions": {
     "occurrences": [
       {
@@ -14357,6 +14591,19 @@
         "kind": "tooltip",
         "line": 4308,
         "start_byte": 152578
+      }
+    ],
+    "status": "accepted"
+  },
+  "Configure at least one LLM provider to start using the panel.": {
+    "occurrences": [
+      {
+        "call": "ConfigurationError",
+        "end_byte": 977,
+        "file": "crates/language_model/src/registry.rs",
+        "kind": "configuration_error",
+        "line": 25,
+        "start_byte": 914
       }
     ],
     "status": "accepted"
@@ -17158,6 +17405,14 @@
         "kind": "button",
         "line": 1881,
         "start_byte": 69116
+      },
+      {
+        "call": "suggest_commit_message_action",
+        "end_byte": 85128,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "commit_message_prefix",
+        "line": 2470,
+        "start_byte": 85120
       },
       {
         "call": "Button::new",
@@ -24333,6 +24588,14 @@
         "start_byte": 63001
       },
       {
+        "call": "suggest_commit_message_action",
+        "end_byte": 85044,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "commit_message_prefix",
+        "line": 2468,
+        "start_byte": 85036
+      },
+      {
         "call": "Button::new",
         "end_byte": 50149,
         "file": "crates/git_ui/src/worktree_picker.rs",
@@ -24355,6 +24618,14 @@
         "kind": "context_menu_action",
         "line": 1202,
         "start_byte": 48749
+      },
+      {
+        "call": "project_panel_prompt_answer",
+        "end_byte": 93978,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_answer",
+        "line": 2392,
+        "start_byte": 93970
       },
       {
         "call": "Button::new",
@@ -25821,6 +26092,14 @@
         "kind": "tooltip",
         "line": 856,
         "start_byte": 32337
+      },
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 21819,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip",
+        "line": 598,
+        "start_byte": 21799
       }
     ],
     "status": "accepted"
@@ -25912,6 +26191,19 @@
         "kind": "tooltip",
         "line": 4538,
         "start_byte": 179115
+      }
+    ],
+    "status": "accepted"
+  },
+  "Disable a breakpoint without removing it from the list": {
+    "occurrences": [
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 21897,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip_meta",
+        "line": 599,
+        "start_byte": 21841
       }
     ],
     "status": "accepted"
@@ -27267,6 +27559,19 @@
     ],
     "status": "accepted"
   },
+  "Don't ask me again": {
+    "occurrences": [
+      {
+        "call": "move_to_applications_prompt_answer",
+        "end_byte": 2509,
+        "file": "crates/zed/src/zed/move_to_applications.rs",
+        "kind": "prompt_answer",
+        "line": 83,
+        "start_byte": 2489
+      }
+    ],
+    "status": "accepted"
+  },
   "Don't use system clipboard.": {
     "occurrences": [
       {
@@ -27607,6 +27912,14 @@
   },
   "Drop": {
     "occurrences": [
+      {
+        "call": "stash_action",
+        "end_byte": 30868,
+        "file": "crates/git_ui/src/commit_view.rs",
+        "kind": "prompt_answer",
+        "line": 800,
+        "start_byte": 30862
+      },
       {
         "call": "Button::new",
         "end_byte": 21487,
@@ -28820,6 +29133,14 @@
         "kind": "tooltip",
         "line": 858,
         "start_byte": 32419
+      },
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 21974,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip",
+        "line": 602,
+        "start_byte": 21955
       }
     ],
     "status": "accepted"
@@ -29797,6 +30118,30 @@
   "Error": {
     "occurrences": [
       {
+        "call": "lsp_status_label",
+        "end_byte": 11651,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 346,
+        "start_byte": 11644
+      },
+      {
+        "call": "lsp_status_label",
+        "end_byte": 11977,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 352,
+        "start_byte": 11970
+      },
+      {
+        "call": "lsp_log_menu",
+        "end_byte": 50250,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1241,
+        "start_byte": 50243
+      },
+      {
         "call": "strum::VariantNames",
         "end_byte": 22014,
         "file": "crates/settings_content/src/editor.rs",
@@ -30150,6 +30495,19 @@
       }
     ],
     "status": "ignored"
+  },
+  "Exception Breakpoints cannot be removed from the breakpoint list": {
+    "occurrences": [
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 21546,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip",
+        "line": 590,
+        "start_byte": 21480
+      }
+    ],
+    "status": "accepted"
   },
   "Excerpt Context Lines": {
     "occurrences": [
@@ -32474,6 +32832,22 @@
         "kind": "child_text",
         "line": 714,
         "start_byte": 24541
+      },
+      {
+        "call": "model_selector_separator",
+        "end_byte": 9146,
+        "file": "crates/agent_ui/src/language_model_selector.rs",
+        "kind": "picker_separator",
+        "line": 277,
+        "start_byte": 9136
+      },
+      {
+        "call": "model_selector_separator",
+        "end_byte": 14335,
+        "file": "crates/agent_ui/src/model_selector.rs",
+        "kind": "picker_separator",
+        "line": 402,
+        "start_byte": 14325
       }
     ],
     "status": "accepted"
@@ -34507,6 +34881,19 @@
     ],
     "status": "accepted"
   },
+  "Follow the {}": {
+    "occurrences": [
+      {
+        "call": "agent_follow_tooltip",
+        "end_byte": 201588,
+        "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
+        "kind": "tooltip",
+        "line": 5043,
+        "start_byte": 201573
+      }
+    ],
+    "status": "accepted"
+  },
   "Follow {login}": {
     "occurrences": [
       {
@@ -34522,6 +34909,14 @@
   },
   "Follow {}": {
     "occurrences": [
+      {
+        "call": "agent_follow_tooltip",
+        "end_byte": 201661,
+        "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
+        "kind": "tooltip",
+        "line": 5045,
+        "start_byte": 201650
+      },
       {
         "call": "Tooltip::text",
         "end_byte": 44396,
@@ -40329,6 +40724,14 @@
   "Info": {
     "occurrences": [
       {
+        "call": "lsp_log_menu",
+        "end_byte": 50064,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1239,
+        "start_byte": 50058
+      },
+      {
         "call": "strum::VariantNames",
         "end_byte": 25778,
         "file": "crates/settings_content/src/project.rs",
@@ -40528,6 +40931,14 @@
         "kind": "context_menu_action",
         "line": 525,
         "start_byte": 17491
+      },
+      {
+        "call": "QuickActionBarButton::new",
+        "end_byte": 7380,
+        "file": "crates/zed/src/zed/quick_action_bar.rs",
+        "kind": "tooltip",
+        "line": 166,
+        "start_byte": 7365
       }
     ],
     "status": "accepted"
@@ -41984,8 +42395,53 @@
     ],
     "status": "accepted"
   },
+  "Jump": {
+    "occurrences": [
+      {
+        "call": "render_edit_prediction_line_popover",
+        "end_byte": 66502,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1749,
+        "start_byte": 66496
+      },
+      {
+        "call": "render_edit_prediction_line_popover",
+        "end_byte": 66768,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1755,
+        "start_byte": 66762
+      }
+    ],
+    "status": "accepted"
+  },
   "Jump to Edit": {
     "occurrences": [
+      {
+        "call": "render_edit_prediction_line_popover",
+        "end_byte": 69520,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1831,
+        "start_byte": 69506
+      },
+      {
+        "call": "render_edit_prediction_line_popover",
+        "end_byte": 70264,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1850,
+        "start_byte": 70250
+      },
+      {
+        "call": "render_edit_prediction_end_of_line_popover",
+        "end_byte": 70956,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1868,
+        "start_byte": 70942
+      },
       {
         "call": "Label::new",
         "end_byte": 91790,
@@ -42051,6 +42507,14 @@
   },
   "Keep": {
     "occurrences": [
+      {
+        "call": "Button::new",
+        "end_byte": 26049,
+        "file": "crates/agent_ui/src/agent_diff.rs",
+        "kind": "button",
+        "line": 798,
+        "start_byte": 26043
+      },
       {
         "call": "Button::new",
         "end_byte": 111256,
@@ -42480,6 +42944,19 @@
         "kind": "section_title",
         "line": 476,
         "start_byte": 19099
+      }
+    ],
+    "status": "accepted"
+  },
+  "LLM provider is not configured or does not support the configured model.": {
+    "occurrences": [
+      {
+        "call": "ConfigurationError",
+        "end_byte": 1082,
+        "file": "crates/language_model/src/registry.rs",
+        "kind": "configuration_error",
+        "line": 27,
+        "start_byte": 1008
       }
     ],
     "status": "accepted"
@@ -43291,6 +43768,14 @@
         "kind": "dock_position_label",
         "line": 329,
         "start_byte": 11036
+      },
+      {
+        "call": "sidebar_side_context_menu",
+        "end_byte": 2430,
+        "file": "crates/workspace/src/multi_workspace.rs",
+        "kind": "context_menu_entry",
+        "line": 74,
+        "start_byte": 2424
       }
     ],
     "status": "accepted"
@@ -44017,6 +44502,19 @@
         "kind": "tooltip",
         "line": 2878,
         "start_byte": 99989
+      }
+    ],
+    "status": "accepted"
+  },
+  "Log": {
+    "occurrences": [
+      {
+        "call": "lsp_log_menu",
+        "end_byte": 49975,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1238,
+        "start_byte": 49970
       }
     ],
     "status": "accepted"
@@ -45246,6 +45744,19 @@
         "kind": "placeholder",
         "line": 3080,
         "start_byte": 117152
+      }
+    ],
+    "status": "accepted"
+  },
+  "Messages": {
+    "occurrences": [
+      {
+        "call": "lsp_log_menu",
+        "end_byte": 45554,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1169,
+        "start_byte": 45544
       }
     ],
     "status": "accepted"
@@ -48703,6 +49214,14 @@
         "start_byte": 27598
       },
       {
+        "call": "Tooltip::for_action_title",
+        "end_byte": 37216,
+        "file": "crates/agent_ui/src/agent_diff.rs",
+        "kind": "tooltip",
+        "line": 1082,
+        "start_byte": 37205
+      },
+      {
         "call": "Tooltip::for_action",
         "end_byte": 99625,
         "file": "crates/editor/src/git.rs",
@@ -48793,6 +49312,14 @@
         "kind": "settings_enum_variant_label",
         "line": 309,
         "start_byte": 9920
+      },
+      {
+        "call": "move_to_applications_prompt_answer",
+        "end_byte": 2448,
+        "file": "crates/zed/src/zed/move_to_applications.rs",
+        "kind": "prompt_answer",
+        "line": 82,
+        "start_byte": 2444
       }
     ],
     "status": "accepted"
@@ -49537,6 +50064,14 @@
         "kind": "status_toast",
         "line": 5534,
         "start_byte": 207444
+      },
+      {
+        "call": "show_thread_title_toast",
+        "end_byte": 140217,
+        "file": "crates/sidebar/src/sidebar.rs",
+        "kind": "toast",
+        "line": 3554,
+        "start_byte": 140162
       }
     ],
     "status": "accepted"
@@ -50447,6 +50982,14 @@
   "Off": {
     "occurrences": [
       {
+        "call": "lsp_log_menu",
+        "end_byte": 45458,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1168,
+        "start_byte": 45453
+      },
+      {
         "call": "strum::VariantNames",
         "end_byte": 11771,
         "file": "crates/settings_content/src/editor.rs",
@@ -50663,6 +51206,14 @@
         "kind": "prompt_answer",
         "line": 2133,
         "start_byte": 80536
+      },
+      {
+        "call": "AlertModal::default_footer",
+        "end_byte": 4388,
+        "file": "crates/ui/src/components/notification/alert_modal.rs",
+        "kind": "button",
+        "line": 144,
+        "start_byte": 4384
       },
       {
         "call": "prompt",
@@ -51130,6 +51681,14 @@
         "start_byte": 36271
       },
       {
+        "call": "permission_option_label",
+        "end_byte": 40400,
+        "file": "crates/agent/src/thread.rs",
+        "kind": "permission_option",
+        "line": 1062,
+        "start_byte": 40384
+      },
+      {
         "call": "PermissionOption::new",
         "end_byte": 176360,
         "file": "crates/agent/src/thread.rs",
@@ -51458,6 +52017,14 @@
         "start_byte": 34977
       },
       {
+        "call": "PlatformWindow::prompt_for_paths",
+        "end_byte": 11388,
+        "file": "crates/gpui_linux/src/linux/platform.rs",
+        "kind": "file_dialog_title",
+        "line": 346,
+        "start_byte": 11377
+      },
+      {
         "call": "action",
         "end_byte": 159454,
         "file": "crates/workspace/src/pane.rs",
@@ -51496,6 +52063,14 @@
   },
   "Open Folder": {
     "occurrences": [
+      {
+        "call": "PlatformWindow::prompt_for_paths",
+        "end_byte": 11331,
+        "file": "crates/gpui_linux/src/linux/platform.rs",
+        "kind": "file_dialog_title",
+        "line": 344,
+        "start_byte": 11318
+      },
       {
         "call": "Label::new",
         "end_byte": 59050,
@@ -55696,6 +56271,14 @@
   "Pop": {
     "occurrences": [
       {
+        "call": "stash_action",
+        "end_byte": 29868,
+        "file": "crates/git_ui/src/commit_view.rs",
+        "kind": "prompt_answer",
+        "line": 773,
+        "start_byte": 29863
+      },
+      {
         "call": "Button::new",
         "end_byte": 22898,
         "file": "crates/git_ui/src/stash_picker.rs",
@@ -56108,6 +56691,14 @@
         "start_byte": 53617
       },
       {
+        "call": "render_mermaid_tab_button",
+        "end_byte": 16252,
+        "file": "crates/markdown/src/mermaid.rs",
+        "kind": "tab_title",
+        "line": 458,
+        "start_byte": 16243
+      },
+      {
         "call": "strum::VariantNames",
         "end_byte": 1564,
         "file": "crates/settings_content/src/agent.rs",
@@ -56234,6 +56825,14 @@
         "kind": "tooltip",
         "line": 864,
         "start_byte": 29259
+      },
+      {
+        "call": "Tooltip::for_action_title",
+        "end_byte": 36125,
+        "file": "crates/agent_ui/src/agent_diff.rs",
+        "kind": "tooltip",
+        "line": 1063,
+        "start_byte": 36110
       },
       {
         "call": "Tooltip::for_action",
@@ -57480,6 +58079,19 @@
     ],
     "status": "accepted"
   },
+  "Re-enable a breakpoint": {
+    "occurrences": [
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 22000,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip_meta",
+        "line": 602,
+        "start_byte": 21976
+      }
+    ],
+    "status": "accepted"
+  },
   "Re-enables the fast mode warning for every provider and model.": {
     "occurrences": [
       {
@@ -57725,6 +58337,14 @@
   },
   "Recommended": {
     "occurrences": [
+      {
+        "call": "model_selector_separator",
+        "end_byte": 9417,
+        "file": "crates/agent_ui/src/language_model_selector.rs",
+        "kind": "picker_separator",
+        "line": 284,
+        "start_byte": 9404
+      },
       {
         "call": "Label::new",
         "end_byte": 13371,
@@ -58199,6 +58819,14 @@
   },
   "Reject": {
     "occurrences": [
+      {
+        "call": "Button::new",
+        "end_byte": 24957,
+        "file": "crates/agent_ui/src/agent_diff.rs",
+        "kind": "button",
+        "line": 774,
+        "start_byte": 24949
+      },
       {
         "call": "Button::new",
         "end_byte": 110069,
@@ -58716,6 +59344,19 @@
     ],
     "status": "accepted"
   },
+  "Remove breakpoint from a breakpoint list": {
+    "occurrences": [
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 21411,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip",
+        "line": 588,
+        "start_byte": 21369
+      }
+    ],
+    "status": "accepted"
+  },
   "Remove co-authored-by": {
     "occurrences": [
       {
@@ -58725,6 +59366,19 @@
         "kind": "tooltip",
         "line": 4330,
         "start_byte": 153484
+      }
+    ],
+    "status": "accepted"
+  },
+  "Remove data breakpoint from a breakpoint list": {
+    "occurrences": [
+      {
+        "call": "breakpoint_control_tooltip",
+        "end_byte": 21652,
+        "file": "crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        "kind": "tooltip",
+        "line": 592,
+        "start_byte": 21605
       }
     ],
     "status": "accepted"
@@ -60483,6 +61137,14 @@
         "kind": "button",
         "line": 705,
         "start_byte": 23983
+      },
+      {
+        "call": "project_panel_prompt_answer",
+        "end_byte": 88551,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_answer",
+        "line": 2247,
+        "start_byte": 88542
       }
     ],
     "status": "accepted"
@@ -61431,6 +62093,14 @@
         "kind": "dock_position_label",
         "line": 331,
         "start_byte": 11109
+      },
+      {
+        "call": "sidebar_side_context_menu",
+        "end_byte": 2485,
+        "file": "crates/workspace/src/multi_workspace.rs",
+        "kind": "context_menu_entry",
+        "line": 75,
+        "start_byte": 2478
       }
     ],
     "status": "accepted"
@@ -61830,6 +62500,27 @@
         "kind": "task_template_label",
         "line": 1116,
         "start_byte": 42526
+      }
+    ],
+    "status": "accepted"
+  },
+  "Running": {
+    "occurrences": [
+      {
+        "call": "lsp_status_label",
+        "end_byte": 11827,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 350,
+        "start_byte": 11818
+      },
+      {
+        "call": "lsp_status_label",
+        "end_byte": 12075,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 355,
+        "start_byte": 12066
       }
     ],
     "status": "accepted"
@@ -62430,6 +63121,14 @@
         "kind": "button",
         "line": 3198,
         "start_byte": 119703
+      },
+      {
+        "call": "render_edit_prediction_line_popover",
+        "end_byte": 68139,
+        "file": "crates/editor/src/edit_prediction.rs",
+        "kind": "edit_prediction_popover",
+        "line": 1795,
+        "start_byte": 68131
       }
     ],
     "status": "accepted"
@@ -64222,6 +64921,22 @@
   },
   "Select Kernel": {
     "occurrences": [
+      {
+        "call": "kernel_name_fallback",
+        "end_byte": 42082,
+        "file": "crates/repl/src/notebook/notebook_ui.rs",
+        "kind": "kernel_selector_label",
+        "line": 1118,
+        "start_byte": 42067
+      },
+      {
+        "call": "kernel_name_fallback",
+        "end_byte": 43176,
+        "file": "crates/repl/src/notebook/notebook_ui.rs",
+        "kind": "kernel_selector_label",
+        "line": 1145,
+        "start_byte": 43161
+      },
       {
         "call": "Label::new",
         "end_byte": 13924,
@@ -70217,6 +70932,32 @@
     ],
     "status": "accepted"
   },
+  "Signed in": {
+    "occurrences": [
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 35738,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "configured_api_card_label",
+        "line": 1041,
+        "start_byte": 35727
+      }
+    ],
+    "status": "accepted"
+  },
+  "Signed in as {e}": {
+    "occurrences": [
+      {
+        "call": "ConfiguredApiCard::new",
+        "end_byte": 35689,
+        "file": "crates/language_models/src/provider/openai_subscribed.rs",
+        "kind": "configured_api_card_label",
+        "line": 1040,
+        "start_byte": 35671
+      }
+    ],
+    "status": "accepted"
+  },
   "Signed out of Copilot": {
     "occurrences": [
       {
@@ -70547,6 +71288,14 @@
         "kind": "context_menu_header",
         "line": 5670,
         "start_byte": 213347
+      },
+      {
+        "call": "submenu_with_colored_icon",
+        "end_byte": 197694,
+        "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
+        "kind": "context_menu_submenu",
+        "line": 4953,
+        "start_byte": 197686
       },
       {
         "call": "settings_field_title",
@@ -72145,6 +72894,19 @@
     ],
     "status": "accepted"
   },
+  "Starting…": {
+    "occurrences": [
+      {
+        "call": "lsp_status_label",
+        "end_byte": 11416,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 342,
+        "start_byte": 11403
+      }
+    ],
+    "status": "accepted"
+  },
   "Starts Open": {
     "occurrences": [
       {
@@ -72517,6 +73279,19 @@
     ],
     "status": "accepted"
   },
+  "Static Credentials": {
+    "occurrences": [
+      {
+        "call": "section_header",
+        "end_byte": 67559,
+        "file": "crates/language_models/src/provider/bedrock.rs",
+        "kind": "section_header",
+        "line": 1666,
+        "start_byte": 67539
+      }
+    ],
+    "status": "accepted"
+  },
   "Status Bar": {
     "occurrences": [
       {
@@ -72783,6 +73558,32 @@
     ],
     "status": "accepted"
   },
+  "Stop Following the {}": {
+    "occurrences": [
+      {
+        "call": "agent_follow_tooltip",
+        "end_byte": 201348,
+        "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
+        "kind": "tooltip",
+        "line": 5037,
+        "start_byte": 201325
+      }
+    ],
+    "status": "accepted"
+  },
+  "Stop Following {}": {
+    "occurrences": [
+      {
+        "call": "agent_follow_tooltip",
+        "end_byte": 201429,
+        "file": "crates/agent_ui/src/conversation_view/thread_view.rs",
+        "kind": "tooltip",
+        "line": 5039,
+        "start_byte": 201410
+      }
+    ],
+    "status": "accepted"
+  },
   "Stop Generation": {
     "occurrences": [
       {
@@ -72925,6 +73726,19 @@
         "kind": "tooltip",
         "line": 457,
         "start_byte": 19081
+      }
+    ],
+    "status": "accepted"
+  },
+  "Stopped": {
+    "occurrences": [
+      {
+        "call": "lsp_status_label",
+        "end_byte": 11548,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 344,
+        "start_byte": 11539
       }
     ],
     "status": "accepted"
@@ -82506,6 +83320,14 @@
         "kind": "context_menu_action",
         "line": 1199,
         "start_byte": 48572
+      },
+      {
+        "call": "project_panel_prompt_answer",
+        "end_byte": 93960,
+        "file": "crates/project_panel/src/project_panel.rs",
+        "kind": "prompt_answer",
+        "line": 2392,
+        "start_byte": 93953
       }
     ],
     "status": "accepted"
@@ -83515,6 +84337,46 @@
   "Unknown": {
     "occurrences": [
       {
+        "call": "profile_name_fallback",
+        "end_byte": 24387,
+        "file": "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs",
+        "kind": "profile_name_fallback",
+        "line": 655,
+        "start_byte": 24378
+      },
+      {
+        "call": "profile_name_fallback",
+        "end_byte": 25423,
+        "file": "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs",
+        "kind": "profile_name_fallback",
+        "line": 687,
+        "start_byte": 25414
+      },
+      {
+        "call": "profile_name_fallback",
+        "end_byte": 42847,
+        "file": "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs",
+        "kind": "profile_name_fallback",
+        "line": 1013,
+        "start_byte": 42838
+      },
+      {
+        "call": "profile_name_fallback",
+        "end_byte": 43785,
+        "file": "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs",
+        "kind": "profile_name_fallback",
+        "line": 1036,
+        "start_byte": 43776
+      },
+      {
+        "call": "profile_name_fallback",
+        "end_byte": 44743,
+        "file": "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs",
+        "kind": "profile_name_fallback",
+        "line": 1059,
+        "start_byte": 44734
+      },
+      {
         "call": "Button::new",
         "end_byte": 10909,
         "file": "crates/agent_ui/src/config_options.rs",
@@ -84159,6 +85021,19 @@
         "kind": "settings_enum_variant_label",
         "line": 578,
         "start_byte": 17297
+      }
+    ],
+    "status": "accepted"
+  },
+  "Update": {
+    "occurrences": [
+      {
+        "call": "suggest_commit_message_action",
+        "end_byte": 85213,
+        "file": "crates/git_ui/src/git_panel.rs",
+        "kind": "commit_message_prefix",
+        "line": 2472,
+        "start_byte": 85205
       }
     ],
     "status": "accepted"
@@ -85480,6 +86355,19 @@
     ],
     "status": "accepted"
   },
+  "Using the an API key": {
+    "occurrences": [
+      {
+        "call": "section_header",
+        "end_byte": 69058,
+        "file": "crates/language_models/src/provider/bedrock.rs",
+        "kind": "section_header",
+        "line": 1697,
+        "start_byte": 69036
+      }
+    ],
+    "status": "accepted"
+  },
   "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.": {
     "occurrences": [
       {
@@ -85653,6 +86541,19 @@
         "kind": "metric_description",
         "line": 200,
         "start_byte": 6411
+      }
+    ],
+    "status": "accepted"
+  },
+  "Verbose": {
+    "occurrences": [
+      {
+        "call": "lsp_log_menu",
+        "end_byte": 45648,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1170,
+        "start_byte": 45639
       }
     ],
     "status": "accepted"
@@ -86578,6 +87479,22 @@
   },
   "Warning": {
     "occurrences": [
+      {
+        "call": "lsp_status_label",
+        "end_byte": 11905,
+        "file": "crates/language_tools/src/lsp_button.rs",
+        "kind": "status_label",
+        "line": 351,
+        "start_byte": 11896
+      },
+      {
+        "call": "lsp_log_menu",
+        "end_byte": 50159,
+        "file": "crates/language_tools/src/lsp_log_view.rs",
+        "kind": "context_menu_entry",
+        "line": 1240,
+        "start_byte": 50150
+      },
       {
         "call": "strum::VariantNames",
         "end_byte": 21946,
@@ -92674,6 +93591,14 @@
         "kind": "settings_enum_variant_label",
         "line": 307,
         "start_byte": 9865
+      },
+      {
+        "call": "move_to_applications_prompt_answer",
+        "end_byte": 2400,
+        "file": "crates/zed/src/zed/move_to_applications.rs",
+        "kind": "prompt_answer",
+        "line": 81,
+        "start_byte": 2395
       }
     ],
     "status": "accepted"
@@ -93416,6 +94341,14 @@
         "kind": "prompt_message",
         "line": 98,
         "start_byte": 3426
+      },
+      {
+        "call": "Notification::new",
+        "end_byte": 6571,
+        "file": "crates/zed/src/main.rs",
+        "kind": "notification",
+        "line": 180,
+        "start_byte": 6549
       }
     ],
     "status": "accepted"
@@ -100864,6 +101797,19 @@
         "kind": "label",
         "line": 2309,
         "start_byte": 82151
+      }
+    ],
+    "status": "accepted"
+  },
+  "{} LLM provider is not configured.": {
+    "occurrences": [
+      {
+        "call": "ConfigurationError",
+        "end_byte": 1152,
+        "file": "crates/language_model/src/registry.rs",
+        "kind": "configuration_error",
+        "line": 29,
+        "start_byte": 1116
       }
     ],
     "status": "accepted"

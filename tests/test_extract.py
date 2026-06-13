@@ -289,6 +289,101 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(by_source["Unrecognized Workspace"].kind, "headline")
         self.assertEqual(by_source["Trust all projects in parent directory"].call, "label")
 
+    def test_extracts_quick_action_bar_button_tooltips(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(focus_handle: FocusHandle) {",
+                "    QuickActionBarButton::new(",
+                '        "toggle buffer search",',
+                "        search::SEARCH_ICON,",
+                "        false,",
+                "        Box::new(buffer_search::Deploy::find()),",
+                "        focus_handle.clone(),",
+                '        "Buffer Search",',
+                "        move |_, window, cx| {},",
+                "    );",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/zed/src/zed/quick_action_bar.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Buffer Search"})
+        self.assertEqual(by_source["Buffer Search"].call, "QuickActionBarButton::new")
+        self.assertEqual(by_source["Buffer Search"].kind, "tooltip")
+
+    def test_extracts_buttons_with_tuple_ids_inside_macro_token_trees(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(row: u32, focus_handle: FocusHandle) {",
+                "    h_flex().children(vec![",
+                '        Button::new(("reject", row as u64), "Reject"),',
+                '        Button::new(("keep", row as u64), "Keep"),',
+                "        IconButton::new(\"hunk-up\", IconName::ArrowUp)",
+                "            .tooltip(Tooltip::for_action_title_in(",
+                '                "Previous Hunk",',
+                "                &GoToPreviousHunk,",
+                "                &focus_handle,",
+                "            )),",
+                "    ]);",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/agent_diff.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Reject", "Keep", "Previous Hunk"})
+        self.assertEqual(by_source["Reject"].call, "Button::new")
+        self.assertEqual(by_source["Reject"].kind, "button")
+        self.assertEqual(by_source["Previous Hunk"].call, "Tooltip::for_action_title")
+        self.assertEqual(by_source["Previous Hunk"].kind, "tooltip")
+
+    def test_extracts_edit_prediction_popover_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn render() {",
+                "    self.render_edit_prediction_end_of_line_popover(",
+                '        "Accept",',
+                "        editor_snapshot,",
+                "        visible_row_range,",
+                "        target_display_point,",
+                "        line_height,",
+                "        scroll_pixel_position,",
+                "        content_origin,",
+                "        editor_width,",
+                "        window,",
+                "        cx,",
+                "    );",
+                "    self.render_edit_prediction_line_popover(",
+                '        "Jump to Edit",',
+                "        Some(IconName::ArrowUp),",
+                "        window,",
+                "        cx,",
+                "    );",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/editor/src/edit_prediction.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Accept", "Jump to Edit"})
+        self.assertEqual(by_source["Accept"].call, "render_edit_prediction_end_of_line_popover")
+        self.assertEqual(by_source["Accept"].kind, "edit_prediction_popover")
+        self.assertEqual(by_source["Jump to Edit"].call, "render_edit_prediction_line_popover")
+        self.assertEqual(by_source["Jump to Edit"].kind, "edit_prediction_popover")
+
     def test_extracts_welcome_section_titles_from_static_content(self) -> None:
         source = "\n".join(
             [
@@ -3411,6 +3506,473 @@ class ExtractTests(unittest.TestCase):
             {"There are still conflicts. You must stage these before committing"},
         )
         self.assertEqual(occurrences[0].call, "error_spawn")
+
+    def test_extracts_project_panel_prompt_answers_from_maybe_macro(self) -> None:
+        source = "\n".join(
+            [
+                "fn restore_file(window: &mut Window, cx: &mut Context<Self>) {",
+                "    maybe!({",
+                '        Some(window.prompt(PromptLevel::Info, &prompt, None, &["Restore", "Cancel"], cx));',
+                "        let operation = if trash { \"Trash\" } else { \"Delete\" };",
+                "        Some(window.prompt(",
+                "            PromptLevel::Info,",
+                "            &prompt,",
+                "            detail,",
+                '            &[operation, "Cancel"],',
+                "            cx,",
+                "        ));",
+                "    });",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/project_panel/src/project_panel.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Restore", "Cancel", "Trash", "Delete"})
+        self.assertEqual(by_source["Restore"].call, "project_panel_prompt_answer")
+        self.assertEqual(by_source["Restore"].kind, "prompt_answer")
+        self.assertEqual(by_source["Trash"].call, "project_panel_prompt_answer")
+        self.assertEqual(by_source["Delete"].call, "project_panel_prompt_answer")
+
+    def test_extracts_git_commit_view_stash_prompt_actions(self) -> None:
+        source = "\n".join(
+            [
+                "fn apply_stash(workspace: &mut Workspace, window: &mut Window, cx: &mut App) {",
+                "    Self::stash_action(",
+                "        workspace,",
+                '        "Apply",',
+                "        window,",
+                "        cx,",
+                "        async move |repository, sha, stash, commit_view, workspace, cx| {},",
+                "    );",
+                "    Self::stash_action(workspace, \"Pop\", window, cx, callback);",
+                "    Self::stash_action(workspace, \"Drop\", window, cx, callback);",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/commit_view.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Apply", "Pop", "Drop"})
+        self.assertEqual(by_source["Apply"].call, "stash_action")
+        self.assertEqual(by_source["Apply"].kind, "prompt_answer")
+
+    def test_extracts_language_model_configuration_error_prompts(self) -> None:
+        source = "\n".join(
+            [
+                "#[derive(Error)]",
+                "pub enum ConfigurationError {",
+                '    #[error("Configure at least one LLM provider to start using the panel.")]',
+                "    NoProvider,",
+                '    #[error("LLM provider is not configured or does not support the configured model.")]',
+                "    ModelNotFound,",
+                '    #[error("{} LLM provider is not configured.", .0.name().0)]',
+                "    ProviderNotAuthenticated(Arc<dyn LanguageModelProvider>),",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/language_model/src/registry.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Configure at least one LLM provider to start using the panel.",
+                "LLM provider is not configured or does not support the configured model.",
+                "{} LLM provider is not configured.",
+            },
+        )
+        self.assertEqual(
+            by_source[
+                "LLM provider is not configured or does not support the configured model."
+            ].call,
+            "ConfigurationError",
+        )
+        self.assertEqual(
+            by_source[
+                "LLM provider is not configured or does not support the configured model."
+            ].kind,
+            "configuration_error",
+        )
+
+    def test_extracts_language_model_provider_configured_card_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn render(cx: &mut Context<Self>) {",
+                "    let configured_card_label = if env_var_set {",
+                '        format!("API key set in {API_KEY_ENV_VAR_NAME} environment variable")',
+                "    } else {",
+                '        "API key configured".to_string()',
+                "    };",
+                '    let other_label = format!("API key configured for {}", api_url);',
+                "    ConfiguredApiCard::new(configured_card_label);",
+                "    let label = state",
+                "        .email()",
+                '        .map(|e| format!("Signed in as {e}"))',
+                '        .unwrap_or_else(|| "Signed in".to_string());',
+                "    ConfiguredApiCard::new(SharedString::from(label));",
+                '    section_header("Static Credentials".into());',
+                '    section_header("Using the an API key".into());',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/language_models/src/provider/open_ai.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "API key set in {API_KEY_ENV_VAR_NAME} environment variable",
+                "API key configured",
+                "API key configured for {}",
+                "Signed in as {e}",
+                "Signed in",
+                "Static Credentials",
+                "Using the an API key",
+            },
+        )
+        self.assertEqual(by_source["API key configured"].call, "ConfiguredApiCard::new")
+        self.assertEqual(by_source["API key configured"].kind, "configured_api_card_label")
+        self.assertEqual(by_source["Signed in"].call, "ConfiguredApiCard::new")
+        self.assertEqual(by_source["Static Credentials"].call, "section_header")
+
+    def test_extracts_debugger_breakpoint_control_strip_tooltip_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn render_control_strip(&self) {",
+                "    let remove_breakpoint_tooltip = selection_kind.map(|(kind, _)| match kind {",
+                '        SelectedBreakpointKind::Source => "Remove breakpoint from a breakpoint list",',
+                "        SelectedBreakpointKind::Exception => {",
+                '            "Exception Breakpoints cannot be removed from the breakpoint list"',
+                "        }",
+                '        SelectedBreakpointKind::Data => "Remove data breakpoint from a breakpoint list",',
+                "    });",
+                "    let toggle_label = selection_kind.map(|(_, is_enabled)| {",
+                "        if is_enabled {",
+                "            (",
+                '                "Disable Breakpoint",',
+                '                "Disable a breakpoint without removing it from the list",',
+                "            )",
+                "        } else {",
+                '            ("Enable Breakpoint", "Re-enable a breakpoint")',
+                "        }",
+                "    });",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/debugger_ui/src/session/running/breakpoint_list.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Remove breakpoint from a breakpoint list",
+                "Exception Breakpoints cannot be removed from the breakpoint list",
+                "Remove data breakpoint from a breakpoint list",
+                "Disable Breakpoint",
+                "Disable a breakpoint without removing it from the list",
+                "Enable Breakpoint",
+                "Re-enable a breakpoint",
+            },
+        )
+        self.assertEqual(by_source["Disable Breakpoint"].call, "breakpoint_control_tooltip")
+        self.assertEqual(
+            by_source["Disable a breakpoint without removing it from the list"].kind,
+            "tooltip_meta",
+        )
+
+    def test_extracts_lsp_and_sidebar_tuple_menu_labels(self) -> None:
+        lsp_source = "\n".join(
+            [
+                "fn render() {",
+                "    for (option, label) in [",
+                '        (TraceValue::Off, "Off"),',
+                '        (TraceValue::Messages, "Messages"),',
+                '        (TraceValue::Verbose, "Verbose"),',
+                "    ] {",
+                "        menu = menu.entry(label, None, handler);",
+                "    }",
+                "    for (option, label) in [",
+                '        (MessageType::LOG, "Log"),',
+                '        (MessageType::INFO, "Info"),',
+                '        (MessageType::WARNING, "Warning"),',
+                '        (MessageType::ERROR, "Error"),',
+                "    ] {",
+                "        menu = menu.entry(label, None, handler);",
+                "    }",
+                "}",
+            ]
+        )
+
+        lsp_occurrences = extract_ui_strings_from_source(
+            lsp_source,
+            relative_path="crates/language_tools/src/lsp_log_view.rs",
+        )
+        self.assertEqual(
+            {occurrence.source for occurrence in lsp_occurrences},
+            {"Off", "Messages", "Verbose", "Log", "Info", "Warning", "Error"},
+        )
+
+        sidebar_source = "\n".join(
+            [
+                "fn sidebar_side_context_menu(cx: &App) {",
+                "    let positions: [(SidebarDockPosition, &str); 2] = [",
+                '        (SidebarDockPosition::Left, "Left"),',
+                '        (SidebarDockPosition::Right, "Right"),',
+                "    ];",
+                "    for (position, label) in positions {",
+                "        menu = menu.toggleable_entry(label, selected, IconPosition::Start, None, handler);",
+                "    }",
+                "}",
+            ]
+        )
+
+        sidebar_occurrences = extract_ui_strings_from_source(
+            sidebar_source,
+            relative_path="crates/workspace/src/multi_workspace.rs",
+        )
+        by_source = {occurrence.source: occurrence for occurrence in sidebar_occurrences}
+        self.assertEqual(set(by_source), {"Left", "Right"})
+        self.assertEqual(by_source["Left"].call, "sidebar_side_context_menu")
+        self.assertEqual(by_source["Left"].kind, "context_menu_entry")
+
+    def test_extracts_changed_ui_fallbacks_and_separator_labels(self) -> None:
+        cases = [
+            (
+                "\n".join(
+                    [
+                        "fn render(&mut self) {",
+                        '    let primary_action = self.primary_action.unwrap_or_else(|| "Ok".into());',
+                        '    let dismiss_label = self.dismiss_label.unwrap_or_else(|| "Cancel".into());',
+                        "}",
+                    ]
+                ),
+                "crates/ui/src/components/notification/alert_modal.rs",
+                {"Ok", "Cancel"},
+                "AlertModal::default_footer",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn prompt_for_paths(&self, options: PathPromptOptions) {",
+                        "    let title = if options.directories {",
+                        '        "Open Folder"',
+                        "    } else {",
+                        '        "Open File"',
+                        "    };",
+                        "}",
+                    ]
+                ),
+                "crates/gpui_linux/src/linux/platform.rs",
+                {"Open Folder", "Open File"},
+                "PlatformWindow::prompt_for_paths",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn render_kernel_status(&self) {",
+                        "    let kernel_name = self.kernel_specification",
+                        "        .as_ref()",
+                        "        .map(|spec| spec.name().to_string())",
+                        '        .unwrap_or_else(|| "Select Kernel".to_string());',
+                        "}",
+                    ]
+                ),
+                "crates/repl/src/notebook/notebook_ui.rs",
+                {"Select Kernel"},
+                "kernel_name_fallback",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn entries(&self) {",
+                        '    entries.push(LanguageModelPickerEntry::Separator("Favorite".into()));',
+                        '    entries.push(LanguageModelPickerEntry::Separator("Recommended".into()));',
+                        '    entries.push(ModelPickerEntry::Separator("All".into()));',
+                        "}",
+                    ]
+                ),
+                "crates/agent_ui/src/language_model_selector.rs",
+                {"Favorite", "Recommended", "All"},
+                "model_selector_separator",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn render(&self, settings: AgentSettings) {",
+                        "    let profile_name = settings.profiles",
+                        "        .get(&mode.profile_id)",
+                        "        .map(|profile| profile.name.clone())",
+                        '        .unwrap_or_else(|| "Unknown".into());',
+                        "}",
+                    ]
+                ),
+                "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs",
+                {"Unknown"},
+                "profile_name_fallback",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn suggest_commit_message(&self) {",
+                        "    let action_text = if git_status_entry.status.is_deleted() {",
+                        '        Some("Delete")',
+                        "    } else if git_status_entry.status.is_created() {",
+                        '        Some("Create")',
+                        "    } else if git_status_entry.status.is_modified() {",
+                        '        Some("Update")',
+                        "    } else {",
+                        "        None",
+                        "    };",
+                        "}",
+                    ]
+                ),
+                "crates/git_ui/src/git_panel.rs",
+                {"Delete", "Create", "Update"},
+                "suggest_commit_message_action",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn render_insert_context_menu(&self) {",
+                        '    this.submenu_with_colored_icon("Skills", IconName::Sparkle, Color::Muted, menu);',
+                        '    let tooltip_label = format!("Stop Following the {}", self.agent_id);',
+                        '    let tooltip_label = format!("Stop Following {}", self.agent_id);',
+                        '    let tooltip_label = format!("Follow the {}", self.agent_id);',
+                        '    let tooltip_label = format!("Follow {}", self.agent_id);',
+                        "}",
+                    ]
+                ),
+                "crates/agent_ui/src/conversation_view/thread_view.rs",
+                {
+                    "Skills",
+                    "Stop Following the {}",
+                    "Stop Following {}",
+                    "Follow the {}",
+                    "Follow {}",
+                },
+                None,
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn render_mermaid_tabs() {",
+                        '    render_mermaid_tab_button("Preview", source_offset, true, handler);',
+                        '    render_mermaid_tab_button("Code", source_offset, false, handler);',
+                        "}",
+                    ]
+                ),
+                "crates/markdown/src/mermaid.rs",
+                {"Preview", "Code"},
+                "render_mermaid_tab_button",
+            ),
+            (
+                "\n".join(
+                    [
+                        "async fn move_to_applications() {",
+                        '    PromptButton::ok("Yes"),',
+                        '    PromptButton::cancel("No"),',
+                        "    PromptButton::new(\"Don't ask me again\"),",
+                        "}",
+                    ]
+                ),
+                "crates/zed/src/zed/move_to_applications.rs",
+                {"Yes", "No", "Don't ask me again"},
+                "move_to_applications_prompt_answer",
+            ),
+            (
+                'fn main() { Notification::new("Zed failed to launch"); }',
+                "crates/zed/src/main.rs",
+                {"Zed failed to launch"},
+                "Notification::new",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn show_no_thread_summary_model_toast(workspace: Entity<Workspace>, cx: &mut App) {",
+                        "    Self::show_thread_title_toast(",
+                        "        workspace,",
+                        '        "No model is configured for summarizing thread titles.",',
+                        "        cx,",
+                        "    );",
+                        "}",
+                    ]
+                ),
+                "crates/sidebar/src/sidebar.rs",
+                {"No model is configured for summarizing thread titles."},
+                "show_thread_title_toast",
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn build_permission_options(&self) {",
+                        '    format!("Always for {}", tool_name.replace(\'_\', " "));',
+                        '    format!("Always for `{}` commands", display);',
+                        '    format!("Always for `{}`", display);',
+                        '    format!("Always for {display_name} MCP tool");',
+                        '    "Only this time".to_string();',
+                        "}",
+                    ]
+                ),
+                "crates/agent/src/thread.rs",
+                {
+                    "Always for `{}` commands",
+                    "Always for `{}`",
+                    "Only this time",
+                },
+                None,
+            ),
+            (
+                "\n".join(
+                    [
+                        "fn render_lsp_menu_item(&self) {",
+                        '    BinaryStatus::Starting => Some((Color::Modified, "Starting…")),',
+                        '    BinaryStatus::Stopped => Some((Color::Disabled, "Stopped")),',
+                        '    BinaryStatus::Failed { .. } => Some((Color::Error, "Error")),',
+                        '    ServerHealth::Ok => (Color::Success, "Running"),',
+                        '    ServerHealth::Warning => (Color::Warning, "Warning"),',
+                        '    ServerHealth::Error => (Color::Error, "Error"),',
+                        "}",
+                    ]
+                ),
+                "crates/language_tools/src/lsp_button.rs",
+                {"Starting…", "Stopped", "Error", "Running", "Warning"},
+                "lsp_status_label",
+            ),
+        ]
+
+        for source, relative_path, expected_sources, expected_call in cases:
+            with self.subTest(relative_path=relative_path):
+                occurrences = extract_ui_strings_from_source(
+                    source,
+                    relative_path=relative_path,
+                )
+
+                by_source = {occurrence.source: occurrence for occurrence in occurrences}
+                self.assertEqual(set(by_source), expected_sources)
+                if expected_call is not None:
+                    for expected_source in expected_sources:
+                        self.assertEqual(by_source[expected_source].call, expected_call)
 
     def test_extracts_add_llm_provider_input_labels_and_textual_placeholders(self) -> None:
         source = "\n".join(
