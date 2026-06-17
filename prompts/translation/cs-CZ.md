@@ -39,6 +39,8 @@ Example output shape:
 
 **Exception:** single-word strings that are clearly visible UI labels (`Online`, `Offline`, `Favorites`, `Requests`, `Channels`, `Invites`) MUST be translated, not nulled.
 
+Short visible settings option labels such as `Auto`, `Default`, `Full`, `Hidden`, `Hollow`, `Line`, `Block`, `On`, `Off`, `Always`, `Never`, and `None` should be translated when their `kind` confirms UI/setting enum usage.
+
 Use `null` as a review signal for strings that are not safe to translate.
 
 ## TRANSLATION STYLE
@@ -68,7 +70,10 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Do not add explanations that are not present in the source.
 - Use the entry `kind`, `call`, `occurrences`, and `code_context` to disambiguate short or overloaded strings.
 - Treat `vscode_references` as VS Code language-pack translation-memory hints, not mandatory replacements.
-- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology; for an overloaded term, pick the row whose `Context` matches the string's `kind`/`code_context`. When the glossary conflicts with these disambiguation rules or local Zed UI context, follow the rules and source context.
+- Use the appended curated glossary table (`English | Context | Translation`) as baseline terminology. For any row whose `Context` is non-empty, use that row only when the string's `kind`, `code_context`, and UI role match the row context. When the glossary conflicts with disambiguation rules or local Zed UI context, follow the rules and source context.
+- Treat glossary rows with a non-empty `Context` as conditional rules, not global replacements. A matching English token is not enough; the source `kind`, `call`, `occurrences`, `code_context`, and any `context_group` must match that row's context.
+- Do not apply glossary entries as blind string replacements. Before using a glossary row, identify the source term's role in this string: command/action verb, object/concept noun, adjective/modifier, named UI surface, or display/layout mode. Use English word order plus `kind`, `call`, `occurrences`, and `code_context` to choose the matching glossary context, then adapt the chosen term naturally to Czech grammar.
+- Pay special attention to overloaded UI/Git terms: `View X` is usually an action label; `X View` is usually a named UI surface or display mode. Short Git command labels or status prefixes (`Fetch`, `Pull`, `Push`, `Rebase`, `Stash`) may require different treatment from descriptive prose or tooltips.
 
 ## DISAMBIGUATION RULES
 
@@ -86,7 +91,8 @@ Each input entry contains:
 - `kind` — extraction category, such as:
   `menu_item`, `menu`, `button`, `label`, `headline`, `tooltip`, `tooltip_meta`,
   `placeholder`, `context_menu_entry`, `setting_title`, `setting_description`,
-  `setting_placeholder`, `settings_page_title`, `settings_section_header`,
+  `setting_placeholder`, `settings_enum_variant_label`, `settings_enum_discriminant_label`,
+  `settings_page_title`, `settings_section_header`,
   `settings_subpage_title`, `settings_subpage_description`, `section_header`,
   `list_bullet_item`, `toast`, `status_toast`, `notification`, `error_prompt`,
   `prompt_message`, `prompt_detail`, `prompt_answer`, `callout_title`,
@@ -108,6 +114,7 @@ When `vscode_references` are present, use them to understand established develop
 - `prompt_message`, `prompt_detail`: translate as dialog text. Confirmations may use 2nd person plural imperative.
 - `setting_title`, `settings_page_title`, `settings_section_header`: translate as compact headings (sentence-case, no trailing punctuation).
 - `setting_description`, `settings_subpage_description`: translate as explanatory UI sentences in 3rd person singular present.
+- `settings_enum_variant_label`, `settings_enum_discriminant_label`: translate as short settings option labels. These are visible enum values, not prose and not internal IDs. Use the setting title/description, sibling enum variants, `call`, `occurrences`, and any `source_comment` in `context_group` before choosing a glossary row. Do not expand them into explanatory phrases; keep them compact.
 - `shared_string`: use context carefully. Translate when it is a visible label or message; return `null` when it looks like an ID, test value, or data value.
 - `tooltip_meta`: translate unless it is a key binding, command id, path, or code-like text.
 - `context_menu_entry`, `menu_item`: translate as command/menu labels using the perfective infinitive or a short noun phrase.
@@ -127,5 +134,6 @@ When `vscode_references` are present, use them to understand established develop
 6. Sentence-case capitalization is used in headings and labels (no English-style title case).
 7. Placeholders followed by nouns do not force awkward declension — sentences are rephrased so placeholders sit in nominative or accusative when needed.
 8. Appended glossary terms and disambiguation rules are applied consistently, with source context taking priority.
-9. VS Code references were considered as hints only, not mandatory replacements.
-10. When in doubt, the value is `null`, not a guess.
+9. Glossary terms were not used as blind replacements; grammatical role and UI role were checked first.
+10. VS Code references were considered as hints only, not mandatory replacements.
+11. When in doubt, the value is `null`, not a guess.

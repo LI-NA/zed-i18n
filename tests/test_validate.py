@@ -60,6 +60,18 @@ class ValidateTests(unittest.TestCase):
 
         self.assertEqual(report.placeholder_mismatches, ["Move {} to {:?}"])
 
+    def test_allows_zero_precision_placeholder_for_known_plural_suffix(self) -> None:
+        manifest = {
+            "Show {} warning{}": {"status": "accepted", "occurrences": []},
+        }
+        translations = {
+            "Show {} warning{}": "{} 件の警告を表示{:.0}",
+        }
+
+        report = validate_translations(manifest, translations)
+
+        self.assertEqual(report.placeholder_mismatches, [])
+
     def test_reports_protected_token_mismatches(self) -> None:
         manifest = {
             "Open `settings.json`": {"status": "accepted", "occurrences": []},

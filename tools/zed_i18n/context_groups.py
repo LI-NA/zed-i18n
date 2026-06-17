@@ -352,7 +352,7 @@ def _build_setting_enum_groups(
                     "entries": [],
                 },
             )
-            group["entries"].append(_group_entry(occurrence, "option"))
+            group["entries"].append(_settings_enum_option_entry(occurrence, lines))
 
     result: list[dict[str, Any]] = []
     for group in groups.values():
@@ -802,6 +802,34 @@ def _normalize_settings_enum_name(name: str, enum_names: set[str]) -> str | None
     return None
 
 
+def _settings_enum_option_entry(
+    occurrence: dict[str, Any],
+    lines: list[str],
+) -> dict[str, Any]:
+    entry = _group_entry(occurrence, "option")
+    source_comment = _rust_doc_comment_before_line(lines, occurrence["line"])
+    if source_comment:
+        entry["source_comment"] = source_comment
+    return entry
+
+
+def _rust_doc_comment_before_line(lines: list[str], line_number: int) -> str | None:
+    index = line_number - 2
+    while index >= 0 and lines[index].strip().startswith("#["):
+        index -= 1
+
+    comments: list[str] = []
+    while index >= 0:
+        stripped = lines[index].strip()
+        if not stripped.startswith("///"):
+            break
+        comments.append(stripped.removeprefix("///").strip())
+        index -= 1
+
+    comments.reverse()
+    return _join_text(comments) or None
+
+
 def _group_entry(occurrence: dict[str, Any], role: str) -> dict[str, Any]:
     entry = {
         "role": role,
@@ -932,22 +960,44 @@ def _settings_markdown(groups: list[dict[str, Any]]) -> str:
         title = f"{group['file']}:{group['start_line']}-{group['end_line']}"
         if group.get("context_key"):
             title += f" `{group['context_key']}`"
-        lines.extend(
-            [
-                f"## {title}",
-                "",
-                "| Role | Source | Current Translation |",
-                "|---|---|---|",
-            ]
+        lines.extend([f"## {title}", ""])
+        group_has_source_context = any(
+            entry.get("source_comment")
+            for entry in group.get("entries", [])
+            if isinstance(entry, dict)
         )
-        for entry in group.get("entries", []):
-            lines.append(
-                "| {role} | {source} | {translation} |".format(
-                    role=_markdown_cell(entry.get("role", "")),
-                    source=_markdown_cell(entry.get("source", "")),
-                    translation=_markdown_cell(entry.get("current_translation", "")),
-                )
+        if group_has_source_context:
+            lines.extend(
+                [
+                    "| Role | Source | Source Context | Current Translation |",
+                    "|---|---|---|---|",
+                ]
             )
+        else:
+            lines.extend(
+                [
+                    "| Role | Source | Current Translation |",
+                    "|---|---|---|",
+                ]
+            )
+        for entry in group.get("entries", []):
+            if group_has_source_context:
+                lines.append(
+                    "| {role} | {source} | {source_context} | {translation} |".format(
+                        role=_markdown_cell(entry.get("role", "")),
+                        source=_markdown_cell(entry.get("source", "")),
+                        source_context=_markdown_cell(entry.get("source_comment", "")),
+                        translation=_markdown_cell(entry.get("current_translation", "")),
+                    )
+                )
+            else:
+                lines.append(
+                    "| {role} | {source} | {translation} |".format(
+                        role=_markdown_cell(entry.get("role", "")),
+                        source=_markdown_cell(entry.get("source", "")),
+                        translation=_markdown_cell(entry.get("current_translation", "")),
+                    )
+                )
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 

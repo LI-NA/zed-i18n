@@ -48,6 +48,74 @@ class TranslationPromptContractTests(unittest.TestCase):
         self.assertIn("curated glossary", review_prompt)
         self.assertNotIn("auto-generated glossary", review_prompt)
 
+    def test_translation_prompts_document_settings_enum_option_labels(self) -> None:
+        required_tokens = (
+            "settings_enum_variant_label",
+            "settings_enum_discriminant_label",
+            "short settings option labels",
+        )
+        for prompt_path in sorted(TRANSLATION_PROMPTS.glob("*.md")):
+            with self.subTest(prompt=prompt_path.name):
+                prompt = prompt_path.read_text(encoding="utf-8")
+                for token in required_tokens:
+                    self.assertIn(token, prompt)
+
+    def test_glossary_headers_warn_against_context_free_replacements(self) -> None:
+        required_tokens = (
+            "single-but-ambiguous",
+            "blank = applies broadly after checking UI role",
+            "glossary rows are not blind replacements",
+        )
+        for glossary_path in sorted(GLOSSARY_DIR.glob("*.md")):
+            with self.subTest(glossary=glossary_path.name):
+                glossary = glossary_path.read_text(encoding="utf-8")
+                for token in required_tokens:
+                    self.assertIn(token, glossary)
+
+    def test_command_prompts_call_out_short_settings_enum_labels(self) -> None:
+        command_dir = ROOT / "prompts" / "commands"
+        expectations = {
+            "translation-start.md": (
+                "settings_enum_variant_label",
+                "visible settings option label",
+            ),
+            "translation-review.md": (
+                "short settings enum labels",
+                "Do not apply a glossary row just because the English token matches",
+            ),
+            "translation-audit.md": (
+                "Short settings enum labels",
+                "Do not “fix” a compact option into a longer explanatory phrase",
+            ),
+            "translation-start-new-keys.md": (
+                "settings_enum_variant_label",
+                "visible settings option label",
+            ),
+            "translation-review-new-keys.md": (
+                "short settings enum labels",
+                "Do not apply a glossary row just because the English token matches",
+            ),
+        }
+        for file_name, required_tokens in expectations.items():
+            with self.subTest(prompt=file_name):
+                prompt = (command_dir / file_name).read_text(encoding="utf-8")
+                for token in required_tokens:
+                    self.assertIn(token, prompt)
+
+    def test_translation_audit_recurring_term_is_metadata_only(self) -> None:
+        audit_prompt = (ROOT / "prompts" / "commands" / "translation-audit.md").read_text(
+            encoding="utf-8"
+        )
+
+        required_tokens = (
+            "recurring_term",
+            "grouping/reporting metadata only",
+            "must not search, replace, or fan out",
+            "never global search/replace or term-based fan-out",
+        )
+        for token in required_tokens:
+            self.assertIn(token, audit_prompt)
+
 
 def _section(markdown: str, heading: str) -> str:
     match = re.search(

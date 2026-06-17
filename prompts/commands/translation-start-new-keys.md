@@ -92,7 +92,7 @@ uv run zed-i18n prepare-translation \
 
 If `.cache/vscode-loc` exists, `prepare-translation` automatically adds optional `vscode_references` translation-memory hints to matching entries. `.cache/vscode-upstream` improves English source recovery for those hints. Missing VS Code reference checkouts are normal and are NOT an anomaly.
 
-Missing-only batches may still include already-translated sibling strings inside an entry's `context_group`. Treat those sibling translations as read-only context for setting title/description consistency, connected-line flow, or prompt/message composition; do not write them into the new-key-only result artifact unless the same source string is part of the planned batch source set.
+Missing-only batches may still include already-translated sibling strings inside an entry's `context_group`. Treat those sibling translations as read-only context for setting title/description/option consistency, connected-line flow, or prompt/message composition; do not write them into the new-key-only result artifact unless the same source string is part of the planned batch source set. For short settings enum labels, `context_group` may include `source_comment` from the Rust enum variant doc comment; use that as meaning context, not as extra output text.
 
 After each preparation step, read `reports/translation-runs/<LANG>/<MODEL_SLUG>/plan.json` and confirm:
 
@@ -119,6 +119,7 @@ Tell it:
 - Process this language's batch prompts sequentially.
 - Follow each batch prompt verbatim.
 - Use any `context_group` data as read-only sibling/flow/composition context.
+- If `kind` is `settings_enum_variant_label` or `settings_enum_discriminant_label`, treat the source as a visible settings option label. Use setting/context siblings and any `source_comment`; do not apply a glossary row just because the English token matches.
 - Use the style guide, glossary/dictionary references, and existing translations to keep terminology and tone consistent.
 - Write each result JSON only to the `output.result_file` path declared inside that batch prompt.
 - Do not touch anything else.
@@ -211,6 +212,7 @@ Tell it:
 - You are reviewing only the new-key-only artifact from this run.
 - Use the batch files to identify source strings and source context.
 - Use any `context_group` data in the batch files to review grouped settings, connected multi-line strings, and prompt-component strings together.
+- For short settings enum labels, inspect `kind`, sibling options, setting title/description context, any `source_comment`, and source occurrences before judging the translation.
 - Use `translations/<LANG>.<MODEL_SLUG>.json` to inspect the proposed new translations.
 - Use `translations/<LANG>.json` only as existing translation memory and style reference.
 - Use `prompts/translation/<LANG>.md` as the primary translation prompt and style guide.
@@ -280,7 +282,7 @@ Output a summary block in Korean:
 - Each translation sub-agent MUST write only assigned `results/batch-XXX.json` files for its own language.
 - JSON keys in result files and model artifacts MUST equal the source string byte-for-byte — no whitespace fixes, no Unicode folding, no normalization.
 - `context_group` sibling strings are context, not permission to add pre-existing or unplanned keys to result files or model artifacts.
-- If a string is ambiguous, looks like an internal ID/enum, or cannot be confidently translated, return `null`. Do not guess.
+- If a string looks like an internal ID or code enum value, return `null`; but if `kind` is `settings_enum_variant_label` or `settings_enum_discriminant_label`, treat it as a visible settings option label and translate it using setting/context siblings. Do not guess when context is insufficient.
 - Preserve all placeholders, code spans, URLs, file paths, config keys, and action IDs verbatim.
 - Keep translation generation and translation review in separate sub-agents.
 

@@ -1,8 +1,8 @@
 # Glossary for zh-cn (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual mainland Chinese developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual mainland Chinese developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -51,7 +51,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Preview | | 预览 |
 | Problem | diagnostics / generic | 问题 |
 | Profile | | 配置文件 |
-| Prompt | | 提示词 |
+| Prompt | AI prompt / prompt library / model input | 提示词 |
+| Prompt | dialog / user input prompt | 提示框 |
+| Prompt | verb: request confirmation / ask user | 提示确认 |
 | Provider | AI / model provider | 提供商 |
 | Pull | Git remote operation | 拉取 |
 | Pull Request | | 拉取请求 |
@@ -61,7 +63,10 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Remote | | 远程 |
 | Repository | | 仓库 |
 | Sandbox | | 沙盒 |
-| Selection | | 选择 |
+| Selection | bare shared menu label / ambiguous key | 选择 |
+| Selection | editor text/range selection | 选区 |
+| Selection | chosen option/value/theme selection | 选择 |
+| Selected | adjective for item/text/value | 已选 |
 | Server | | 服务器 |
 | Session | | 会话 |
 | Settings | | 设置 |
@@ -69,10 +74,12 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | 注销 |
 | Skill | Agent Skills feature | 技能 |
 | Snippet | | 代码片段 |
-| Stage | Git index | 暂存 |
+| Stage | Git command / action label | 暂存 |
+| Staged | Git status adjective | 已暂存 |
 | Stash | | 贮藏 |
 | Status Bar | | 状态栏 |
 | Subagent | | 子智能体 |
+| Subtle | shared UI style / edit prediction mode | 低调 |
 | Suggestion | inline / AI suggestion | 建议 |
 | Symbol | | 符号 |
 | Tag | | 标签 |
@@ -82,9 +89,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | 标题栏 |
 | Tool | | 工具 |
 | Tool Call | | 工具调用 |
-| Unstage | Git index | 取消暂存 |
+| Unstage | Git command / action label | 取消暂存 |
+| Unstaged | Git status adjective | 未暂存 |
 | Variable | | 变量 |
-| View | UI view / display mode | 视图 |
+| View | command/action label (View X) | 查看 |
+| View | named UI surface / display mode (X View, Tree View) | 视图 |
 | Window | | 窗口 |
 | Workspace | | 工作区 |
 | Worktree | | 工作树 |

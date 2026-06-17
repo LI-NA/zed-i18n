@@ -1,8 +1,8 @@
 # Glossary for cs (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Czech developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Czech developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -30,7 +30,8 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Editor | | Editor |
 | Extension | software / plugin | Rozšíření |
 | Extension | file name suffix | Přípona souboru |
-| Fetch | Git remote operation | Fetch |
+| Fetch | Git command / short UI label / status prefix | Fetch |
+| Fetch | Git fetch action / tooltip / prose | Vyzvednout |
 | Fetch | data / network / completion retrieval | načíst |
 | File | | Soubor |
 | Filter | | Filtrovat |
@@ -48,17 +49,27 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Panel | named Zed panel | Panel |
 | Patch | | Oprava |
 | Path | | Cesta |
-| Preview | | Náhled |
+| Preview | file / Markdown / UI preview / preview tab or mode | Náhled |
+| Preview | command/action label (Preview X) | Zobrazit náhled |
+| Preview | Zed release channel / build name | Preview |
 | Problem | | Problém |
 | Profile | | Profil |
-| Prompt | | Výzva |
+| Prompt | AI prompt / prompt library / model input | Výzva |
+| Prompt | dialog / user input prompt | Vstupní dialog |
+| Prompt | verb: request confirmation / ask user | Požádat o potvrzení |
 | Provider | AI / model provider | Poskytovatel |
-| Pull | Git remote operation | Pull |
+| Pull | Git command / short UI label / status prefix | Pull |
+| Pull | Git pull action / tooltip / prose | Vyzvednout a začlenit |
 | Pull Request | | Žádost o přijetí změn |
-| Push | Git remote operation | Push |
-| Rebase | | Rebase |
+| Push | Git command / short UI label / status prefix | Push |
+| Push | Git push action / tooltip / prose | Odeslat |
+| Rebase | Git command / short label | Rebase |
+| Rebase | descriptive prose / operation name | Přeskládání |
 | Reference | code navigation | Odkaz |
-| Remote | | Vzdálené |
+| Remote | Git remote short UI label / branch filter | Vzdálené |
+| Remote | Git remote name / alias / command object | remote |
+| Remote | Git remote repository itself / prose explicitly about repository | Vzdálené úložiště |
+| Remote | remote development / server / project adjective | vzdálený |
 | Repository | | Úložiště |
 | Sandbox | | sandbox |
 | Selection | | Výběr |
@@ -69,7 +80,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | Odhlásit se |
 | Skill | Agent Skills feature | Dovednost |
 | Snippet | | Fragment |
-| Stage | Git index | Připravit ke commitu |
+| Split | DiffViewStyle setting option paired with Unified / compact label; not Split Up/Down commands | Rozdělené |
+| Stage | Git command / action label | Připravit ke commitu |
+| Staged | Git status adjective | Připravené |
 | Stash | Git object (noun) | Dočasné úložiště |
 | Stash | Git command (verb) | Dočasně uložit |
 | Status Bar | | Stavový řádek |
@@ -82,9 +95,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | Záhlaví |
 | Tool | | Nástroj |
 | Tool Call | | Volání nástroje |
-| Unstage | Git index | Odebrat z přípravy |
+| Unstage | Git command / action label | Odebrat z přípravy |
+| Unstaged | Git status adjective | Nepřipravené |
 | Variable | | Proměnná |
-| View | UI view / display mode | Zobrazení |
+| View | command/action label (View X) | Zobrazit |
+| View | named UI surface / display mode (X View, Tree View) | Zobrazení |
 | Window | | Okno |
 | Workspace | | Pracovní prostor |
 | Worktree | | Worktree |

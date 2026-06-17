@@ -262,8 +262,11 @@ class ContextGroupTests(unittest.TestCase):
             "\n".join(
                 [
                     "pub enum ThinkingBlockDisplay {",
+                    "    /// Let Zed decide whether to show thinking blocks.",
                     "    Auto,",
+                    "    /// Show thinking blocks as previews.",
                     "    Preview,",
+                    "    /// Always expand thinking blocks.",
                     "    AlwaysExpanded,",
                     "}",
                 ]
@@ -275,7 +278,7 @@ class ContextGroupTests(unittest.TestCase):
                 "occurrences": [
                     self._occurrence(
                         "crates/settings_content/src/agent.rs",
-                        2,
+                        3,
                         "strum::VariantNames",
                         "settings_enum_variant_label",
                     )
@@ -286,7 +289,7 @@ class ContextGroupTests(unittest.TestCase):
                 "occurrences": [
                     self._occurrence(
                         "crates/settings_content/src/agent.rs",
-                        3,
+                        5,
                         "strum::VariantNames",
                         "settings_enum_variant_label",
                     )
@@ -297,7 +300,7 @@ class ContextGroupTests(unittest.TestCase):
                 "occurrences": [
                     self._occurrence(
                         "crates/settings_content/src/agent.rs",
-                        4,
+                        7,
                         "strum::VariantNames",
                         "settings_enum_variant_label",
                     )
@@ -323,7 +326,78 @@ class ContextGroupTests(unittest.TestCase):
                 ("option", "Always Expanded"),
             ],
         )
+        self.assertEqual(
+            [entry.get("source_comment") for entry in group["entries"]],
+            [
+                "Let Zed decide whether to show thinking blocks.",
+                "Show thinking blocks as previews.",
+                "Always expand thinking blocks.",
+            ],
+        )
         self.assertEqual(group["entries"][0]["current_translation"], "자동")
+
+    def test_setting_enum_variant_comments_skip_variant_attributes(self) -> None:
+        self._write_source(
+            "crates/settings_content/src/project.rs",
+            "\n".join(
+                [
+                    "pub enum GitHunkStyleSetting {",
+                    "    /// Show unstaged hunks with a filled background and staged hunks hollow.",
+                    '    #[strum(serialize = "Staged Hollow")]',
+                    "    #[default]",
+                    "    StagedHollow,",
+                    "    /// Show unstaged hunks hollow and staged hunks with a filled background.",
+                    '    #[strum(serialize = "Unstaged Hollow")]',
+                    "    UnstagedHollow,",
+                    "}",
+                ]
+            ),
+        )
+        manifest = {
+            "Staged Hollow": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/project.rs",
+                        3,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+            "Unstaged Hollow": {
+                "status": "accepted",
+                "occurrences": [
+                    self._occurrence(
+                        "crates/settings_content/src/project.rs",
+                        7,
+                        "strum::VariantNames",
+                        "settings_enum_variant_label",
+                    )
+                ],
+            },
+        }
+
+        groups = build_context_groups(
+            zed_root=self.zed_root,
+            manifest=manifest,
+            translations={},
+        )
+
+        group = groups.settings[0]
+        self.assertEqual(
+            [(entry["source"], entry.get("source_comment")) for entry in group["entries"]],
+            [
+                (
+                    "Staged Hollow",
+                    "Show unstaged hunks with a filled background and staged hunks hollow.",
+                ),
+                (
+                    "Unstaged Hollow",
+                    "Show unstaged hunks hollow and staged hunks with a filled background.",
+                ),
+            ],
+        )
 
     def test_builds_setting_groups_with_dropdown_options(self) -> None:
         self._write_source(
@@ -1110,6 +1184,28 @@ class ContextGroupTests(unittest.TestCase):
                 ],
             }
         )
+        groups.settings.append(
+            {
+                "id": "settings_enum:main.rs:5",
+                "type": "setting",
+                "subtype": "settings_enum",
+                "file": "main.rs",
+                "start_line": 5,
+                "end_line": 6,
+                "context_key": "DiffViewStyle",
+                "entries": [
+                    {
+                        "role": "option",
+                        "source": "Split",
+                        "kind": "settings_enum_variant_label",
+                        "call": "strum::VariantNames",
+                        "line": 5,
+                        "source_comment": "Show diffs in a split view.",
+                        "current_translation": "분할",
+                    }
+                ],
+            }
+        )
         groups.connected_lines.append(
             {
                 "id": "connected:main.rs:10",
@@ -1182,6 +1278,15 @@ class ContextGroupTests(unittest.TestCase):
             self.root / "reports" / "context-groups" / "ko-KR" / "summary.json"
         )
         self.assertIn("Line Width", settings_md)
+        self.assertIn(
+            "## main.rs:1-2 `editor.line_width`\n\n| Role | Source | Current Translation |",
+            settings_md,
+        )
+        self.assertIn(
+            "## main.rs:5-6 `DiffViewStyle`\n\n| Role | Source | Source Context | Current Translation |",
+            settings_md,
+        )
+        self.assertIn("| option | Split | Show diffs in a split view. | 분할 |", settings_md)
         self.assertEqual(len(connected_json), 1)
         self.assertEqual(len(prompt_components_json), 1)
         self.assertEqual(summary["connected_lines"], 1)

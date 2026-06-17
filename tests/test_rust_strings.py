@@ -1,6 +1,10 @@
 import unittest
 
-from tools.zed_i18n.rust_strings import rust_format_placeholders, rust_string_literal
+from tools.zed_i18n.rust_strings import (
+    rust_format_placeholders,
+    rust_format_placeholders_compatible,
+    rust_string_literal,
+)
 
 
 class RustStringTests(unittest.TestCase):
@@ -21,6 +25,42 @@ class RustStringTests(unittest.TestCase):
 
     def test_does_not_ignore_invalid_rust_unicode_escape_braces(self) -> None:
         self.assertEqual(rust_format_placeholders("Bad escape \\u{ZZ}"), ["{ZZ}"])
+
+    def test_allows_zero_precision_placeholder_for_known_plural_suffix(self) -> None:
+        self.assertTrue(
+            rust_format_placeholders_compatible(
+                "Resolve Merge Conflict{} with Agent",
+                "에이전트로 병합 충돌 해결{:.0}",
+            )
+        )
+        self.assertTrue(
+            rust_format_placeholders_compatible(
+                "Show {} warning{}",
+                "{} 件の警告を表示{:.0}",
+            )
+        )
+        self.assertTrue(
+            rust_format_placeholders_compatible(
+                "{} Comment{}",
+                "{} 件のコメント{:.0}",
+            )
+        )
+
+    def test_rejects_zero_precision_placeholder_for_unlisted_source(self) -> None:
+        self.assertFalse(
+            rust_format_placeholders_compatible(
+                "Move {} to {}",
+                "{} に移動{:.0}",
+            )
+        )
+
+    def test_rejects_zero_precision_placeholder_for_non_suffix_argument(self) -> None:
+        self.assertFalse(
+            rust_format_placeholders_compatible(
+                "Show {} warning{}",
+                "{:.0} 件の警告を表示{}",
+            )
+        )
 
     def test_rust_string_literal_preserves_rust_unicode_escapes(self) -> None:
         self.assertEqual(

@@ -25,7 +25,7 @@ AUDIT_DIR_NAME: [DIR_NAME]
 
 # Zed i18n — Full Translation Audit (Conservative Review Pass)
 
-You are running a coordinated, multi-agent **audit/QA pass** over one or more pre-translated Zed locales. The translation files already exist and have passed multiple earlier AI review rounds — your job is **NOT** to rewrite them, but to catch a small number of genuine defects (mistranslation, unnatural phrasing, broken connected-sentence flow inside multi-line doc-comment clusters, terminology/sibling inconsistencies) and emit two artefacts per language:
+You are running a coordinated, multi-agent **audit/QA pass** over one or more pre-translated Zed locales. The translation files already exist and have passed multiple earlier AI review rounds — your job is **NOT** to rewrite them, but to catch a small number of genuine defects (mistranslation, unnatural phrasing, broken connected-sentence flow inside multi-line doc-comment clusters, terminology/sibling inconsistencies, document-wide recurring mistranslations) and emit two artefacts per language:
 - applied `changes.json` entries directly into `translations/<LOCALE>.json` (must-fix)
 - a curated `suggestions.md` of optional improvements (could-do — left for human review)
 
@@ -108,14 +108,18 @@ If `reports/<AUDIT_DIR_NAME>/preprocess/batches.json` already exists, ensure `re
    uv run python reports/<AUDIT_DIR_NAME>/preprocess/build_batch_meta.py
    ```
 6. Write `reports/<AUDIT_DIR_NAME>/agent-guide.md` — the per-sub-agent instruction document. It must specify:
-   - the five audit lenses (A. mistranslation · B. unnatural phrasing · C. setting title/description consistency · D. connected-sentence flow · E. terminology consistency)
+   - the six audit lenses (A. mistranslation · B. unnatural phrasing · C. setting title/description consistency · D. connected-sentence flow · E. terminology consistency · F. document-wide / recurring mistranslation)
+   - **Short settings enum labels**: review `settings_enum_variant_label` and `settings_enum_discriminant_label` as option values. Check sibling variants, setting title/description, and any `source_comment` before changing them. Do not “fix” a compact option into a longer explanatory phrase, and do not align it to a glossary row unless the setting context matches.
+   - **the MAJORITY TRAP rule** (state it explicitly): frequency is NOT correctness. NEVER align a correct translation to a more-frequent wrong one — consistency with a wrong term is still wrong. When the same English term is translated inconsistently across keys, first decide which form is CORRECT (from the source meaning + real target-language usage), then align wrong occurrences toward the correct form **even if the correct form is currently the minority**. If the DOMINANT form is itself the mistranslation, a document-wide correction is valid only as explicit per-key changes: emit one normal `changes.json` entry for each affected key you audited and whose `current` value you verified. Do NOT assume `recurring_term` causes automatic fan-out. If you suspect broader document-wide impact outside your assigned/audited keys, record it in `notes.md` and/or `suggestions.json` for follow-up rather than inventing changes.
+   - **lens F output:** when a finding is a recurring/document-wide mistranslation, add a `recurring_term` field (the English term) to each explicit `changes.json` or `suggestions.json` entry that belongs to that recurring issue. This field is grouping/reporting metadata only. `apply_changes.py` applies only listed key-level changes and must not search, replace, or fan out changes from `recurring_term`.
    - the LANGUAGE_SHORT glossary mapping table
    - the prohibition list (no worktree / no branch / no git write / no `translations/*.json` modification / no auto-script audit / no sub-agent spawning)
-   - the output spec for `changes.json`, `suggestions.json`, `notes.md` (key MUST byte-match catalog; current MUST byte-match the live translation; placeholders/backticks/product names/escapes preserved)
+   - the output spec for `changes.json`, `suggestions.json`, `notes.md` (key MUST byte-match catalog; current MUST byte-match the live translation; placeholders/backticks/product names/escapes preserved; optional `recurring_term` field — the English term — for grouping/reporting lens-F recurring findings; it does not imply automatic application to unlisted keys)
    - conservative target: **1–5% must-fix rate**
    - context-group workflow: read `reports/<AUDIT_DIR_NAME>/context-groups/<LOCALE>/settings-groups.md`, `connected-lines.md`, and `prompt-components.md` for assigned keys before proposing sibling, line-flow, or prompt-composition fixes
 7. Write `reports/<AUDIT_DIR_NAME>/apply_changes.py` — applies one locale's `batch-XX/changes.json` files into `translations/<LOCALE>.json`. It must:
    - verify each change's `current` byte-matches the live file before applying (skip with warning on mismatch)
+   - treat `recurring_term` and any other unknown metadata fields as informational only; apply only explicit entries with verified `key`, `current`, and `proposed`, never global search/replace or term-based fan-out
    - preserve original file formatting (2-space indent, `ensure_ascii=False`, sorted keys, trailing `\n`, Windows-default newline handling)
    - emit `reports/<AUDIT_DIR_NAME>/<LOCALE>/apply.log`
    - support `--dry-run`
@@ -145,7 +149,7 @@ For each locale in `TARGET LANGUAGES`, in this exact order:
    Grouped review context: `reports/<AUDIT_DIR_NAME>/context-groups/<LOCALE>/`.
    Output: `reports/<AUDIT_DIR_NAME>/<LOCALE>/batch-NN/` — `changes.json`, `suggestions.json`, `notes.md` (use `batch-NN`, two-digit zero-padded folder name).
 
-   Reminders: no worktree/branch/commit/push; do not modify `translations/<LOCALE>.json`; audit each key by reading it (no auto-scripted comparison); review setting groups, connected-line groups, and prompt-component groups as units when present; be conservative (~1–5% must-fix); final report under 200 words, file paths only.
+   Reminders: no worktree/branch/commit/push; do not modify `translations/<LOCALE>.json`; audit each key by reading it (no auto-scripted comparison); review setting groups, short settings enum labels, connected-line groups, and prompt-component groups as units when present; be conservative (~1–5% must-fix); final report under 200 words, file paths only.
    ```
 
    Use `subagent_type: "general-purpose"`, `model: "opus"`. Do NOT pass `isolation: "worktree"`. Wait for all 6 to return before launching the next round.
@@ -213,6 +217,8 @@ A concise message containing:
 - Every `key` in a sub-agent's output MUST equal `catalog/en-US.json[key]` byte-for-byte.
 - Every `current` field MUST equal `translations/<LOCALE>.json[key]` byte-for-byte at the time the sub-agent ran.
 - Every `proposed`/`alternative` MUST preserve placeholders (`{}`, `{name}`, `{0}`), backtick code spans, URLs, file paths, product/proper nouns, and escape sequences (`\n`, `\t`).
+- **Three plural-suffix keys are special — never alter their plural placeholder.** In `Show {} warning{}`, `{} Comment{}`, and `Resolve Merge Conflict{} with Agent`, the English source fills the trailing `{}` with a pluralization suffix (`""` for singular, `"s"` for plural — e.g. "1 warning" vs "3 warnings"). A correct translation MAY keep that `{}`, reposition it onto the head noun, or replace it with `{:.0}` — which renders **nothing** (precision 0 on the suffix string), a deliberate way to drop the English "s" in languages that do not pluralize by an appended suffix. All of these are intentional. NEVER "fix" `{:.0}` back to `{}`, never remove or relocate the suffix placeholder, and never flag these three keys' placeholder form as a defect: the current form is the answer.
+- **Per-key token preservation inside connected-line groups (validator-enforced).** Protected tokens — single-quoted `'snake_case'` setting keys, backtick code spans, placeholders, paths — are checked PER KEY by `validate`. When smoothing the flow of a multi-line connected group, a token that appears in one key's English source MUST remain in that same key's translation — do NOT move it onto a sibling line to make the joined sentence read better. If a clean flow fix is impossible without dropping or relocating a token across keys, leave the current translation. (The `'preferred_line_length'` connected key has failed validation exactly this way.)
 - The audit run NEVER touches `.cache/zed/` (read-only) or any file outside `reports/<AUDIT_DIR_NAME>/` and `translations/<LOCALE>.json` for in-scope locales.
 - On Windows, write Python helper scripts to a `.py` file and invoke with `uv run python <file>` — do not use inline `python -c` or heredocs (cp949 / shell-escaping pitfalls).
 

@@ -1,8 +1,8 @@
 # Glossary for pl (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Polish developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Polish developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -31,7 +31,8 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Editor | | Edytor |
 | Extension | software / plugin | Rozszerzenie |
 | Extension | file name suffix | Rozszerzenie pliku |
-| Fetch | Git remote operation | Fetch |
+| Fetch | Git command / short UI label / status prefix | Fetch |
+| Fetch | Git fetch action / tooltip / prose | Pobierz |
 | Fetch | data / network / completion retrieval | Pobierz |
 | File | | Plik |
 | Filter | | Filtr |
@@ -43,24 +44,36 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Keybinding | | Powiązanie klawiszy |
 | Language Server | | Serwer języka |
 | Merge Conflict | | Konflikt scalania |
-| Message | | Komunikat |
+| Message | chat / agent / user message | Wiadomość |
+| Message | error / log / status / commit message | Komunikat |
+| Message | command verb (Message X) | Wyślij wiadomość |
 | Model | | Model |
 | Outline | | Konspekt |
 | Pane | split editor pane | Okienko |
 | Panel | named Zed panel | Panel |
 | Patch | | Poprawka |
 | Path | | Ścieżka |
-| Preview | | Podgląd |
+| Preview | file / Markdown / UI preview / preview tab or mode | Podgląd |
+| Preview | command/action label (Preview X) | Wyświetl podgląd |
+| Preview | release channel / build | Wersja zapoznawcza |
 | Problem | diagnostics / generic | Problem |
 | Profile | | Profil |
-| Prompt | | Polecenie |
+| Prompt | AI prompt / prompt library / model input | Polecenie |
+| Prompt | dialog / user input prompt | Monit |
+| Prompt | verb: request confirmation / ask user | poprosić o potwierdzenie |
 | Provider | AI / model provider | Dostawca |
-| Pull | Git remote operation | Pull |
+| Pull | Git command / short UI label / status prefix | Pull |
+| Pull | Git pull action / tooltip / prose | Ściągnij |
 | Pull Request | | Pull request |
-| Push | Git remote operation | Push |
-| Rebase | | Rebase |
+| Push | Git command / short UI label / status prefix | Push |
+| Push | Git push action / tooltip / prose | Wypchnij |
+| Rebase | Git command / short label | Rebase |
+| Rebase | descriptive prose / operation name | Zmiana bazy |
 | Reference | code navigation | Odwołanie |
-| Remote | | Remote |
+| Remote | Git remote short UI label / branch filter | Zdalne |
+| Remote | Git remote name / alias / command object | remote |
+| Remote | Git remote repository itself / prose explicitly about repository | Zdalne repozytorium |
+| Remote | remote development / server / project adjective | zdalny |
 | Repository | | Repozytorium |
 | Sandbox | | piaskownica |
 | Selection | | Zaznaczenie |
@@ -71,7 +84,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | Wyloguj się |
 | Skill | Agent Skills feature | Umiejętność |
 | Snippet | | Fragment kodu |
-| Stage | Git index | Przygotuj |
+| Split | DiffViewStyle setting option paired with Unified / compact label; not Split Up/Down commands | Podzielony |
+| Stage | Git command / action label | Przygotuj |
+| Staged | Git status adjective | Przygotowane |
 | Stash | | Stash |
 | Status Bar | | Pasek stanu |
 | Subagent | | Agent podrzędny |
@@ -83,9 +98,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | Pasek tytułu |
 | Tool | | Narzędzie |
 | Tool Call | | Wywołanie narzędzia |
-| Unstage | Git index | Cofnij przygotowanie |
+| Unstage | Git command / action label | Cofnij przygotowanie |
+| Unstaged | Git status adjective | Nieprzygotowane |
 | Variable | | Zmienna |
-| View | UI view / display mode | Widok |
+| View | command/action label (View X) | Wyświetl |
+| View | named UI surface / display mode (X View, Tree View) | Widok |
 | Window | | Okno |
 | Workspace | | Obszar roboczy |
-| Worktree | | Worktree |
+| Worktree | | Drzewo robocze |

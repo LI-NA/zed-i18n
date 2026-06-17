@@ -6,6 +6,12 @@ import re
 import warnings
 
 _RUST_UNICODE_ESCAPE_RE = re.compile(r"\\u\{([0-9A-Fa-f_]{1,6})\}")
+_ZERO_PRECISION_SUFFIX_PLACEHOLDER = "{:.0}"
+_ZERO_PRECISION_SUFFIX_SOURCES = {
+    "Resolve Merge Conflict{} with Agent": frozenset({0}),
+    "Show {} warning{}": frozenset({1}),
+    "{} Comment{}": frozenset({1}),
+}
 
 
 def rust_format_placeholders(text: str) -> list[str]:
@@ -38,7 +44,36 @@ def rust_format_placeholders(text: str) -> list[str]:
 def rust_format_placeholders_compatible(source: str, translation: str) -> bool:
     source_implicit, source_explicit = _rust_format_placeholder_profile(source)
     translation_implicit, translation_explicit = _rust_format_placeholder_profile(translation)
-    return source_implicit == translation_implicit and source_explicit == translation_explicit
+    return (
+        _implicit_placeholders_compatible(source, source_implicit, translation_implicit)
+        and source_explicit == translation_explicit
+    )
+
+
+def _implicit_placeholders_compatible(
+    source: str,
+    source_placeholders: list[str],
+    translation_placeholders: list[str],
+) -> bool:
+    if source_placeholders == translation_placeholders:
+        return True
+    if len(source_placeholders) != len(translation_placeholders):
+        return False
+
+    zero_precision_indices = _ZERO_PRECISION_SUFFIX_SOURCES.get(source, frozenset())
+    for index, (source_placeholder, translation_placeholder) in enumerate(
+        zip(source_placeholders, translation_placeholders, strict=True)
+    ):
+        if source_placeholder == translation_placeholder:
+            continue
+        if (
+            index in zero_precision_indices
+            and source_placeholder == "{}"
+            and translation_placeholder == _ZERO_PRECISION_SUFFIX_PLACEHOLDER
+        ):
+            continue
+        return False
+    return True
 
 
 def _rust_format_placeholder_profile(text: str) -> tuple[list[str], Counter[str]]:

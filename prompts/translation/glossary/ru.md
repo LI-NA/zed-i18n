@@ -1,8 +1,8 @@
 # Glossary for ru (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Russian developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Russian developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -30,7 +30,8 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Editor | | Редактор |
 | Extension | software / plugin | Расширение |
 | Extension | file name suffix | Расширение файла |
-| Fetch | Git remote operation | Fetch |
+| Fetch | Git command / short UI label / status prefix | Fetch |
+| Fetch | Git fetch action / tooltip / prose | выполнить Fetch |
 | Fetch | data / network / completion retrieval | Получить |
 | File | | Файл |
 | Filter | | Фильтр |
@@ -49,17 +50,26 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Panel | named Zed panel | Панель |
 | Patch | | Исправление |
 | Path | | Путь |
-| Preview | | Предварительный просмотр |
+| Preview | file / Markdown / UI preview / preview tab or mode | Предварительный просмотр |
+| Preview | command/action label (Preview X) | Просмотреть |
+| Preview | release channel / build | Предварительная версия |
 | Problem | diagnostics / generic | Проблема |
 | Profile | | Профиль |
-| Prompt | | Запрос |
+| Prompt | AI prompt / prompt library / model input | Запрос |
+| Prompt | dialog / user input prompt | Диалог ввода |
+| Prompt | verb: request confirmation / ask user | запросить подтверждение |
 | Provider | AI / model provider | Поставщик |
-| Pull | Git remote operation | Pull |
+| Pull | Git command / short UI label / status prefix | Pull |
+| Pull | Git pull action / tooltip / prose | вытянуть |
 | Pull Request | | Пулл-реквест |
-| Push | Git remote operation | Push |
+| Push | Git command / short UI label / status prefix | Push |
+| Push | Git push action / tooltip / prose | отправить |
 | Rebase | | Перебазирование |
 | Reference | code navigation | Ссылка |
-| Remote | | Удалённый репозиторий |
+| Remote | Git remote short label / branch filter | Удалённые |
+| Remote | Git remote name / alias / command object | удалённый источник |
+| Remote | Git remote repository itself / prose explicitly about repository | Удалённый репозиторий |
+| Remote | remote development / server / project adjective | удалённый |
 | Repository | | Репозиторий |
 | Sandbox | | песочница |
 | Selection | | Выделение |
@@ -70,7 +80,10 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | Выйти |
 | Skill | Agent Skills feature | Навык |
 | Snippet | | Фрагмент |
-| Stage | Git index | Внести в индекс |
+| Split | DiffViewStyle setting option paired with Unified / compact label; not Split Up/Down commands | Разделённое |
+| Stage | Git command / action label | Внести в индекс |
+| Stage | Git index / staging area noun | Индекс Git |
+| Staged | Git status adjective | В индексе |
 | Stash | Git object (noun) | Спрятанные изменения |
 | Stash | Git command (verb) | Спрятать |
 | Status Bar | | Строка состояния |
@@ -84,9 +97,12 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | Заголовок окна |
 | Tool | | Инструмент |
 | Tool Call | | Вызов инструмента |
-| Unstage | Git index | Удалить из индекса |
+| Unstage | Git command / action label | Удалить из индекса |
+| Unstaged | Git status adjective | Не в индексе |
 | Variable | | Переменная |
-| View | UI view / display mode | Представление |
+| View | command/action label (View X) | Показать |
+| View | top-level menu (View) | Вид |
+| View | named UI surface / display mode (X View, Tree View) | Представление |
 | Window | | Окно |
 | Workspace | | Рабочая область |
 | Worktree | | Рабочее дерево |

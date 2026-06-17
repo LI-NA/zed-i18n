@@ -1,8 +1,8 @@
 # Glossary for it (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Italian developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Italian developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -30,7 +30,8 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Editor | | Editor |
 | Extension | software / plugin | Estensione |
 | Extension | file name suffix | Estensione del file |
-| Fetch | Git remote operation | Fetch |
+| Fetch | Git command / short UI label / status prefix | Fetch |
+| Fetch | Git fetch action / tooltip / prose | eseguire il fetch |
 | Fetch | data / network / completion retrieval | Recuperare |
 | File | | File |
 | Filter | | Filtro |
@@ -42,23 +43,36 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Language Server | | Server di linguaggio |
 | Merge Conflict | | Conflitto di merge |
 | Message | | Messaggio |
+| Message Editor | agent message input | Editor dei messaggi |
+| Message Editor | Git commit message editor | Editor del messaggio di commit |
 | Model | | Modello |
 | Outline | | Struttura |
 | Pane | split editor pane | Riquadro |
 | Panel | named Zed panel | Pannello |
 | Patch | | Patch |
 | Path | | Percorso |
-| Preview | | Anteprima |
+| Preview | file / Markdown / UI preview / preview tab or mode | Anteprima |
+| Preview | command/action label (Preview X) | Visualizzare l'anteprima |
+| Preview | Zed release channel / build name | Preview |
 | Problem | | Problema |
 | Profile | | Profilo |
-| Prompt | | Prompt |
+| Prompt | AI prompt / prompt library / model input | Prompt |
+| Prompt | dialog / user input prompt | Prompt di input |
+| Prompt | verb: request confirmation / ask user | Richiedere |
 | Provider | AI / model provider | Provider |
-| Pull | Git remote operation | Pull |
+| Pull | Git command / short UI label / status prefix | Pull |
+| Pull | Git pull action / tooltip / prose | eseguire il pull |
 | Pull Request | | Richiesta pull |
-| Push | Git remote operation | Push |
+| Push | Git command / short UI label / status prefix | Push |
+| Push | Git push action / tooltip / prose | eseguire il push |
 | Rebase | | Rebase |
 | Reference | code navigation | Riferimento |
-| Remote | | Remoto |
+| Remote | Git remote short label / name / alias / branch filter | Remoto |
+| Remote | Git remote repository itself / prose explicitly about repository | Repository remoto |
+| Remote | remote development / server / project / repository adjective with masculine singular noun | remoto |
+| Remote | remote folder / instance adjective with feminine singular noun | remota |
+| Remote | remote projects / servers / branches adjective with masculine plural noun | remoti |
+| Remote | remote folders / instances adjective with feminine plural noun | remote |
 | Repository | | Repository |
 | Sandbox | | sandbox |
 | Selection | | Selezione |
@@ -69,7 +83,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | Disconnetti |
 | Skill | Agent Skills feature | Competenza |
 | Snippet | | Frammento |
-| Stage | Git index | Esegui staging |
+| Split | DiffViewStyle setting option paired with Unified / compact label; not Split Up/Down commands | Affiancata |
+| Stage | Git command / action label | Esegui staging |
+| Staged | Git status adjective | In staging |
 | Stash | Git object (noun) | Accantonamento |
 | Stash | Git command (verb) | Accantona |
 | Status Bar | | Barra di stato |
@@ -83,9 +99,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | Barra del titolo |
 | Tool | | Strumento |
 | Tool Call | | Chiamata di strumento |
-| Unstage | Git index | Annulla staging |
+| Unstage | Git command / action label | Annulla staging |
+| Unstaged | Git status adjective | Non in staging |
 | Variable | | Variabile |
-| View | UI view / display mode | Visualizzazione |
+| View | command/action label (View X) | Visualizza |
+| View | named UI surface / display mode (X View, Tree View) | Visualizzazione |
 | Window | | Finestra |
 | Workspace | | Area di lavoro |
 | Worktree | | Worktree |

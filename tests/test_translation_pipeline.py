@@ -118,6 +118,8 @@ class TranslationPipelineTests(unittest.TestCase):
         self.assertIn("Base ko-KR prompt", prompt)
         self.assertIn("Rate Limit Reached", prompt)
         self.assertIn("prompt-component context", prompt)
+        self.assertIn("source_comment", prompt)
+        self.assertIn("settings_enum_variant_label", prompt)
 
         prepare_translation_batches(
             root=self.root,

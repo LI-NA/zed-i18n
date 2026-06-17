@@ -1,8 +1,8 @@
 # Glossary for ja (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded or single-but-ambiguous; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Japanese developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Japanese developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -55,7 +55,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Preview | | プレビュー |
 | Problem | diagnostics / generic | 問題 |
 | Profile | | プロファイル |
-| Prompt | | プロンプト |
+| Prompt | AI prompt / prompt library / model input | プロンプト |
+| Prompt | dialog / user input prompt | 入力プロンプト |
+| Prompt | verb: request confirmation / ask user | 確認を求める |
 | Provider | AI / model provider | プロバイダー |
 | Pull | Git remote operation | プル |
 | Pull Request | | プルリクエスト |
@@ -73,7 +75,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | サインアウト |
 | Skill | Agent Skills feature | スキル |
 | Snippet | | スニペット |
-| Stage | Git index | ステージ |
+| Stage | Git command / action label | ステージ |
+| Stage | Git index / staging area noun | ステージングエリア |
+| Staged | Git status adjective | ステージ済み |
 | Stash | | スタッシュ |
 | Status Bar | | ステータスバー |
 | Subagent | | サブエージェント |
@@ -85,9 +89,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | タイトルバー |
 | Tool | | ツール |
 | Tool Call | | ツール呼び出し |
-| Unstage | Git index | ステージング解除 |
+| Unstage | Git command / action label | ステージング解除 |
+| Unstaged | Git status adjective | 未ステージ |
 | Variable | | 変数 |
-| View | UI view / display mode | ビュー |
+| View | command/action label (View X) | 表示 |
+| View | named UI surface / display mode (X View, Tree View) | ビュー |
 | Window | | ウィンドウ |
 | Workspace | | ワークスペース |
 | Worktree | | ワークツリー |

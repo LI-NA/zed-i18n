@@ -312,6 +312,40 @@ class ApplyTests(unittest.TestCase):
         self.assertEqual(report.applied, [source])
         self.assertEqual(report.stale, [])
 
+    def test_applies_zero_precision_placeholder_for_known_plural_suffix(self) -> None:
+        source_path = self.root / "main.rs"
+        source = "Show {} warning{}"
+        source_path.write_text(
+            'let label = format!("Show {} warning{}", warning_count, plural_suffix);\n',
+            encoding="utf-8",
+        )
+        manifest = {
+            source: {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "main.rs",
+                        "line": 1,
+                        "call": "format!",
+                        "kind": "button",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(
+            self.root,
+            manifest,
+            {source: "{} 件の警告を表示{:.0}"},
+        )
+
+        self.assertEqual(report.applied, [source])
+        self.assertEqual(report.stale, [])
+        self.assertIn(
+            'format!("{} 件の警告を表示{:.0}", warning_count, plural_suffix)',
+            source_path.read_text(encoding="utf-8"),
+        )
+
     def test_applies_translation_to_action_doc_comment_occurrence(self) -> None:
         source_path = self.root / "crates" / "agent_ui" / "src" / "agent_ui.rs"
         source_path.parent.mkdir(parents=True)

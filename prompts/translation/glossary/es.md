@@ -1,8 +1,8 @@
 # Glossary for es (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Spanish (Spain) developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Spanish (Spain) developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -30,7 +30,8 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Editor | | Editor |
 | Extension | software / plugin | Extensión |
 | Extension | file name suffix | Extensión de archivo |
-| Fetch | Git remote operation | Fetch |
+| Fetch | Git command / short UI label / status prefix | Fetch |
+| Fetch | Git fetch action / tooltip / prose | hacer fetch |
 | Fetch | data / network / completion retrieval | Obtener |
 | File | | Archivo |
 | Filter | | Filtrar |
@@ -50,18 +51,27 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Patch | | Parche |
 | Path | | Ruta |
 | Preview | file / Markdown / UI preview | Vista previa |
+| Preview | command/action label (Preview X) | Previsualizar |
 | Preview | release channel / build | Versión preliminar |
 | Problem | diagnostics / generic | Problema |
 | Profile | | Perfil |
 | Prompt | AI prompt / prompt library | prompt |
-| Prompt | dialog / user input prompt | mensaje |
+| Prompt | dialog / user input prompt | diálogo |
+| Prompt | verb: request confirmation / ask user | solicitar |
 | Provider | AI / model provider | Proveedor |
-| Pull | Git remote operation | Pull |
+| Pull | Git command / short UI label / status prefix | Pull |
+| Pull | Git pull action / tooltip / prose | incorporar cambios |
 | Pull Request | | Solicitud de cambios |
-| Push | Git remote operation | Push |
+| Push | Git command / short UI label / status prefix | Push |
+| Push | Git push action / tooltip / prose | hacer push |
 | Rebase | | Rebase |
 | Reference | code navigation | Referencia |
-| Remote | | Remoto |
+| Remote | Git remote short label / name / alias / branch filter | Remoto |
+| Remote | Git remote repository itself / prose explicitly about repository | Repositorio remoto |
+| Remote | remote development / server / project / file adjective with masculine singular noun | remoto |
+| Remote | remote folder / branch / instance adjective with feminine singular noun | remota |
+| Remote | remote projects / servers adjective with masculine plural noun | remotos |
+| Remote | remote folders / branches adjective with feminine plural noun | remotas |
 | Repository | | Repositorio |
 | Sandbox | | sandbox |
 | Selection | | Selección |
@@ -72,7 +82,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | Cerrar sesión |
 | Skill | Agent Skills feature | Habilidad |
 | Snippet | | Fragmento de código |
-| Stage | Git index | Preparar |
+| Split | DiffViewStyle setting option paired with Unified / compact label; not Split Up/Down commands | Dividida |
+| Stage | Git command / action label | Preparar |
+| Staged | Git status adjective | Preparado |
 | Stash | | Stash |
 | Status Bar | | Barra de estado |
 | Subagent | | Subagente |
@@ -85,9 +97,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | Barra de título |
 | Tool | | Herramienta |
 | Tool Call | | Llamada de herramienta |
-| Unstage | Git index | Quitar de preparados |
+| Unstage | Git command / action label | Quitar de preparados |
+| Unstaged | Git status adjective | Sin preparar |
 | Variable | | Variable |
-| View | UI view / display mode | Vista |
+| View | command/action label (View X) | Ver |
+| View | named UI surface / display mode (X View, Tree View) | Vista |
 | Window | | Ventana |
 | Workspace | | Área de trabajo |
 | Worktree | | Worktree |

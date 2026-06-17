@@ -72,7 +72,7 @@ uv run zed-i18n prepare-translation \
 
 If `.cache/vscode-loc` exists, `prepare-translation` automatically adds optional `vscode_references` translation-memory hints to matching entries. `.cache/vscode-upstream` improves English source recovery for those hints. Missing VS Code reference checkouts are normal and are NOT an anomaly.
 
-`prepare-translation` also keeps grouped setting title/description strings, connected multi-line strings, and prompt-component strings batch-atomic when possible. Individual batch entries may include `context_group`; use it to translate sibling UI labels/descriptions, split lines, and composed prompt messages consistently, but the result JSON must still contain only the exact source keys listed in that batch's `entries`.
+`prepare-translation` also keeps grouped setting title/description/option strings, connected multi-line strings, and prompt-component strings batch-atomic when possible. Individual batch entries may include `context_group`; use it to translate sibling UI labels/descriptions/options, split lines, and composed prompt messages consistently, but the result JSON must still contain only the exact source keys listed in that batch's `entries`. For short settings enum labels, `context_group` may include `source_comment` from the Rust enum variant doc comment; use that as meaning context, not as extra output text.
 
 ### 3. Dispatch sub-agents
 
@@ -127,7 +127,7 @@ Output a summary block for this model:
 - Sub-agents MUST write only their assigned `results/batch-XXX.json`.
 - JSON keys in result files MUST equal the source string byte-for-byte — no whitespace fixes, no Unicode folding, no normalization.
 - `context_group` sibling strings are context, not permission to add extra result keys unless those source strings also appear in the batch `entries`.
-- If a string is ambiguous, looks like an internal ID/enum, or cannot be confidently translated, return `null`. Do not guess.
+- If a string looks like an internal ID or code enum value, return `null`; but if `kind` is `settings_enum_variant_label` or `settings_enum_discriminant_label`, treat it as a visible settings option label and translate it using setting/context siblings. Do not guess when context is insufficient.
 - Preserve all placeholders, code spans, URLs, file paths, config keys, and action IDs verbatim.
 
 ---

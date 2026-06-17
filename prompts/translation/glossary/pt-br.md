@@ -1,8 +1,8 @@
 # Glossary for pt-BR (curated)
 
-Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (only filled when the term is overloaded; blank = applies to all contexts) | **Translation**.
+Curated, field-verified Zed terminology. Columns: **English** source term | **Context** (filled when the term is overloaded, single-but-ambiguous, or unsafe to apply globally; blank = applies broadly after checking UI role) | **Translation**.
 
-For an overloaded term, pick the row whose Context matches the string's `kind` / `code_context`. Values reflect actual Brazilian developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
+Before applying a row, verify the source term's role and `kind` / `code_context`; glossary rows are not blind replacements. Values reflect actual Brazilian developer usage and take priority over VS Code language-pack defaults. Preserve-rules and grammar notes that cannot be expressed as a single value stay in the prompt's `## DISAMBIGUATION RULES`.
 
 | English | Context | Translation |
 |---------|---------|-------------|
@@ -30,11 +30,13 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Editor | | Editor |
 | Extension | software / plugin | Extensão |
 | Extension | file name suffix | Extensão de arquivo |
-| Fetch | Git remote operation | Fetch |
+| Fetch | Git command / short UI label / status prefix | Fetch |
+| Fetch | Git fetch action / tooltip / prose | fazer fetch |
 | Fetch | data / network / completion retrieval | Buscar |
 | File | | Arquivo |
 | Filter | | Filtro |
 | Folder | | Pasta |
+| Gutter | editor / Git / SCM gutter; not generic scroll margin | Medianiz |
 | Hunk | diff hunk | Trecho |
 | Inline | | Embutido |
 | Issue | GitHub / project tracker | Issue |
@@ -48,17 +50,28 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Panel | named Zed panel | Painel |
 | Patch | | Patch |
 | Path | | Caminho |
-| Preview | | Visualização |
+| Preview | file / Markdown / UI preview / preview tab or mode | Visualização |
+| Preview | command/action label (Preview X) | Visualizar |
+| Preview | Zed release channel / build name | Preview |
 | Problem | diagnostics / generic | Problema |
 | Profile | | Perfil |
-| Prompt | | prompt |
+| Prompt | AI prompt / prompt library / model input | prompt |
+| Prompt | dialog / user input prompt | diálogo |
+| Prompt | verb: request confirmation / ask user | solicitar |
 | Provider | AI / model provider | provedor |
-| Pull | Git remote operation | Pull |
+| Pull | Git command / short UI label / status prefix | Pull |
+| Pull | Git pull action / tooltip / prose | puxar |
 | Pull Request | | Pull Request |
-| Push | Git remote operation | Push |
+| Push | Git command / short UI label / status prefix | Push |
+| Push | Git push action / tooltip / prose | fazer push |
 | Rebase | | Rebase |
 | Reference | code navigation | Referência |
-| Remote | | Remoto |
+| Remote | Git remote short label / name / alias / branch filter | Remoto |
+| Remote | Git remote repository itself / prose explicitly about repository | Repositório remoto |
+| Remote | remote development / server / project / file adjective with masculine singular noun | remoto |
+| Remote | remote folder / instance adjective with feminine singular noun | remota |
+| Remote | remote projects / servers / branches adjective with masculine plural noun | remotos |
+| Remote | remote folders / instances adjective with feminine plural noun | remotas |
 | Repository | | Repositório |
 | Sandbox | | sandbox |
 | Selection | | Seleção |
@@ -69,7 +82,9 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Sign Out | | Sair |
 | Skill | Agent Skills feature | habilidade |
 | Snippet | | Trecho |
-| Stage | Git index | Preparar |
+| Split | DiffViewStyle setting option paired with Unified / compact label; not Split Up/Down commands | Dividido |
+| Stage | Git command / action label | Preparar |
+| Staged | Git status adjective | Preparado |
 | Stash | | Stash |
 | Status Bar | | Barra de status |
 | Subagent | | Subagente |
@@ -83,9 +98,11 @@ For an overloaded term, pick the row whose Context matches the string's `kind` /
 | Title Bar | | Barra de título |
 | Tool | | Ferramenta |
 | Tool Call | | Chamada de ferramenta |
-| Unstage | Git index | Cancelar preparação |
+| Unstage | Git command / action label | Cancelar preparação |
+| Unstaged | Git status adjective | Não preparado |
 | Variable | | Variável |
-| View | UI view / display mode | Exibição |
+| View | command/action label (View X) | Exibir |
+| View | named UI surface / display mode (X View, Tree View) | Exibição |
 | Window | | Janela |
 | Workspace | | Espaço de trabalho |
 | Worktree | | Árvore de trabalho |

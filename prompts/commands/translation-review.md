@@ -33,8 +33,9 @@ MODEL_B: [MODEL_B]
    - Escape sequences (`\n`, `\t`, `\r`, `\\`)
 4. Do NOT translate internal-ID-shaped values (kebab-case/snake_case that resembles code, config keys, URIs, routes, test fixtures). If a model wrongly translated such an entry, set the merged value to `null` (the validator and downstream tooling treat `null` as "ignore"). Match how existing accepted entries for this language handle these cases.
 5. The language prompt's DISAMBIGUATION RULES override either model's choice when they conflict. Glossary is the baseline, not a hard override — source context wins.
-6. When entries belong to a setting title/description pair, connected multi-line group, or prompt-component group, judge the group together so title wording, description wording, line flow, and composed prompt/message flow agree.
-7. Output must be valid JSON: no trailing commas, no comments, no markdown fences. Keys identical to the source strings.
+6. For short settings enum labels, first inspect `kind`, sibling enum variants, setting title/description context, any `source_comment`, and source occurrences. Do not apply a glossary row just because the English token matches; verify whether the token is an option value, action, display mode, Git term, or adjective.
+7. When entries belong to a setting title/description pair, connected multi-line group, or prompt-component group, judge the group together so title wording, description wording, line flow, and composed prompt/message flow agree.
+8. Output must be valid JSON: no trailing commas, no comments, no markdown fences. Keys identical to the source strings.
 
 ## Forbidden
 - Do NOT commit, stage, push, branch, or create worktrees.
