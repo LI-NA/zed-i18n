@@ -205,6 +205,135 @@ AGENT_PANEL_TOOL_WARNING_SOURCES = {
     "The project contained multiple worktrees backed by the same git repository, so they were consolidated into a single new worktree. The new thread's worktree is based on one of them and may not reflect the exact state of the others.",
 }
 
+SKILL_CREATOR_ERROR_SOURCES = {
+    "Body is required.",
+    "Couldn't read shared skill: {err}",
+    "SKILL.md file exceeds maximum size of {}KB",
+    "GitHub response was not valid UTF-8",
+    "failed to fetch {raw_url}",
+    "GitHub returned an unexpected redirect ({}) for the authenticated request to {raw_url}",
+    "failed to read response body",
+    "GitHub returned 404 while fetching the skill; no repository exists at this URL, or it is private",
+    "GitHub returned {} while fetching the skill",
+    "Enter a valid GitHub URL",
+    "GitHub skill URLs must use https://",
+    "Paste a GitHub .md URL",
+    "Paste a GitHub blob URL that points to a .md file",
+    "Paste a GitHub URL that points to a .md file",
+    'A skill named "{name}" already exists at {}. Pick a different name.',
+    "A file (not a skill directory) already exists at {}. Delete it or pick a different skill name.",
+    "failed to check whether {} already exists",
+    "failed to create skill directory {}",
+    "failed to write {}",
+    "failed to serialize skill frontmatter as YAML",
+}
+
+ADD_LLM_PROVIDER_VALIDATION_ERROR_SOURCES = {
+    "Provider Name cannot be empty",
+    "Provider Name is already taken by another provider",
+    "API URL cannot be empty",
+    "API Key cannot be empty",
+    "Model Names must be unique",
+}
+
+CONFIGURE_CONTEXT_SERVER_MODAL_DESCRIPTION_SOURCES = {
+    "Check the server docs for required arguments and environment variables.",
+}
+
+CONFIGURE_CONTEXT_SERVER_MODAL_TAB_SOURCES = {
+    "Local",
+    "Remote",
+}
+
+CONFIGURE_CONTEXT_SERVER_MODAL_ERROR_SOURCES = {
+    "Expected object",
+    "Expected exactly one key-value pair",
+    "Expected exactly one context server configuration",
+    "Context server stopped running",
+    "Context server store was dropped",
+    "Timed out waiting for context server `{}` to start. Check the Zed log for details.",
+}
+
+AGENT_THREAD_IMPORT_STATUS_SOURCES = {
+    "Fetching Sessions…",
+    "Importing threads from this agent is not possible as it doesn't support ACP's session/list capability.",
+    "Failed to fetch sessions: {error}",
+    "Could not find workspace to import from.",
+    "Did not find any workspaces to import from.",
+    "Failed to list sessions.",
+}
+
+RATE_PREDICTION_STATUS_LABEL_SOURCES = {
+    "Rated Prediction",
+    "No Edits Produced",
+    "Edits Available",
+}
+
+RATE_PREDICTION_TRIGGER_LABEL_SOURCES = {
+    "Testing",
+    "Diagnostics",
+    "Diagnostic Navigation",
+    "CLI",
+    "Explicit",
+    "Buffer Edit",
+    "LSP Completion Accepted",
+    "Prediction Accepted",
+    "Prediction Partially Accepted",
+    "Other",
+}
+
+RATE_PREDICTION_VIEW_TAB_SOURCES = {
+    "Suggested Edits",
+    "Recorded Events & Input",
+}
+
+RATE_PREDICTION_INLAY_HINT_SOURCES = {
+    "╭─ editable region start\n",
+    "\n╰─ editable region end",
+}
+
+RATE_PREDICTION_MARKDOWN_SECTION_SOURCES = {
+    "## Events\n\n",
+    "## Related files\n\n",
+    "## Cursor Excerpt\n\n",
+}
+
+WORKSPACE_ERROR_ACTION_SOURCES = {
+    "Dismiss",
+    "See docs",
+}
+
+GIT_WORKTREE_PICKER_SECTION_SOURCES = {
+    "This Window",
+}
+
+GIT_WORKTREE_PICKER_LABEL_SOURCES = {
+    'Create "{name}" based on {branch_label}',
+}
+
+GIT_WORKTREE_PICKER_PROMPT_SOURCES = {
+    'Worktree "{display_name}" contains modified or untracked files. Force delete it?',
+}
+
+GIT_WORKTREE_PICKER_DISABLED_REASON_SOURCES = {
+    "Cannot create a named worktree in a project with multiple repositories",
+    "A worktree with this name already exists",
+}
+
+THREADS_ARCHIVE_BUCKET_LABEL_SOURCES = {
+    "Today",
+    "Yesterday",
+    "This Week",
+    "Past Week",
+    "Older",
+}
+
+PROFILE_SELECTOR_DOCUMENTATION_SOURCES = {
+    "Get help to write anything.",
+    "Chat about your codebase.",
+    "Chat about anything with no tools.",
+}
+
 GIT_NOTIFY_ERROR_SOURCES = {
     "No active repository",
     "Could not determine default branch",
@@ -1325,6 +1454,96 @@ def _allowed_literal_rules_for_path(
                 "AgentPanel.agent_tool_warning",
             )
         )
+    if _is_skill_creator_page_path(relative_path):
+        rules.append(
+            (
+                SKILL_CREATOR_ERROR_SOURCES,
+                "skill_creator_error",
+                "SkillCreator.error",
+            )
+        )
+    if _is_add_llm_provider_modal_path(relative_path):
+        rules.append(
+            (
+                ADD_LLM_PROVIDER_VALIDATION_ERROR_SOURCES,
+                "llm_provider_validation_error",
+                "AddLlmProvider.validation_error",
+            )
+        )
+    if _is_configure_context_server_modal_path(relative_path):
+        rules.append(
+            (
+                CONFIGURE_CONTEXT_SERVER_MODAL_DESCRIPTION_SOURCES,
+                "context_server_modal_description",
+                "ConfigureContextServerModal.description",
+            )
+        )
+        rules.append(
+            (
+                CONFIGURE_CONTEXT_SERVER_MODAL_TAB_SOURCES,
+                "context_server_modal_tab",
+                "ConfigureContextServerModal.tab",
+            )
+        )
+        rules.append(
+            (
+                CONFIGURE_CONTEXT_SERVER_MODAL_ERROR_SOURCES,
+                "context_server_modal_error",
+                "ConfigureContextServerModal.error",
+            )
+        )
+    if _is_agent_thread_import_path(relative_path):
+        rules.append(
+            (
+                AGENT_THREAD_IMPORT_STATUS_SOURCES,
+                "thread_import_status",
+                "AgentImportStatus",
+            )
+        )
+    if _is_rate_prediction_modal_path(relative_path):
+        rules.append(
+            (
+                RATE_PREDICTION_STATUS_LABEL_SOURCES,
+                "prediction_status_label",
+                "RatePrediction.status_label",
+            )
+        )
+        rules.append(
+            (
+                RATE_PREDICTION_TRIGGER_LABEL_SOURCES,
+                "prediction_trigger_label",
+                "RatePrediction.trigger_label",
+            )
+        )
+        rules.append(
+            (
+                RATE_PREDICTION_VIEW_TAB_SOURCES,
+                "tab_title",
+                "RatePredictionView.name",
+            )
+        )
+        rules.append(
+            (
+                RATE_PREDICTION_INLAY_HINT_SOURCES,
+                "inlay_hint_label",
+                "RatePrediction.inlay_hint_label",
+            )
+        )
+        rules.append(
+            (
+                RATE_PREDICTION_MARKDOWN_SECTION_SOURCES,
+                "markdown_section_heading",
+                "RatePrediction.formatted_inputs",
+            )
+        )
+    if _is_workspace_error_path(relative_path):
+        rules.append(
+            (
+                WORKSPACE_ERROR_ACTION_SOURCES,
+                "workspace_error_action",
+                "WorkspaceError.action",
+            )
+        )
     if _is_git_user_error_path(relative_path):
         rules.append((GIT_NOTIFY_ERROR_SOURCES, "notification_error", "git_user_error"))
     if _is_git_graph_path(relative_path):
@@ -1340,6 +1559,51 @@ def _allowed_literal_rules_for_path(
                 GIT_GRAPH_CHANGED_FILES_COUNT_FRAGMENT_SOURCES,
                 "git_changed_files_count_fragment",
                 "git_graph.changed_files_count",
+            )
+        )
+    if _is_git_worktree_picker_path(relative_path):
+        rules.append(
+            (
+                GIT_WORKTREE_PICKER_SECTION_SOURCES,
+                "git_worktree_picker_section",
+                "WorktreeEntry::SectionHeader",
+            )
+        )
+        rules.append(
+            (
+                GIT_WORKTREE_PICKER_LABEL_SOURCES,
+                "git_worktree_picker_label",
+                "WorktreePicker.create_label",
+            )
+        )
+        rules.append(
+            (
+                GIT_WORKTREE_PICKER_PROMPT_SOURCES,
+                "prompt_message",
+                "WorktreePicker.force_delete_prompt",
+            )
+        )
+        rules.append(
+            (
+                GIT_WORKTREE_PICKER_DISABLED_REASON_SOURCES,
+                "git_worktree_picker_disabled_reason",
+                "WorktreePicker.disabled_reason",
+            )
+        )
+    if _is_threads_archive_view_path(relative_path):
+        rules.append(
+            (
+                THREADS_ARCHIVE_BUCKET_LABEL_SOURCES,
+                "archive_bucket_label",
+                "TimeBucket.label",
+            )
+        )
+    if _is_profile_selector_path(relative_path):
+        rules.append(
+            (
+                PROFILE_SELECTOR_DOCUMENTATION_SOURCES,
+                "documentation_aside",
+                "ProfilePickerDelegate.documentation",
             )
         )
     return rules
@@ -1942,6 +2206,10 @@ def _is_tool_permissions_setup_path(relative_path: str) -> bool:
     return relative_path == "crates/settings_ui/src/pages/tool_permissions_setup.rs"
 
 
+def _is_skill_creator_page_path(relative_path: str) -> bool:
+    return relative_path == "crates/settings_ui/src/pages/skill_creator.rs"
+
+
 def _is_settings_ui_root_path(relative_path: str) -> bool:
     return relative_path == "crates/settings_ui/src/settings_ui.rs"
 
@@ -1993,8 +2261,19 @@ def _is_agent_thread_view_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/conversation_view/thread_view.rs"
 
 
+def _is_agent_thread_import_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/thread_import.rs"
+
+
 def _is_add_llm_provider_modal_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs"
+
+
+def _is_configure_context_server_modal_path(relative_path: str) -> bool:
+    return (
+        relative_path
+        == "crates/agent_ui/src/agent_configuration/configure_context_server_modal.rs"
+    )
 
 
 def _is_agent_model_selector_path(relative_path: str) -> bool:
@@ -2006,6 +2285,14 @@ def _is_agent_model_selector_path(relative_path: str) -> bool:
 
 def _is_agent_manage_profiles_modal_path(relative_path: str) -> bool:
     return relative_path == "crates/agent_ui/src/agent_configuration/manage_profiles_modal.rs"
+
+
+def _is_profile_selector_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/profile_selector.rs"
+
+
+def _is_threads_archive_view_path(relative_path: str) -> bool:
+    return relative_path == "crates/agent_ui/src/threads_archive_view.rs"
 
 
 def _is_zed_root_path(relative_path: str) -> bool:
@@ -2062,6 +2349,10 @@ def _is_sidebar_path(relative_path: str) -> bool:
 
 def _is_workspace_multi_workspace_path(relative_path: str) -> bool:
     return relative_path == "crates/workspace/src/multi_workspace.rs"
+
+
+def _is_workspace_error_path(relative_path: str) -> bool:
+    return relative_path == "crates/workspace/src/workspace_error.rs"
 
 
 def _is_project_panel_path(relative_path: str) -> bool:
@@ -2185,6 +2476,10 @@ def _is_git_multi_diff_view_path(relative_path: str) -> bool:
 
 def _is_git_text_diff_view_path(relative_path: str) -> bool:
     return relative_path == "crates/git_ui/src/text_diff_view.rs"
+
+
+def _is_rate_prediction_modal_path(relative_path: str) -> bool:
+    return relative_path == "crates/edit_prediction_ui/src/rate_prediction_modal.rs"
 
 
 def _is_language_selector_path(relative_path: str) -> bool:
@@ -3046,7 +3341,7 @@ GIT_BRANCH_PICKER_LINE_PATTERNS: tuple[LinePattern, ...] = (
 
 GIT_PICKER_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
-        re.compile(r'GitPickerTab::(?:Branches|Stash)\s*=>\s*("(?:Branches|Stash)")'),
+        re.compile(r'GitPickerTab::(?:Branches|Stashes)\s*=>\s*("(?:Branches|Stashes)")'),
         "GitPickerTab.to_string",
         "git_picker_tab",
         1,

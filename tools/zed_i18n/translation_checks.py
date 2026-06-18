@@ -82,8 +82,10 @@ def protected_tokens(text: str) -> list[str]:
         token for token in _SETTING_KEY_RE.findall(text) if not _is_file_token(token)
     )
     tokens.extend(_SNAKE_CASE_RE.findall(text))
-    tokens.extend(_GLOB_RE.findall(text))
-    tokens.extend(_PATH_RE.findall(text))
+    tokens.extend(_normal_protected_literal(token) for token in _GLOB_RE.findall(text))
+    tokens.extend(
+        _normal_protected_literal(token) for token in _PATH_RE.findall(text)
+    )
     tokens.extend(_FILE_RE.findall(text))
     tokens.extend(_control_tokens(text))
     return tokens
@@ -95,6 +97,10 @@ def protected_tokens_match(source: str, translation: str) -> bool:
 
 def _normal_url(url: str) -> str:
     return url.rstrip(".,;:!?")
+
+
+def _normal_protected_literal(token: str) -> str:
+    return token.rstrip(".,;:!?")
 
 
 def _protected_code_spans(text: str) -> list[str]:

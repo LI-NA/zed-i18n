@@ -2341,11 +2341,11 @@ class ExtractTests(unittest.TestCase):
             {
                 occurrence.source
                 for occurrence in extract_ui_strings_from_source(
-                    'GitPickerTab::Branches => "Branches",\nGitPickerTab::Stash => "Stash",',
+                    'GitPickerTab::Branches => "Branches",\nGitPickerTab::Stashes => "Stashes",',
                     relative_path="crates/git_ui/src/git_picker.rs",
                 )
             },
-            {"Branches", "Stash"},
+            {"Branches", "Stashes"},
         )
 
         self.assertEqual(
@@ -4008,6 +4008,453 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(by_source["e.g. gpt-5, claude-opus-4"].kind, "placeholder")
         self.assertNotIn("200000", by_source)
         self.assertNotIn("32000", by_source)
+
+    def test_extracts_add_llm_provider_user_facing_errors(self) -> None:
+        source = "\n".join(
+            [
+                "fn save_provider_to_settings(input: &AddLlmProviderInput) -> Task<Result<(), SharedString>> {",
+                '    return Task::ready(Err("Provider Name cannot be empty".into()));',
+                '    return Task::ready(Err("Provider Name is already taken by another provider".into()));',
+                '    return Task::ready(Err("API URL cannot be empty".into()));',
+                '    return Task::ready(Err("API Key cannot be empty".into()));',
+                '    return Task::ready(Err("Model Names must be unique".into()));',
+                "}",
+                "fn render(&mut self) {",
+                "    if let Some(error) = self.last_error.clone() {",
+                "        Banner::new().severity(Severity::Warning).child(div().text_xs().child(error));",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Provider Name cannot be empty",
+                "Provider Name is already taken by another provider",
+                "API URL cannot be empty",
+                "API Key cannot be empty",
+                "Model Names must be unique",
+            },
+        )
+        self.assertEqual(
+            by_source["Provider Name cannot be empty"].kind,
+            "llm_provider_validation_error",
+        )
+
+    def test_extracts_skill_creator_user_facing_errors(self) -> None:
+        source = "\n".join(
+            [
+                "fn recompute_body_error(&mut self, cx: &App) {",
+                '    self.body_error = Some("Body is required.");',
+                "}",
+                "fn open_install_review(&mut self, content: String) {",
+                '    self.save_error = Some(SharedString::from(format!("Couldn\\\'t read shared skill: {err}")));',
+                "}",
+                "fn github_raw_url(input: &str) -> Result<String> {",
+                '    let url = Url::parse(input.trim()).context("Enter a valid GitHub URL")?;',
+                '    anyhow::bail!("Paste a GitHub .md URL");',
+                '    anyhow::bail!("Paste a GitHub blob URL that points to a .md file");',
+                "}",
+                "async fn write_skill_to_disk() -> Result<PathBuf> {",
+                '    anyhow::bail!("A skill named \\"{name}\\" already exists at {}. Pick a different name.", skill_dir.display());',
+                r'''    anyhow::bail!("A file (not a skill directory) already exists at {}. \
+                 Delete it or pick a different skill name.", skill_dir.display());''',
+                '    fs.create_dir(&skill_dir).await.with_context(|| format!("failed to create skill directory {}", skill_dir.display()))?;',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_ui/src/pages/skill_creator.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Body is required.",
+                "Couldn't read shared skill: {err}",
+                "Enter a valid GitHub URL",
+                "Paste a GitHub .md URL",
+                "Paste a GitHub blob URL that points to a .md file",
+                'A skill named "{name}" already exists at {}. Pick a different name.',
+                "A file (not a skill directory) already exists at {}. Delete it or pick a different skill name.",
+                "failed to create skill directory {}",
+            },
+        )
+        self.assertEqual(by_source["Body is required."].kind, "skill_creator_error")
+
+    def test_extracts_thread_import_status_tooltips_and_errors(self) -> None:
+        source = "\n".join(
+            [
+                "impl AgentImportStatus {",
+                "    fn tooltip_text(&self) -> Option<SharedString> {",
+                "        match self {",
+                '            Self::Loading => Some("Fetching Sessions…".into()),',
+                '            Self::Unsupported => Some("Importing threads from this agent is not possible as it doesn\\\'t support ACP\\\'s session/list capability.".into()),',
+                '            Self::Error(error) => Some(format!("Failed to fetch sessions: {error}").into()),',
+                "        }",
+                "    }",
+                "}",
+                "fn fetch_sessions(&mut self) {",
+                '    self.mark_all_agents_failed("Could not find workspace to import from.");',
+                '    self.mark_all_agents_failed("Did not find any workspaces to import from.");',
+                '    let fallback = "Failed to list sessions.".into();',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/thread_import.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Fetching Sessions…",
+                "Importing threads from this agent is not possible as it doesn't support ACP's session/list capability.",
+                "Failed to fetch sessions: {error}",
+                "Could not find workspace to import from.",
+                "Did not find any workspaces to import from.",
+                "Failed to list sessions.",
+            },
+        )
+        self.assertEqual(by_source["Fetching Sessions…"].kind, "thread_import_status")
+
+    def test_extracts_rate_prediction_tooltip_fragments(self) -> None:
+        source = "\n".join(
+            [
+                "fn render_shown_completions(&self) {",
+                "    let (icon_name, icon_color, tooltip_text) = match state {",
+                '        (true, _) => (IconName::Check, Color::Success, "Rated Prediction"),',
+                '        (false, true) => (IconName::File, Color::Muted, "No Edits Produced"),',
+                '        (false, false) => (IconName::FileDiff, Color::Accent, "Edits Available"),',
+                "    };",
+                "    let (trigger_icon, trigger_tooltip) = match completion.trigger {",
+                '        PredictEditsRequestTrigger::Testing => (IconName::Debug, "Testing"),',
+                '        PredictEditsRequestTrigger::DiagnosticNavigation => (IconName::ArrowRight, "Diagnostic Navigation"),',
+                '        PredictEditsRequestTrigger::LSPCompletionAccepted => (IconName::Code, "LSP Completion Accepted"),',
+                '        PredictEditsRequestTrigger::Other => (IconName::CircleHelp, "Other"),',
+                "    };",
+                '    Tooltip::text(format!("{tooltip_text} • Trigger: {trigger_tooltip}"));',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/edit_prediction_ui/src/rate_prediction_modal.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Rated Prediction",
+                "No Edits Produced",
+                "Edits Available",
+                "Testing",
+                "Diagnostic Navigation",
+                "LSP Completion Accepted",
+                "Other",
+                "{tooltip_text} • Trigger: {trigger_tooltip}",
+            },
+        )
+        self.assertEqual(by_source["Testing"].kind, "prediction_trigger_label")
+
+    def test_extracts_workspace_error_actions(self) -> None:
+        source = "\n".join(
+            [
+                "impl ErrorAction {",
+                "    pub fn dismiss() -> Self {",
+                '        Self { label: "Dismiss".into(), handler: ErrorActionHandler::Dismiss }',
+                "    }",
+                "}",
+                "impl WorkspaceError for PortalError {",
+                "    fn primary_action(&self) -> ErrorAction {",
+                '        ErrorAction::link("See docs", "https://zed.dev/docs/linux#i-cant-open-any-files")',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/workspace/src/workspace_error.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Dismiss", "See docs"})
+        self.assertEqual(by_source["See docs"].kind, "workspace_error_action")
+
+    def test_extracts_worktree_picker_dynamic_create_and_section_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn update_matches(&mut self) {",
+                '    matches.push(WorktreeEntry::SectionHeader("This Window".into()));',
+                '    let label = format!("Create \\"{name}\\" based on {branch_label}");',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/worktree_picker.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {"This Window", 'Create "{name}" based on {branch_label}'},
+        )
+        self.assertEqual(by_source["This Window"].kind, "git_worktree_picker_section")
+
+    def test_extracts_worktree_picker_force_delete_prompt_and_disabled_reasons(self) -> None:
+        source = "\n".join(
+            [
+                "fn dirty_worktree_force_delete_prompt(display_name: &str) -> String {",
+                '    format!("Worktree \\"{display_name}\\" contains modified or untracked files. Force delete it?")',
+                "}",
+                "fn update_matches() {",
+                '    let create_named_disabled_reason = Some("Cannot create a named worktree in a project with multiple repositories".into());',
+                '    let other_disabled_reason = Some("A worktree with this name already exists".into());',
+                "}",
+                "fn prompt(window: &mut Window, cx: &mut App) {",
+                '    window.prompt(PromptLevel::Warning, &prompt_message, None, &["Force Delete", "Cancel"], cx);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/worktree_picker.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertTrue(
+            {
+                'Worktree "{display_name}" contains modified or untracked files. Force delete it?',
+                "Cannot create a named worktree in a project with multiple repositories",
+                "A worktree with this name already exists",
+                "Force Delete",
+                "Cancel",
+            }.issubset(by_source)
+        )
+        self.assertEqual(
+            by_source[
+                'Worktree "{display_name}" contains modified or untracked files. Force delete it?'
+            ].kind,
+            "prompt_message",
+        )
+        self.assertEqual(
+            by_source[
+                "Cannot create a named worktree in a project with multiple repositories"
+            ].kind,
+            "git_worktree_picker_disabled_reason",
+        )
+
+    def test_extracts_git_picker_stashes_tab_label(self) -> None:
+        source = "\n".join(
+            [
+                "impl Display for GitPickerTab {",
+                "    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {",
+                "        let label = match self {",
+                '            GitPickerTab::Branches => "Branches",',
+                '            GitPickerTab::Stashes => "Stashes",',
+                "        };",
+                '        write!(f, "{}", label)',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/git_picker.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(set(by_source), {"Branches", "Stashes"})
+        self.assertEqual(by_source["Stashes"].kind, "git_picker_tab")
+
+    def test_extracts_rate_prediction_view_tabs_and_review_markers(self) -> None:
+        source = "\n".join(
+            [
+                "impl RatePredictionView {",
+                "    pub fn name(&self) -> &'static str {",
+                "        match self {",
+                '            Self::SuggestedEdits => "Suggested Edits",',
+                '            Self::RawInput => "Recorded Events & Input",',
+                "        }",
+                "    }",
+                "}",
+                "fn insert_editable_region_markers() {",
+                '    label: InlayHintLabel::String("╭─ editable region start\\n".into()),',
+                '    label: InlayHintLabel::String("\\n╰─ editable region end".into()),',
+                "}",
+                "fn formatted_inputs() {",
+                '    write!(&mut formatted_inputs, "## Events\\n\\n").unwrap();',
+                '    write!(&mut formatted_inputs, "## Related files\\n\\n").unwrap();',
+                '    write!(&mut formatted_inputs, "## Cursor Excerpt\\n\\n").unwrap();',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/edit_prediction_ui/src/rate_prediction_modal.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertTrue(
+            {
+                "Suggested Edits",
+                "Recorded Events & Input",
+                "╭─ editable region start\n",
+                "\n╰─ editable region end",
+                "## Events\n\n",
+                "## Related files\n\n",
+                "## Cursor Excerpt\n\n",
+            }.issubset(by_source)
+        )
+        self.assertEqual(by_source["Suggested Edits"].kind, "tab_title")
+        self.assertEqual(
+            by_source["╭─ editable region start\n"].kind,
+            "inlay_hint_label",
+        )
+        self.assertEqual(by_source["## Events\n\n"].kind, "markdown_section_heading")
+
+    def test_extracts_threads_archive_bucket_labels(self) -> None:
+        source = "\n".join(
+            [
+                "impl TimeBucket {",
+                "    fn label(&self) -> &'static str {",
+                "        match self {",
+                '            TimeBucket::Today => "Today",',
+                '            TimeBucket::Yesterday => "Yesterday",',
+                '            TimeBucket::ThisWeek => "This Week",',
+                '            TimeBucket::PastWeek => "Past Week",',
+                '            TimeBucket::Older => "Older",',
+                "        }",
+                "    }",
+                "}",
+                "fn render(bucket: TimeBucket) {",
+                "    Label::new(bucket.label());",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/threads_archive_view.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertTrue(
+            {"Today", "Yesterday", "This Week", "Past Week", "Older"}.issubset(
+                by_source
+            )
+        )
+        self.assertEqual(by_source["This Week"].kind, "archive_bucket_label")
+
+    def test_extracts_profile_selector_documentation_asides(self) -> None:
+        source = "\n".join(
+            [
+                "fn documentation(candidate: &ProfileCandidate) -> Option<&'static str> {",
+                "    match candidate.id.as_str() {",
+                '        builtin_profiles::WRITE => Some("Get help to write anything."),',
+                '        builtin_profiles::ASK => Some("Chat about your codebase."),',
+                '        builtin_profiles::MINIMAL => Some("Chat about anything with no tools."),',
+                "        _ => None,",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/profile_selector.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "Get help to write anything.",
+                "Chat about your codebase.",
+                "Chat about anything with no tools.",
+            },
+        )
+        self.assertEqual(
+            by_source["Get help to write anything."].kind,
+            "documentation_aside",
+        )
+
+    def test_extracts_configure_context_server_modal_indirect_ui_text(self) -> None:
+        source = "\n".join(
+            [
+                "fn render_modal_description(&self) -> AnyElement {",
+                '    const MODAL_DESCRIPTION: &str = "Check the server docs for required arguments and environment variables."; ',
+                "    Label::new(MODAL_DESCRIPTION).into_any_element()",
+                "}",
+                "fn render_tab_bar(&self) -> AnyElement {",
+                "    let tab = |label: &'static str, active: bool| div().child(label);",
+                '    tab("Local", true);',
+                '    tab("Remote", false);',
+                "}",
+                "fn parse_input(text: &str) -> Result<()> {",
+                '    let object = value.as_object().context("Expected object")?;',
+                '    anyhow::ensure!(object.len() == 1, "Expected exactly one key-value pair");',
+                '    anyhow::bail!("Expected exactly one context server configuration");',
+                "}",
+                "fn wait_for_context_server() {",
+                '    Err("Context server stopped running".into());',
+                '    Err(Arc::from("Context server store was dropped"));',
+                '    Err(Arc::from(format!("Timed out waiting for context server `{}` to start. Check the Zed log for details.", context_server_id)));',
+                "}",
+                "fn render_error(error: SharedString) {",
+                "    Label::new(error);",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/agent_configuration/configure_context_server_modal.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertTrue(
+            {
+                "Check the server docs for required arguments and environment variables.",
+                "Local",
+                "Remote",
+                "Expected object",
+                "Expected exactly one key-value pair",
+                "Expected exactly one context server configuration",
+                "Context server stopped running",
+                "Context server store was dropped",
+                "Timed out waiting for context server `{}` to start. Check the Zed log for details.",
+            }.issubset(by_source)
+        )
+        self.assertEqual(
+            by_source[
+                "Check the server docs for required arguments and environment variables."
+            ].kind,
+            "context_server_modal_description",
+        )
+        self.assertEqual(by_source["Local"].kind, "context_server_modal_tab")
+        self.assertEqual(by_source["Expected object"].kind, "context_server_modal_error")
 
     def test_extracts_time_format_strings_without_layout_templates(self) -> None:
         source = "\n".join(

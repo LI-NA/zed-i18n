@@ -68,6 +68,14 @@ class TranslationChecksTests(unittest.TestCase):
             )
         )
 
+    def test_ignores_sentence_punctuation_after_paths(self) -> None:
+        self.assertTrue(
+            protected_tokens_match(
+                "Adds a file to the repository's .git/info/exclude.",
+                "저장소의 .git/info/exclude에 파일을 추가합니다.",
+            )
+        )
+
     def test_ignores_plain_words_accidentally_wrapped_in_backticks(self) -> None:
         self.assertTrue(
             protected_tokens_match(
