@@ -55,7 +55,8 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Problem | | Problém |
 | Profile | | Profil |
 | Prompt | AI prompt / prompt library / model input | Výzva |
-| Prompt | dialog / user input prompt | Vstupní dialog |
+| Prompt | OS / system dialog (file picker, confirmation) | Dialog |
+| Prompt | user text-input prompt (enter a value) | Vstupní výzva |
 | Prompt | verb: request confirmation / ask user | Požádat o potvrzení |
 | Provider | AI / model provider | Poskytovatel |
 | Pull | Git command / short UI label / status prefix | Pull |

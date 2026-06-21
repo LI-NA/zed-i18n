@@ -59,7 +59,8 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Problem | diagnostics / generic | Problem |
 | Profile | | Profil |
 | Prompt | AI prompt / prompt library / model input | Polecenie |
-| Prompt | dialog / user input prompt | Monit |
+| Prompt | OS / system dialog (file picker, confirmation) | Okno dialogowe |
+| Prompt | user text-input prompt (enter a value) | Monit |
 | Prompt | verb: request confirmation / ask user | poprosić o potwierdzenie |
 | Provider | AI / model provider | Dostawca |
 | Pull | Git command / short UI label / status prefix | Pull |

@@ -52,7 +52,8 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Problem | diagnostics / generic | 问题 |
 | Profile | | 配置文件 |
 | Prompt | AI prompt / prompt library / model input | 提示词 |
-| Prompt | dialog / user input prompt | 提示框 |
+| Prompt | OS / system dialog (file picker, confirmation) | 对话框 |
+| Prompt | user text-input prompt (enter a value) | 提示框 |
 | Prompt | verb: request confirmation / ask user | 提示确认 |
 | Provider | AI / model provider | 提供商 |
 | Pull | Git remote operation | 拉取 |

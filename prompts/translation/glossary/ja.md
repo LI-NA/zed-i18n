@@ -56,7 +56,8 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Problem | diagnostics / generic | 問題 |
 | Profile | | プロファイル |
 | Prompt | AI prompt / prompt library / model input | プロンプト |
-| Prompt | dialog / user input prompt | 入力プロンプト |
+| Prompt | OS / system dialog (file picker, confirmation) | ダイアログ |
+| Prompt | user text-input prompt (enter a value) | 入力プロンプト |
 | Prompt | verb: request confirmation / ask user | 確認を求める |
 | Provider | AI / model provider | プロバイダー |
 | Pull | Git remote operation | プル |

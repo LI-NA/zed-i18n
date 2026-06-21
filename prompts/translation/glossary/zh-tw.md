@@ -50,10 +50,12 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Patch | | 修補檔 |
 | Path | | 路徑 |
 | Preview | | 預覽 |
+| Preview | Zed release channel / build name | Preview |
 | Problem | diagnostics / generic | 問題 |
 | Profile | | 設定檔 |
 | Prompt | AI prompt / prompt library / model input | 提示詞 |
-| Prompt | dialog / user input prompt | 提示框 |
+| Prompt | OS / system dialog (file picker, confirmation) | 對話方塊 |
+| Prompt | user text-input prompt (enter a value) | 提示框 |
 | Prompt | verb: request confirmation / ask user | 提示確認 |
 | Provider | AI / model provider | 提供者 |
 | Pull | Git remote operation | 拉取 |

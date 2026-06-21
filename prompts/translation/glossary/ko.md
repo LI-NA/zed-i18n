@@ -60,7 +60,8 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Problem | diagnostics / generic | 문제 |
 | Profile | | 프로필 |
 | Prompt | AI prompt / prompt library / model input | 프롬프트 |
-| Prompt | dialog / user input prompt | 입력 프롬프트 |
+| Prompt | OS / system dialog (file picker, confirmation) | 대화 상자 |
+| Prompt | user text-input prompt (enter a value) | 입력 프롬프트 |
 | Prompt | verb: request confirmation / ask user | 확인 요청 |
 | Provider | AI / model provider | 프로바이더 |
 | Pull | Git remote operation | 풀 |

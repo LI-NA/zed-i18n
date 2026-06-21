@@ -55,7 +55,8 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Problem | | Sorun |
 | Profile | | Profil |
 | Prompt | AI prompt / prompt library / model input | İstem |
-| Prompt | dialog / user input prompt | Girdi istemi |
+| Prompt | OS / system dialog (file picker, confirmation) | İletişim kutusu |
+| Prompt | user text-input prompt (enter a value) | Girdi istemi |
 | Prompt | verb: request confirmation / ask user | onay istemek |
 | Provider | AI / model provider | Sağlayıcı |
 | Pull | Git command / short UI label / status prefix | Pull |
