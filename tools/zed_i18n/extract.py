@@ -154,7 +154,11 @@ TIME_FORMAT_SOURCES = {
 
 SANDBOX_APPROVAL_TITLE_SOURCES = {
     "Allow this command to run outside the sandbox?",
+    "arbitrary network access",
     "network access",
+    "network access to {single}",
+    "network access to {first} and {second}",
+    "network access to {}, and {last}",
     "unrestricted filesystem writes",
     "write access to {}",
     "Allow this command extra permissions?",
@@ -182,6 +186,18 @@ AGENT_THREAD_TOOL_ERROR_SOURCES = {
     "Creating sibling threads is not supported in this environment",
     "Listing available agents is not supported in this environment",
     "Permission to run tool denied by user",
+}
+
+AGENT_THREAD_ERROR_CALLOUT_SOURCES = {
+    "No credentials are configured for {provider}.",
+    "Could not authenticate with {provider}.",
+    "{provider} rejected the request due to insufficient permissions.",
+}
+
+AGENT_THREAD_SANDBOX_NOTICE_SOURCES = {
+    "Ran without sandbox",
+    "Unsandboxed execution is enabled in settings.",
+    "Unsandboxed execution is allowed for the rest of this thread.",
 }
 
 AGENT_SKILL_SHARE_LINK_ERROR_SOURCES = {
@@ -301,6 +317,66 @@ RATE_PREDICTION_MARKDOWN_SECTION_SOURCES = {
 WORKSPACE_ERROR_ACTION_SOURCES = {
     "Dismiss",
     "See docs",
+}
+
+SETTINGS_FORM_VALIDATION_SOURCES = {
+    "Agent name is required.",
+    "Server name is required.",
+    "Command is required.",
+    "URL is required.",
+    "Invalid URL: {error}",
+    "Invalid URL in settings.",
+    "Timeout must be a positive whole number of seconds.",
+    'An agent named "{}" already exists.',
+    'A server named "{}" already exists.',
+    'Duplicate {label} "{key}".',
+}
+
+LANGUAGE_MODEL_PROVIDER_MODEL_ERROR_SOURCES = {
+    "Failed to fetch model from API: {error}",
+}
+
+PICKER_DELEGATE_PLACEHOLDER_SOURCES = {
+    "Select the process you want to attach the debugger to",
+    "Select a running process to attach to...",
+    "Find a task, or run a command in the central pane",
+    "Find a task, or run a command",
+    "Find a task or type to create a new one...",
+    "Find a debug configuration or type to create a new one...",
+}
+
+GIT_BRANCH_PICKER_PROMPT_SOURCES = {
+    'Branch "{branch_name}" is not fully merged. Force delete it?',
+}
+
+PROJECT_PANEL_VALIDATION_SOURCES = {
+    "File or directory name cannot be empty.",
+    "File or directory name contains leading or trailing whitespace.",
+    "File or directory '{}' already exists at location. Please choose a different name.",
+}
+
+COLLAB_NOTIFICATION_SOURCES = {
+    "{} wants to add you as a contact",
+    "{} accepted your contact request",
+    "{} invited you to join the #{channel_name} channel",
+}
+
+CALL_QUALITY_LABEL_SOURCES = {
+    "Excellent",
+    "Good",
+    "Poor",
+    "Lost",
+}
+
+AGENT_CONFIG_OPTION_SEPARATOR_SOURCES = {
+    "Favorites",
+    "All Options",
+}
+
+LINUX_WSL_SANDBOX_ERROR_SOURCES = {
+    "No usable `bwrap` binary was found on your PATH. Install Bubblewrap to let the agent sandbox terminal commands.",
+    "The only `bwrap` available is setuid-root, which Zed refuses to run. Install a non-setuid Bubblewrap to let the agent sandbox terminal commands.",
+    "`bwrap` is installed but couldn't create a sandbox, likely because unprivileged user namespaces are disabled on this system.",
 }
 
 GIT_WORKTREE_PICKER_SECTION_SOURCES = {
@@ -490,6 +566,8 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
         return ((0, "tooltip", "tooltip"),)
     if canonical.endswith(".with_link_button") or canonical == "with_link_button":
         return ((0, "link_button", "with_link_button"),)
+    if canonical.endswith("ErrorAction::new") or canonical.endswith("ErrorAction::link"):
+        return ((0, "workspace_error_action", "WorkspaceError.action"),)
     if canonical.endswith(".primary_message") or canonical == "primary_message":
         return ((0, "notification_message", "primary_message"),)
     if canonical.endswith(".secondary_message") or canonical == "secondary_message":
@@ -628,6 +706,29 @@ def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int
             (0, "input_label", "single_line_input"),
             (1, "placeholder", "single_line_input.placeholder"),
         )
+    if _is_settings_ui_path(relative_path):
+        if canonical.endswith("push_dynamic_sub_page"):
+            return (
+                (0, "settings_subpage_title", "push_dynamic_sub_page"),
+                (1, "settings_subpage_breadcrumb", "push_dynamic_sub_page"),
+            )
+        if canonical.endswith("render_settings_item_layout"):
+            return (
+                (1, "setting_title", "render_settings_item_layout"),
+                (2, "setting_description", "render_settings_item_layout"),
+            )
+        if canonical in {"render_form_field", "render_kv_section"}:
+            return (
+                (1, "setting_title", canonical),
+                (2, "setting_description", canonical),
+            )
+        if canonical == "new_input":
+            return ((0, "setting_placeholder", "new_input.placeholder"),)
+    if _is_language_model_provider_path(relative_path):
+        if canonical.endswith("ApiKeyEditor::new"):
+            return ((2, "placeholder", "ApiKeyEditor::new.placeholder"),)
+        if canonical.endswith("Model::new_disabled"):
+            return ((1, "provider_model_error", "Model::new_disabled"),)
     if _is_prompt_error_call(canonical):
         return ((0, "error_prompt", _prompt_error_call_name(canonical)),)
     if _is_method_call(canonical, "show_error"):
@@ -660,7 +761,7 @@ def _prompt_error_call_name(call: str) -> str:
 def _should_skip_contextual_call_source(source: str, call_name: str) -> bool:
     if source == "":
         return True
-    if call_name == "single_line_input.placeholder" and source.strip().isdigit():
+    if call_name in {"single_line_input.placeholder", "new_input.placeholder"} and source.strip().isdigit():
         return True
     return False
 
@@ -729,8 +830,16 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
     if rule is None and _is_terminal_tool_path(relative_path):
         if method_name == "sandbox_approval_title":
             rule = ("sandbox_permission_title", "sandbox_approval_title")
+        elif method_name in {"network_clause", "format_hosts_clause"}:
+            rule = ("sandbox_permission_title", "sandbox_approval_title")
         elif method_name == "write_path_summary":
             rule = ("sandbox_permission_path_summary", "write_path_summary")
+    if (
+        rule is None
+        and relative_path == "crates/acp_thread/src/terminal.rs"
+        and method_name == "user_facing_message"
+    ):
+        rule = ("sandbox_error_message", "LinuxWslSandboxError.user_facing_message")
     if rule is None and _is_git_graph_path(relative_path) and method_name == "format_timestamp":
         rule = ("git_timestamp_fallback", "git_graph.format_timestamp")
     if (
@@ -770,6 +879,25 @@ def _extract_ui_return_method_occurrences(source_bytes: bytes, node, relative_pa
         and method_name == "creation_blocked_reason"
     ):
         rule = ("git_worktree_picker_disabled_reason", "creation_blocked_reason")
+    if (
+        rule is None
+        and _is_add_llm_provider_modal_path(relative_path)
+        and method_name == "description"
+    ):
+        rule = ("llm_provider_description", "LlmCompatibleProvider.description")
+    if (
+        rule is None
+        and _is_language_model_provider_path(relative_path)
+        and method_name
+        in {"authentication_error_message", "missing_credentials_error_message"}
+    ):
+        rule = ("provider_credential_error", f"LanguageModelProvider.{method_name}")
+    if (
+        rule is None
+        and method_name in {"primary_message", "secondary_message"}
+        and _is_trait_impl_method(source_bytes, node, "WorkspaceError")
+    ):
+        rule = ("workspace_error_message", f"WorkspaceError.{method_name}")
     if rule is None and _is_editor_code_context_menus_path(relative_path):
         if method_name == "completion_kind_name":
             rule = ("completion_kind_tooltip", "completion_kind_name")
@@ -832,7 +960,20 @@ def _return_method_source_allowed(call_name: str, source: str) -> bool:
         return source in SANDBOX_WRITE_PATH_SUMMARY_SOURCES
     if call_name == "git_graph.format_timestamp":
         return source in GIT_GRAPH_TIMESTAMP_FALLBACK_SOURCES
+    if call_name == "LinuxWslSandboxError.user_facing_message":
+        return source in LINUX_WSL_SANDBOX_ERROR_SOURCES
     return True
+
+
+def _is_trait_impl_method(source_bytes: bytes, node, trait_name: str) -> bool:
+    current = node.parent
+    while current is not None:
+        if current.type == "impl_item":
+            header = _node_text(source_bytes, current)
+            header = header.split("{", 1)[0]
+            return f"impl {trait_name} for " in header
+        current = current.parent
+    return False
 
 
 def _string_literal_nodes(node) -> list:
@@ -1431,6 +1572,21 @@ def _allowed_literal_rules_for_path(
                 "AgentThread.tool_error",
             )
         )
+    if _is_agent_thread_view_path(relative_path):
+        rules.append(
+            (
+                AGENT_THREAD_ERROR_CALLOUT_SOURCES,
+                "callout_description",
+                "AgentThread.error_callout",
+            )
+        )
+        rules.append(
+            (
+                AGENT_THREAD_SANDBOX_NOTICE_SOURCES,
+                "sandbox_status_message",
+                "AgentThread.sandbox_notice",
+            )
+        )
     if _is_agent_skills_path(relative_path):
         rules.append(
             (
@@ -1468,6 +1624,22 @@ def _allowed_literal_rules_for_path(
                 ADD_LLM_PROVIDER_VALIDATION_ERROR_SOURCES,
                 "llm_provider_validation_error",
                 "AddLlmProvider.validation_error",
+            )
+        )
+    if _is_settings_ui_path(relative_path):
+        rules.append(
+            (
+                SETTINGS_FORM_VALIDATION_SOURCES,
+                "settings_form_validation",
+                "SettingsForm.validation",
+            )
+        )
+    if _is_language_model_provider_path(relative_path):
+        rules.append(
+            (
+                LANGUAGE_MODEL_PROVIDER_MODEL_ERROR_SOURCES,
+                "provider_model_error",
+                "Model::new_disabled",
             )
         )
     if _is_configure_context_server_modal_path(relative_path):
@@ -1544,8 +1716,24 @@ def _allowed_literal_rules_for_path(
                 "WorkspaceError.action",
             )
         )
+    if _is_picker_delegate_placeholder_path(relative_path):
+        rules.append(
+            (
+                PICKER_DELEGATE_PLACEHOLDER_SOURCES,
+                "placeholder",
+                "PickerDelegate.placeholder_text",
+            )
+        )
     if _is_git_user_error_path(relative_path):
         rules.append((GIT_NOTIFY_ERROR_SOURCES, "notification_error", "git_user_error"))
+    if _is_git_branch_picker_path(relative_path):
+        rules.append(
+            (
+                GIT_BRANCH_PICKER_PROMPT_SOURCES,
+                "prompt_message",
+                "BranchPicker.force_delete_prompt",
+            )
+        )
     if _is_git_graph_path(relative_path):
         rules.append(
             (
@@ -1588,6 +1776,38 @@ def _allowed_literal_rules_for_path(
                 GIT_WORKTREE_PICKER_DISABLED_REASON_SOURCES,
                 "git_worktree_picker_disabled_reason",
                 "WorktreePicker.disabled_reason",
+            )
+        )
+    if _is_project_panel_path(relative_path):
+        rules.append(
+            (
+                PROJECT_PANEL_VALIDATION_SOURCES,
+                "project_panel_validation",
+                "ProjectPanel.validation",
+            )
+        )
+    if _is_collab_panel_path(relative_path):
+        rules.append(
+            (
+                COLLAB_NOTIFICATION_SOURCES,
+                "notification",
+                "CollabPanel.notification",
+            )
+        )
+    if _is_title_bar_collab_path(relative_path):
+        rules.append(
+            (
+                CALL_QUALITY_LABEL_SOURCES,
+                "call_quality_label",
+                "ConnectionQuality.label",
+            )
+        )
+    if _is_agent_config_options_path(relative_path):
+        rules.append(
+            (
+                AGENT_CONFIG_OPTION_SEPARATOR_SOURCES,
+                "picker_separator",
+                "ConfigOptionPickerEntry::Separator",
             )
         )
     if _is_threads_archive_view_path(relative_path):
@@ -2319,6 +2539,10 @@ def _is_title_bar_path(relative_path: str) -> bool:
     return relative_path == "crates/title_bar/src/title_bar.rs"
 
 
+def _is_title_bar_collab_path(relative_path: str) -> bool:
+    return relative_path == "crates/title_bar/src/collab.rs"
+
+
 def _is_activity_indicator_path(relative_path: str) -> bool:
     return relative_path == "crates/activity_indicator/src/activity_indicator.rs"
 
@@ -2357,6 +2581,10 @@ def _is_workspace_error_path(relative_path: str) -> bool:
 
 def _is_project_panel_path(relative_path: str) -> bool:
     return relative_path == "crates/project_panel/src/project_panel.rs"
+
+
+def _is_collab_panel_path(relative_path: str) -> bool:
+    return relative_path == "crates/collab_ui/src/collab_panel.rs"
 
 
 def _is_search_path(relative_path: str) -> bool:
@@ -2423,6 +2651,13 @@ def _is_debugger_new_process_modal_path(relative_path: str) -> bool:
 
 def _is_debugger_breakpoint_list_path(relative_path: str) -> bool:
     return relative_path == "crates/debugger_ui/src/session/running/breakpoint_list.rs"
+
+
+def _is_picker_delegate_placeholder_path(relative_path: str) -> bool:
+    return relative_path in {
+        "crates/debugger_ui/src/attach_modal.rs",
+        "crates/tasks_ui/src/modal.rs",
+    }
 
 
 def _is_git_panel_path(relative_path: str) -> bool:

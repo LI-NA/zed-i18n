@@ -749,6 +749,21 @@ class ExtractTests(unittest.TestCase):
                 '        paths => format!("{} paths", paths.len()),',
                 "    }",
                 "}",
+                "fn network_clause(network: &NetworkRequest) -> Option<String> {",
+                "    match network {",
+                "        NetworkRequest::None => None,",
+                '        NetworkRequest::AnyHost => Some("arbitrary network access".to_string()),',
+                "        NetworkRequest::Hosts(hosts) => Some(format_hosts_clause(hosts)),",
+                "    }",
+                "}",
+                "fn format_hosts_clause(hosts: &[HostPattern]) -> String {",
+                "    match hosts {",
+                '        [] => "network access".to_string(),',
+                '        [single] => format!("network access to {single}"),',
+                '        [first, second] => format!("network access to {first} and {second}"),',
+                '        _ => format!("network access to {}, and {last}", init.join(", ")),',
+                "    }",
+                "}",
             ]
         )
 
@@ -770,7 +785,53 @@ class ExtractTests(unittest.TestCase):
                 "Allow {}?",
                 "0 paths",
                 "{} paths",
+                "arbitrary network access",
+                "network access to {single}",
+                "network access to {first} and {second}",
+                "network access to {}, and {last}",
             },
+        )
+
+    def test_extracts_linux_wsl_sandbox_user_facing_messages(self) -> None:
+        source = "\n".join(
+            [
+                "impl LinuxWslSandboxError {",
+                "    pub fn user_facing_message(&self) -> String {",
+                "        match self {",
+                "            LinuxWslSandboxError::BwrapNotFound => {",
+                '                "No usable `bwrap` binary was found on your PATH. Install Bubblewrap to let the agent sandbox terminal commands.".to_string()',
+                "            }",
+                "            LinuxWslSandboxError::SetuidRejected => {",
+                '                "The only `bwrap` available is setuid-root, which Zed refuses to run. Install a non-setuid Bubblewrap to let the agent sandbox terminal commands.".to_string()',
+                "            }",
+                "            LinuxWslSandboxError::SandboxProbeFailed => {",
+                '                "`bwrap` is installed but couldn\'t create a sandbox, likely because unprivileged user namespaces are disabled on this system.".to_string()',
+                "            }",
+                "        }",
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/acp_thread/src/terminal.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertEqual(
+            set(by_source),
+            {
+                "No usable `bwrap` binary was found on your PATH. Install Bubblewrap to let the agent sandbox terminal commands.",
+                "The only `bwrap` available is setuid-root, which Zed refuses to run. Install a non-setuid Bubblewrap to let the agent sandbox terminal commands.",
+                "`bwrap` is installed but couldn't create a sandbox, likely because unprivileged user namespaces are disabled on this system.",
+            },
+        )
+        self.assertEqual(
+            by_source[
+                "No usable `bwrap` binary was found on your PATH. Install Bubblewrap to let the agent sandbox terminal commands."
+            ].kind,
+            "sandbox_error_message",
         )
 
     def test_extracts_empty_agent_draft_placeholder_label(self) -> None:
@@ -2852,6 +2913,14 @@ class ExtractTests(unittest.TestCase):
                 "        true,",
                 "        cx,",
                 "    );",
+                "    let message = Self::provider_by_name(provider, cx)",
+                "        .map(|provider| provider.missing_credentials_error_message())",
+                '        .unwrap_or_else(|| format!("No credentials are configured for {provider}.").into());',
+                '    self.render_error_callout("Credentials Missing", message, false, true, cx);',
+                "    let message: SharedString = message.clone().unwrap_or_else(|| {",
+                '        format!("{provider} rejected the request due to insufficient permissions.").into()',
+                "    });",
+                '    self.render_error_callout("Permission Denied", message, false, false, cx);',
                 "}",
             ]
         )
@@ -2867,12 +2936,99 @@ class ExtractTests(unittest.TestCase):
             {
                 "Rate Limit Reached",
                 "{provider}'s rate limit was reached. Zed will retry automatically.",
+                "No credentials are configured for {provider}.",
+                "Credentials Missing",
+                "{provider} rejected the request due to insufficient permissions.",
+                "Permission Denied",
             },
         )
         self.assertEqual(by_source["Rate Limit Reached"].kind, "callout_title")
         self.assertEqual(
             by_source["{provider}'s rate limit was reached. Zed will retry automatically."].kind,
             "callout_description",
+        )
+
+    def test_extracts_settings_dynamic_form_helpers_and_errors(self) -> None:
+        source = "\n".join(
+            [
+                "fn open_form(settings_window: &mut SettingsWindow, transport: McpTransport) {",
+                '    let title = if is_edit { "Configure MCP Server" } else { "Add Remote MCP Server" };',
+                "    settings_window.push_dynamic_sub_page(",
+                "        title,",
+                '        "Agent Configuration",',
+                '        Some("context_servers"),',
+                "        false,",
+                "        render_mcp_server_form_page,",
+                "        window,",
+                "        cx,",
+                "    );",
+                "}",
+                "fn render_form(settings_window: &SettingsWindow) {",
+                "    crate::render_settings_item_layout(",
+                "        settings_window,",
+                '        "Agent Name",',
+                '        "Required. A unique name used to identify this agent.",',
+                "        control,",
+                "        None,",
+                "        None,",
+                "        None,",
+                "        false,",
+                "        cx,",
+                "    );",
+                "    render_form_field(",
+                "        settings_window,",
+                '        "Server Name",',
+                '        "Required. A unique name used to identify this MCP server.",',
+                "        &form.name,",
+                "        cx,",
+                "    );",
+                "    render_kv_section(",
+                "        settings_window,",
+                '        "Headers",',
+                '        "HTTP headers sent with each request to the server.",',
+                "        &form.headers,",
+                "        McpKvKind::Header,",
+                "        cx,",
+                "    );",
+                "}",
+                "fn validate(id: &str, label: &str, key: &str) -> Result<(), SharedString> {",
+                '    return Err("Server name is required.".into());',
+                '    return Err(format!("A server named \\"{}\\" already exists.", id).into());',
+                '    return Err(format!("Invalid URL: {error}").into());',
+                '    return Err(format!("Duplicate {label} \\"{key}\\".").into());',
+                '    return Err("Timeout must be a positive whole number of seconds.".into());',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings_ui/src/pages/mcp_servers_page.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertTrue(
+            {
+                "Configure MCP Server",
+                "Add Remote MCP Server",
+                "Agent Configuration",
+                "Agent Name",
+                "Required. A unique name used to identify this agent.",
+                "Server Name",
+                "Required. A unique name used to identify this MCP server.",
+                "Headers",
+                "HTTP headers sent with each request to the server.",
+                "Server name is required.",
+                'A server named "{}" already exists.',
+                "Invalid URL: {error}",
+                'Duplicate {label} "{key}".',
+                "Timeout must be a positive whole number of seconds.",
+            }.issubset(by_source)
+        )
+        self.assertEqual(by_source["Agent Name"].kind, "setting_title")
+        self.assertEqual(
+            by_source["Required. A unique name used to identify this MCP server."].kind,
+            "setting_description",
         )
 
     def test_extracts_reviewed_ui_helper_arguments(self) -> None:
@@ -4009,6 +4165,74 @@ class ExtractTests(unittest.TestCase):
         self.assertNotIn("200000", by_source)
         self.assertNotIn("32000", by_source)
 
+    def test_extracts_llm_provider_descriptions_credentials_and_placeholders(self) -> None:
+        modal_source = "\n".join(
+            [
+                "impl LlmCompatibleProvider {",
+                "    fn description(&self) -> &'static str {",
+                "        match self {",
+                '            Self::OpenAi => "This provider will use an OpenAI compatible API.",',
+                '            Self::Anthropic => "This provider will use an Anthropic Messages compatible API.",',
+                "        }",
+                "    }",
+                "}",
+            ]
+        )
+        provider_source = "\n".join(
+            [
+                "fn configuration_view_v2(&self, window: &mut Window, cx: &mut App) {",
+                "    crate::ApiKeyEditor::new(",
+                "        state,",
+                '        "https://console.mistral.ai/api-keys",',
+                '        "Paste your Mistral API key",',
+                "        status,",
+                "        set,",
+                "        reset,",
+                "        window,",
+                "        cx,",
+                "    );",
+                "}",
+                "fn authentication_error_message(&self) -> SharedString {",
+                '    "Your ChatGPT subscription session is invalid or has expired. Sign in again via the Agent Panel settings to continue.".into()',
+                "}",
+                "fn missing_credentials_error_message(&self) -> SharedString {",
+                '    "You are not signed in to your ChatGPT account. Sign in via the Agent Panel settings to continue.".into()',
+                "}",
+                "fn show_disabled_model(error: anyhow::Error) {",
+                '    Model::new_disabled(name, format!("Failed to fetch model from API: {error}"));',
+                "}",
+            ]
+        )
+
+        modal_occurrences = extract_ui_strings_from_source(
+            modal_source,
+            relative_path="crates/agent_ui/src/agent_configuration/add_llm_provider_modal.rs",
+        )
+        provider_occurrences = extract_ui_strings_from_source(
+            provider_source,
+            relative_path="crates/language_models/src/provider/mistral.rs",
+        )
+
+        by_source = {
+            occurrence.source: occurrence
+            for occurrence in [*modal_occurrences, *provider_occurrences]
+        }
+        self.assertTrue(
+            {
+                "This provider will use an OpenAI compatible API.",
+                "This provider will use an Anthropic Messages compatible API.",
+                "Paste your Mistral API key",
+                "Your ChatGPT subscription session is invalid or has expired. Sign in again via the Agent Panel settings to continue.",
+                "You are not signed in to your ChatGPT account. Sign in via the Agent Panel settings to continue.",
+                "Failed to fetch model from API: {error}",
+            }.issubset(by_source)
+        )
+        self.assertEqual(by_source["Paste your Mistral API key"].kind, "placeholder")
+        self.assertEqual(
+            by_source["This provider will use an Anthropic Messages compatible API."].kind,
+            "llm_provider_description",
+        )
+
     def test_extracts_add_llm_provider_user_facing_errors(self) -> None:
         source = "\n".join(
             [
@@ -4181,8 +4405,17 @@ class ExtractTests(unittest.TestCase):
                 "    }",
                 "}",
                 "impl WorkspaceError for PortalError {",
+                "    fn primary_message(&self) -> SharedString {",
+                '        "Couldn\'t load release notes".into()',
+                "    }",
+                "    fn secondary_message(&self) -> SharedString {",
+                '        format!("Dev extension \'{extension_id}\' is not installed.").into()',
+                "    }",
                 "    fn primary_action(&self) -> ErrorAction {",
                 '        ErrorAction::link("See docs", "https://zed.dev/docs/linux#i-cant-open-any-files")',
+                "    }",
+                "    fn secondary_action(&self) -> ErrorAction {",
+                '        ErrorAction::new("Install Dev Extension", InstallDevExtension)',
                 "    }",
                 "}",
             ]
@@ -4194,7 +4427,17 @@ class ExtractTests(unittest.TestCase):
         )
 
         by_source = {occurrence.source: occurrence for occurrence in occurrences}
-        self.assertEqual(set(by_source), {"Dismiss", "See docs"})
+        self.assertEqual(
+            set(by_source),
+            {
+                "Dismiss",
+                "Couldn't load release notes",
+                "Dev extension '{extension_id}' is not installed.",
+                "See docs",
+                "Install Dev Extension",
+            },
+        )
+        self.assertEqual(by_source["Couldn't load release notes"].kind, "workspace_error_message")
         self.assertEqual(by_source["See docs"].kind, "workspace_error_action")
 
     def test_extracts_worktree_picker_dynamic_create_and_section_labels(self) -> None:
@@ -4262,6 +4505,176 @@ class ExtractTests(unittest.TestCase):
             ].kind,
             "git_worktree_picker_disabled_reason",
         )
+
+    def test_extracts_picker_delegate_placeholder_fields(self) -> None:
+        debugger_source = "\n".join(
+            [
+                "fn new() -> Self {",
+                "    Self {",
+                '        placeholder_text: Arc::from("Select the process you want to attach the debugger to"),',
+                "    }",
+                "}",
+            ]
+        )
+        task_source = "\n".join(
+            [
+                "fn build_placeholder(selected_kind: TaskTemplateKind) {",
+                "    let placeholder_text = if selected_kind == TaskTemplateKind::Task {",
+                '        Arc::from("Find a task, or run a command in the central pane")',
+                "    } else {",
+                '        Arc::from("Find a task, or run a command")',
+                "    };",
+                "}",
+            ]
+        )
+
+        debugger_occurrences = extract_ui_strings_from_source(
+            debugger_source,
+            relative_path="crates/debugger_ui/src/attach_modal.rs",
+        )
+        task_occurrences = extract_ui_strings_from_source(
+            task_source,
+            relative_path="crates/tasks_ui/src/modal.rs",
+        )
+
+        by_source = {
+            occurrence.source: occurrence
+            for occurrence in [*debugger_occurrences, *task_occurrences]
+        }
+        self.assertEqual(
+            set(by_source),
+            {
+                "Select the process you want to attach the debugger to",
+                "Find a task, or run a command in the central pane",
+                "Find a task, or run a command",
+            },
+        )
+        self.assertEqual(
+            by_source["Select the process you want to attach the debugger to"].kind,
+            "placeholder",
+        )
+
+    def test_extracts_branch_and_project_validation_messages(self) -> None:
+        branch_source = "\n".join(
+            [
+                "fn delete_branch(branch_name: &str) {",
+                '    let prompt = format!("Branch \\"{branch_name}\\" is not fully merged. Force delete it?");',
+                "}",
+            ]
+        )
+        project_source = "\n".join(
+            [
+                "fn validate_new_path(file_name: &str) -> ValidationState {",
+                '    return ValidationState::Error("File or directory name cannot be empty.".into());',
+                '    return ValidationState::Warning("File or directory name contains leading or trailing whitespace.".into());',
+                '    return ValidationState::Error(format!("File or directory \'{}\' already exists at location. Please choose a different name.", file_name).into());',
+                "}",
+            ]
+        )
+
+        branch_occurrences = extract_ui_strings_from_source(
+            branch_source,
+            relative_path="crates/git_ui/src/branch_picker.rs",
+        )
+        project_occurrences = extract_ui_strings_from_source(
+            project_source,
+            relative_path="crates/project_panel/src/project_panel.rs",
+        )
+
+        by_source = {
+            occurrence.source: occurrence
+            for occurrence in [*branch_occurrences, *project_occurrences]
+        }
+        self.assertEqual(
+            set(by_source),
+            {
+                'Branch "{branch_name}" is not fully merged. Force delete it?',
+                "File or directory name cannot be empty.",
+                "File or directory name contains leading or trailing whitespace.",
+                "File or directory '{}' already exists at location. Please choose a different name.",
+            },
+        )
+        self.assertEqual(
+            by_source[
+                'Branch "{branch_name}" is not fully merged. Force delete it?'
+            ].kind,
+            "prompt_message",
+        )
+        self.assertEqual(
+            by_source["File or directory name cannot be empty."].kind,
+            "project_panel_validation",
+        )
+
+    def test_extracts_collab_notifications_quality_and_config_option_separators(
+        self,
+    ) -> None:
+        collab_source = "\n".join(
+            [
+                "fn notify(user_name: &str) {",
+                '    format!("{} wants to add you as a contact", requester.github_login);',
+                '    format!("{} accepted your contact request", responder.github_login);',
+                '    format!("{} invited you to join the #{channel_name} channel", inviter.github_login);',
+                "}",
+            ]
+        )
+        quality_source = "\n".join(
+            [
+                "fn label(quality: ConnectionQuality) -> &'static str {",
+                "    match quality {",
+                '        ConnectionQuality::Excellent => "Excellent",',
+                '        ConnectionQuality::Good => "Good",',
+                '        ConnectionQuality::Poor => "Poor",',
+                '        ConnectionQuality::Lost => "Lost",',
+                "    }",
+                "}",
+            ]
+        )
+        config_source = "\n".join(
+            [
+                "fn picker_entries() {",
+                '    entries.push(ConfigOptionPickerEntry::Separator("Favorites".into()));',
+                '    entries.push(ConfigOptionPickerEntry::Separator("All Options".into()));',
+                "}",
+            ]
+        )
+
+        collab_occurrences = extract_ui_strings_from_source(
+            collab_source,
+            relative_path="crates/collab_ui/src/collab_panel.rs",
+        )
+        quality_occurrences = extract_ui_strings_from_source(
+            quality_source,
+            relative_path="crates/title_bar/src/collab.rs",
+        )
+        config_occurrences = extract_ui_strings_from_source(
+            config_source,
+            relative_path="crates/agent_ui/src/config_options.rs",
+        )
+
+        by_source = {
+            occurrence.source: occurrence
+            for occurrence in [
+                *collab_occurrences,
+                *quality_occurrences,
+                *config_occurrences,
+            ]
+        }
+        self.assertEqual(
+            set(by_source),
+            {
+                "{} wants to add you as a contact",
+                "{} accepted your contact request",
+                "{} invited you to join the #{channel_name} channel",
+                "Excellent",
+                "Good",
+                "Poor",
+                "Lost",
+                "Favorites",
+                "All Options",
+            },
+        )
+        self.assertEqual(by_source["Excellent"].kind, "call_quality_label")
+        self.assertEqual(by_source["Favorites"].kind, "picker_separator")
 
     def test_extracts_git_picker_stashes_tab_label(self) -> None:
         source = "\n".join(
