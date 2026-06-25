@@ -17,6 +17,7 @@ Before applying a row, verify the source term's role and `kind` / `code_context`
 | Call | voice / collaboration | 通話 |
 | Call | tool / function / API | 呼叫 |
 | Chat | | 聊天 |
+| Code Lens | editor feature / LSP code lens concept | Code Lens |
 | Command Palette | | 命令選擇區 |
 | Commit | | 提交 |
 | Completion | editor autocomplete | 自動完成 |
