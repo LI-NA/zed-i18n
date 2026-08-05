@@ -90,6 +90,8 @@ jobs:
         run: |
           set -euo pipefail
 
+          mv release-artifacts/release-notes.md release-notes.md
+
           if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" >/dev/null; then
             echo "Release tag does not exist: $RELEASE_TAG"
             exit 1
@@ -101,7 +103,7 @@ jobs:
               --verify-tag \
               --draft \
               --title "$RELEASE_TAG" \
-              --notes "Localized Zed build restored from workflow run ${{ inputs.source_run_id }}."
+              --notes-file release-notes.md
           fi
 
           gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"

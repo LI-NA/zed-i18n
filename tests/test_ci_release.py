@@ -17,6 +17,7 @@ from tools.zed_i18n.ci_release import (
     disk_summary_entries,
     expected_app_asset_names,
     generate_release_metadata,
+    generate_release_notes,
     github_matrix_outputs,
     list_translation_languages,
     MACOS_TRANSIENT_BUNDLE_ERRORS,
@@ -311,6 +312,96 @@ class CiReleaseTests(unittest.TestCase):
             "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-i18n-ko-KR-windows-x86_64.zip",
         )
 
+    def test_generates_draft_release_notes_from_manifest_assets(self) -> None:
+        release_tag = "v1.2.5-i18n.1"
+        base_url = f"https://github.com/owner/repo/releases/download/{release_tag}"
+        manifest = {
+            "zed_version": "v1.2.5",
+            "release_tag": release_tag,
+            "repository": "owner/repo",
+            "assets": [
+                {
+                    "kind": "app",
+                    "locale": "ko-KR",
+                    "platform": "linux",
+                    "arch": "x86_64",
+                    "download_url": f"{base_url}/zed-i18n-ko-KR-linux-x86_64.tar.gz",
+                },
+                {
+                    "kind": "app",
+                    "locale": "ko-KR",
+                    "platform": "linux",
+                    "arch": "aarch64",
+                    "download_url": f"{base_url}/zed-i18n-ko-KR-linux-aarch64.tar.gz",
+                },
+                {
+                    "kind": "app",
+                    "locale": "ko-KR",
+                    "platform": "macos",
+                    "arch": "aarch64",
+                    "download_url": f"{base_url}/Zed-i18n-ko-KR-macos-aarch64.dmg",
+                },
+                {
+                    "kind": "app",
+                    "locale": "ko-KR",
+                    "platform": "windows",
+                    "arch": "x86_64",
+                    "download_url": f"{base_url}/Zed-i18n-ko-KR-windows-x86_64.exe",
+                },
+                {
+                    "kind": "portable_app",
+                    "locale": "ko-KR",
+                    "platform": "windows",
+                    "arch": "x86_64",
+                    "download_url": f"{base_url}/Zed-i18n-ko-KR-windows-x86_64.zip",
+                },
+            ],
+        }
+
+        notes = generate_release_notes(manifest, "v1.2.4-i18n.1")
+
+        self.assertEqual(
+            notes,
+            "Localized Zed build for v1.2.5.\n\n"
+            "Full Changelog: [`v1.2.4-i18n.1...v1.2.5-i18n.1`](https://github.com/owner/repo/compare/v1.2.4-i18n.1...v1.2.5-i18n.1)\n\n"
+            "<!-- Add the manually summarized changelog here before publishing. -->\n\n"
+            "| Language | Linux | macOS | Windows |\n"
+            "| --- | --- | --- | --- |\n"
+            f"| 한국어 (ko-KR) | [aarch64]({base_url}/zed-i18n-ko-KR-linux-aarch64.tar.gz) / [x86_64]({base_url}/zed-i18n-ko-KR-linux-x86_64.tar.gz) | [aarch64]({base_url}/Zed-i18n-ko-KR-macos-aarch64.dmg) | [x86_64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
+            "Windows ZIP builds are also available in the Assets section below if needed.\n",
+        )
+        self.assertNotIn(".zip)", notes)
+
+    def test_generates_release_notes_without_changelog_when_previous_tag_is_empty(self) -> None:
+        release_tag = "v1.2.5-i18n.1"
+        base_url = f"https://github.com/owner/repo/releases/download/{release_tag}"
+        manifest = {
+            "zed_version": "v1.2.5",
+            "release_tag": release_tag,
+            "repository": "owner/repo",
+            "assets": [
+                {
+                    "kind": "app",
+                    "locale": "ko-KR",
+                    "platform": "windows",
+                    "arch": "x86_64",
+                    "download_url": f"{base_url}/Zed-i18n-ko-KR-windows-x86_64.exe",
+                },
+            ],
+        }
+
+        notes = generate_release_notes(manifest, "")
+
+        self.assertEqual(
+            notes,
+            "Localized Zed build for v1.2.5.\n\n"
+            "<!-- Add the manually summarized changelog here before publishing. -->\n\n"
+            "| Language | Linux | macOS | Windows |\n"
+            "| --- | --- | --- | --- |\n"
+            f"| 한국어 (ko-KR) | - | - | [x86_64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n",
+        )
+        self.assertNotIn("Full Changelog", notes)
+
     def test_windows_app_source_path_uses_distribution_setup_name(self) -> None:
         config = DistributionConfig(windows_setup_name="Zed-i18n")
 
@@ -463,6 +554,25 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn('gh release create "$RELEASE_TAG"', workflow)
         self.assertIn('gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"', workflow)
         self.assertIn('gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets', workflow)
+
+    def test_release_workflows_prefill_draft_notes_from_the_combined_artifact(self) -> None:
+        release_workflow = (
+            Path.cwd() / ".github" / "workflows" / "i18n-release.yml"
+        ).read_text(encoding="utf-8")
+        restore_workflow = (
+            Path.cwd() / ".github" / "workflows" / "i18n-publish-existing.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn('repos/${GITHUB_REPOSITORY}/releases/latest', release_workflow)
+        self.assertIn('PREVIOUS_TAG=""', release_workflow)
+        self.assertIn("ci_release release-notes", release_workflow)
+        self.assertIn("--output release-artifacts/release-notes.md", release_workflow)
+        self.assertIn("mv release-artifacts/release-notes.md release-notes.md", release_workflow)
+        self.assertIn("--notes-file release-notes.md", release_workflow)
+        self.assertNotIn('--notes "Localized Zed build', release_workflow)
+        self.assertIn("mv release-artifacts/release-notes.md release-notes.md", restore_workflow)
+        self.assertIn("--notes-file release-notes.md", restore_workflow)
+        self.assertNotIn('--notes "Localized Zed build restored', restore_workflow)
 
     def test_release_workflow_attests_release_artifacts(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(

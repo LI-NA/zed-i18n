@@ -1217,6 +1217,97 @@ def generate_release_metadata(
     checksums_path.write_text("\n".join(checksum_lines) + "\n", encoding="utf-8")
 
 
+RELEASE_LOCALE_NAMES = {
+    "cs-CZ": "Čeština",
+    "de-DE": "Deutsch",
+    "es-ES": "Español",
+    "fr-FR": "Français",
+    "it-IT": "Italiano",
+    "ja-JP": "日本語",
+    "ko-KR": "한국어",
+    "pl-PL": "Polski",
+    "pt-BR": "Português",
+    "ru-RU": "Русский",
+    "tr-TR": "Türkçe",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+}
+RELEASE_TABLE_PLATFORMS = ("linux", "macos", "windows")
+RELEASE_TABLE_ARCHES = ("aarch64", "x86_64")
+
+
+def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> str:
+    zed_version = str(manifest["zed_version"])
+    release_tag = str(manifest["release_tag"])
+    repository = str(manifest["repository"])
+    assets = manifest["assets"]
+    if not isinstance(assets, list):
+        raise ValueError("release manifest assets must be a list")
+
+    app_links: dict[tuple[str, str, str], str] = {}
+    locales: set[str] = set()
+    has_windows_zip = False
+    for asset in assets:
+        if not isinstance(asset, dict):
+            raise ValueError("release manifest assets must be objects")
+        if asset.get("kind") == "portable_app":
+            has_windows_zip = True
+            continue
+        if asset.get("kind") != "app":
+            continue
+
+        locale = str(asset["locale"])
+        platform = str(asset["platform"])
+        arch = str(asset["arch"])
+        app_links[(locale, platform, arch)] = str(asset["download_url"])
+        locales.add(locale)
+
+    lines = [
+        f"Localized Zed build for {zed_version}.",
+        "",
+    ]
+    if previous_tag:
+        lines.extend(
+            [
+                (
+                    f"Full Changelog: [`{previous_tag}...{release_tag}`]"
+                    f"(https://github.com/{repository}/compare/{previous_tag}...{release_tag})"
+                ),
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "<!-- Add the manually summarized changelog here. -->",
+            "",
+            "| Language | Linux | macOS | Windows |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+
+    for locale in sorted(locales):
+        locale_name = RELEASE_LOCALE_NAMES.get(locale)
+        language = f"{locale_name} ({locale})" if locale_name else locale
+        cells = []
+        for platform in RELEASE_TABLE_PLATFORMS:
+            downloads = [
+                f"[{arch}]({app_links[(locale, platform, arch)]})"
+                for arch in RELEASE_TABLE_ARCHES
+                if (locale, platform, arch) in app_links
+            ]
+            cells.append(" / ".join(downloads) or "-")
+        lines.append(f"| {language} | {' | '.join(cells)} |")
+
+    if has_windows_zip:
+        lines.extend(
+            [
+                "",
+                "Windows ZIP builds are also available in the Assets section below if needed.",
+            ]
+        )
+    return "\n".join(lines) + "\n"
+
+
 def resolve_workspace_path(root: Path, value: str) -> Path:
     path = Path(value)
     if not path.is_absolute():
@@ -1298,6 +1389,11 @@ def build_parser() -> argparse.ArgumentParser:
     metadata_parser.add_argument("--languages")
     metadata_parser.add_argument("--platforms")
 
+    release_notes_parser = subparsers.add_parser("release-notes")
+    release_notes_parser.add_argument("--manifest", required=True)
+    release_notes_parser.add_argument("--output", required=True)
+    release_notes_parser.add_argument("--previous-tag", required=True)
+
     rust_cache_parser = subparsers.add_parser("rust-cache-env")
     rust_cache_parser.add_argument("--platform", required=True, choices=["linux", "macos", "windows"])
 
@@ -1352,6 +1448,15 @@ def main(argv: list[str] | None = None) -> int:
                 repository=args.repository,
                 run_id=args.run_id,
                 expected_assets=expected_assets,
+            )
+            return 0
+        if args.command == "release-notes":
+            manifest_path = ensure_inside_workspace(root, Path(args.manifest).resolve())
+            output_path = ensure_inside_workspace(root, Path(args.output).resolve())
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(
+                generate_release_notes(read_json(manifest_path), args.previous_tag),
+                encoding="utf-8",
             )
             return 0
         if args.command == "rust-cache-env":

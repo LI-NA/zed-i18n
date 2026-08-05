@@ -480,6 +480,19 @@ jobs:
         with:
           subject-path: release-artifacts/*
 
+      - name: Generate draft release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! PREVIOUS_TAG="$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" --jq .tag_name)"; then
+            echo "Could not resolve the previous release tag; generating notes without the Full Changelog line."
+            PREVIOUS_TAG=""
+          fi
+          uv run python -m tools.zed_i18n.ci_release release-notes \
+            --manifest release-artifacts/manifest.json \
+            --output release-artifacts/release-notes.md \
+            --previous-tag "$PREVIOUS_TAG"
+
       - name: Upload combined artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -518,6 +531,7 @@ jobs:
           fi
 
           RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          mv release-artifacts/release-notes.md release-notes.md
           if ! gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${RELEASE_TAG}" >/dev/null; then
             echo "Release tag does not exist: $RELEASE_TAG"
             exit 1
@@ -529,7 +543,7 @@ jobs:
               --verify-tag \
               --draft \
               --title "$RELEASE_TAG" \
-              --notes "Localized Zed build for ${{ needs.prepare.outputs.zed-version }}."
+              --notes-file release-notes.md
           fi
 
           gh release upload "$RELEASE_TAG" release-artifacts/* --repo "$GITHUB_REPOSITORY"
