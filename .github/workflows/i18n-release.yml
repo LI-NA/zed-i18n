@@ -536,6 +536,25 @@ jobs:
           pattern: zed-i18n-*
           merge-multiple: true
 
+      - name: Build Debian packages
+        env:
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          uv run python -m tools.zed_i18n.ci_release build-debs \
+            --dist-dir release-artifacts \
+            --release-tag "$RELEASE_TAG" \
+            --repository "$GITHUB_REPOSITORY"
+          shopt -s nullglob
+          debs=(release-artifacts/*.deb)
+          for deb in "${debs[@]}"; do
+            dpkg-deb --info "$deb" >/dev/null
+            dpkg-deb --contents "$deb" >/dev/null
+          done
+          echo "Validated ${#debs[@]} Debian packages with dpkg-deb"
+
       - name: Generate manifest and checksums
         env:
           INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}

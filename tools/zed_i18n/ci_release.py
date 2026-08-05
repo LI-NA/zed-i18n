@@ -19,6 +19,7 @@ import zipfile
 
 from .apply import apply_translations
 from .config import load_project_config, zed_checkout_path
+from .deb import build_release_debs, deb_asset_name
 from .distribution import (
     DistributionConfig,
     apply_distribution_patches,
@@ -786,6 +787,8 @@ def windows_portable_asset_name(language: str, arch: str) -> str:
 
 def app_asset_names(language: str, platform: str, arch: str) -> list[str]:
     names = [app_asset_name(language, platform, arch)]
+    if platform == "linux":
+        names.append(deb_asset_name(language, arch))
     if platform == "windows":
         names.append(windows_portable_asset_name(language, arch))
     return names
@@ -1108,6 +1111,11 @@ APP_PATTERNS = (
         "app",
     ),
     (
+        re.compile(r"^zed-i18n-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.deb$"),
+        "linux",
+        "deb_package",
+    ),
+    (
         re.compile(r"^Zed-i18n-(?P<locale>.+)-macos-(?P<arch>x86_64|aarch64)\.dmg$"),
         "macos",
         "app",
@@ -1234,6 +1242,8 @@ RELEASE_LOCALE_NAMES = {
 }
 RELEASE_TABLE_PLATFORMS = ("linux", "macos", "windows")
 RELEASE_TABLE_ARCHES = ("aarch64", "x86_64")
+# Short display labels keep the download table cells from truncating.
+RELEASE_TABLE_ARCH_LABELS = {"aarch64": "arm64", "x86_64": "x64"}
 
 
 def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> str:
@@ -1287,7 +1297,7 @@ def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> st
         cells = []
         for platform in RELEASE_TABLE_PLATFORMS:
             downloads = [
-                f"[{arch}]({app_links[(locale, platform, arch)]})"
+                f"[{RELEASE_TABLE_ARCH_LABELS[arch]}]({app_links[(locale, platform, arch)]})"
                 for arch in RELEASE_TABLE_ARCHES
                 if (locale, platform, arch) in app_links
             ]
@@ -1374,6 +1384,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional distribution patch config. Omit for an upstream-identical Zed build.",
     )
 
+    debs_parser = subparsers.add_parser("build-debs")
+    debs_parser.add_argument("--dist-dir", required=True)
+    debs_parser.add_argument("--release-tag")
+    debs_parser.add_argument("--repository")
+    debs_parser.add_argument("--max-workers", type=int)
+
     metadata_parser = subparsers.add_parser("metadata")
     metadata_parser.add_argument("--dist-dir", required=True)
     metadata_parser.add_argument("--manifest", required=True)
@@ -1426,6 +1442,29 @@ def main(argv: list[str] | None = None) -> int:
                     else None
                 ),
             )
+            return 0
+        if args.command == "build-debs":
+            release_tag = (
+                args.release_tag
+                or os.environ.get("ZED_I18N_RELEASE_TAG")
+                or os.environ.get("GITHUB_REF_NAME")
+            )
+            repository = (
+                args.repository
+                or os.environ.get("ZED_I18N_REPOSITORY")
+                or os.environ.get("GITHUB_REPOSITORY")
+            )
+            debs = build_release_debs(
+                root=root,
+                dist_dir=ensure_inside_workspace(root, Path(args.dist_dir).resolve()),
+                release_tag=release_tag,
+                repository=repository,
+                max_workers=args.max_workers,
+            )
+            if not debs:
+                print("No Linux release archives found; no Debian packages were built.")
+            for deb in debs:
+                print(f"Built {deb.name} ({deb.stat().st_size} bytes)")
             return 0
         if args.command == "metadata":
             expected_assets = None

@@ -45,7 +45,7 @@ def _format_version(value: tuple[int, ...] | None) -> str:
     return ".".join(str(component) for component in value)
 
 
-def _validate_archive_members(members: Sequence[tarfile.TarInfo]) -> None:
+def validate_archive_members(members: Sequence[tarfile.TarInfo]) -> None:
     seen: set[str] = set()
     for member in members:
         name = member.name
@@ -104,7 +104,7 @@ def verify_archive(
         extract_root = Path(temp_dir)
         with tarfile.open(archive_path, "r:*") as archive:
             members = archive.getmembers()
-            _validate_archive_members(members)
+            validate_archive_members(members)
             archive.extractall(extract_root, members=members, filter="data")
 
         version_by_file: dict[str, tuple[int, ...]] = {}

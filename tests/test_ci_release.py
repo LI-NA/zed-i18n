@@ -208,6 +208,17 @@ class CiReleaseTests(unittest.TestCase):
             classify_asset(Path("zed-remote-server-windows-aarch64.zip"))
 
         self.assertEqual(
+            classify_asset(Path("zed-i18n-ko-KR-linux-x86_64.deb")),
+            {
+                "name": "zed-i18n-ko-KR-linux-x86_64.deb",
+                "kind": "deb_package",
+                "locale": "ko-KR",
+                "platform": "linux",
+                "arch": "x86_64",
+            },
+        )
+
+        self.assertEqual(
             classify_asset(Path("Zed-i18n-ko-KR-windows-x86_64.zip")),
             {
                 "name": "Zed-i18n-ko-KR-windows-x86_64.zip",
@@ -254,7 +265,9 @@ class CiReleaseTests(unittest.TestCase):
                 "Zed-i18n-ja-JP-windows-aarch64.zip",
                 "Zed-i18n-ko-KR-windows-aarch64.exe",
                 "Zed-i18n-ko-KR-windows-aarch64.zip",
+                "zed-i18n-ja-JP-linux-x86_64.deb",
                 "zed-i18n-ja-JP-linux-x86_64.tar.gz",
+                "zed-i18n-ko-KR-linux-x86_64.deb",
                 "zed-i18n-ko-KR-linux-x86_64.tar.gz",
             ],
         )
@@ -367,7 +380,7 @@ class CiReleaseTests(unittest.TestCase):
             "<!-- Add the manually summarized changelog here. -->\n\n"
             "| Language | Linux | macOS | Windows |\n"
             "| --- | --- | --- | --- |\n"
-            f"| 한국어 (ko-KR) | [aarch64]({base_url}/zed-i18n-ko-KR-linux-aarch64.tar.gz) / [x86_64]({base_url}/zed-i18n-ko-KR-linux-x86_64.tar.gz) | [aarch64]({base_url}/Zed-i18n-ko-KR-macos-aarch64.dmg) | [x86_64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
+            f"| 한국어 (ko-KR) | [arm64]({base_url}/zed-i18n-ko-KR-linux-aarch64.tar.gz) / [x64]({base_url}/zed-i18n-ko-KR-linux-x86_64.tar.gz) | [arm64]({base_url}/Zed-i18n-ko-KR-macos-aarch64.dmg) | [x64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
             "The full download table is available in the [README](https://github.com/owner/repo#downloads).\n",
         )
         self.assertNotIn(".zip)", notes)
@@ -398,7 +411,7 @@ class CiReleaseTests(unittest.TestCase):
             "<!-- Add the manually summarized changelog here. -->\n\n"
             "| Language | Linux | macOS | Windows |\n"
             "| --- | --- | --- | --- |\n"
-            f"| 한국어 (ko-KR) | - | - | [x86_64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
+            f"| 한국어 (ko-KR) | - | - | [x64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
             "The full download table is available in the [README](https://github.com/owner/repo#downloads).\n",
         )
         self.assertNotIn("Full Changelog", notes)
