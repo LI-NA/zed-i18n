@@ -1,0 +1,5 @@
+# The Linux builder image only copies docker/linux-builder; keep local build
+# contexts tiny (.cache/zed alone is tens of GB).
+*
+!docker/linux-builder
+!docker/linux-builder/**

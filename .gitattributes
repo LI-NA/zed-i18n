@@ -1,0 +1,3 @@
+# The Linux builder scripts run inside an Ubuntu container; CRLF breaks their
+# shebangs and changes the content-derived builder image tag.
+docker/linux-builder/* text eol=lf

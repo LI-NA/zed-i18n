@@ -707,6 +707,48 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("Record disk space after Linux cleanup", workflow)
         self.assertIn("disk-summary --label \"after-linux-cleanup\"", workflow)
 
+    def test_release_workflow_resolves_linux_builder_to_an_immutable_manifest(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("linux-builder-image: ${{ steps.linux-builder.outputs.image }}", workflow)
+        self.assertIn("linux-builder-digest: ${{ steps.linux-builder.outputs.digest }}", workflow)
+        self.assertIn("Resolve Linux builder contract", workflow)
+        self.assertIn("Resolve immutable Linux builder image", workflow)
+        self.assertIn("tools.zed_i18n.linux_builder outputs", workflow)
+        self.assertIn("docker buildx imagetools inspect", workflow)
+        self.assertIn("--format '{{.Name}}'", workflow)
+        self.assertIn("--format '{{json .Manifest}}'", workflow)
+        self.assertIn("tools.zed_i18n.linux_builder resolve-manifest", workflow)
+        self.assertIn("docker login ghcr.io", workflow)
+        self.assertIn("packages: read", workflow)
+
+    def test_release_workflow_builds_linux_inside_the_validated_container(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        ).replace("\r\n", "\n")
+        linux_job = workflow.split("\n  build-linux:\n", 1)[1].split("\n  build-macos:\n", 1)[0]
+
+        self.assertIn("Pull and validate Linux builder", linux_job)
+        self.assertIn("docker login ghcr.io", linux_job)
+        self.assertIn("docker pull \"$LINUX_BUILDER_IMAGE\"", linux_job)
+        self.assertIn("docker image inspect", linux_job)
+        self.assertIn("tools.zed_i18n.linux_builder validate-labels", linux_job)
+        self.assertIn("Build and verify localized artifacts in container", linux_job)
+        self.assertIn("docker run --rm", linux_job)
+        self.assertIn('--user "$(id -u):$(id -g)"', linux_job)
+        self.assertIn('--security-opt no-new-privileges', linux_job)
+        self.assertIn('--cap-drop ALL', linux_job)
+        self.assertIn('"$GITHUB_WORKSPACE:/workspace"', linux_job)
+        self.assertIn('"${{ steps.rust-cache.outputs.cargo-home }}:/cargo-home"', linux_job)
+        self.assertIn("/usr/local/bin/zed-i18n-run-linux-release", linux_job)
+        self.assertNotIn("docker.sock", linux_job)
+        self.assertNotIn("Setup Linux dependencies", linux_job)
+        self.assertNotIn("./script/linux", linux_job)
+        self.assertNotIn("./script/download-wasi-sdk", linux_job)
+        self.assertNotIn("ci_release build-shard", linux_job)
+
     def test_release_workflow_cleans_only_macos_core_simulator(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"

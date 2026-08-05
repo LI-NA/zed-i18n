@@ -46,6 +46,7 @@ fetch-zed
 - `.cache/zed/<version>` — for `apply` and local builds.
 - Do not delete `.cache/zed` or run `cargo clean` unless the user explicitly asks.
 - When bumping the Zed version in `config/project.toml`, manually review the `distribution.py` patch targets and the `config/distribution.toml` overlay against the fetched Zed checkout before release work.
+- When bumping the Zed version, also compare `docker/linux-builder/environment.toml` and `docker/linux-builder/ubuntu-packages.txt` against the fetched checkout (`rust-toolchain.toml`, `script/download-wasi-sdk`, the apt package list in `script/linux`), then run `uv run python -m tools.zed_i18n.linux_builder validate-zed`. Editing anything under `docker/linux-builder/` or `config/linux-builder.toml` republishes the Linux builder image automatically on push to `master`.
 - When bumping the Zed version, update the README source of truth at `docs/readme/ko-KR.md` first, then synchronize `README.md` and every other `docs/readme/*.md` localized README in the same version-bump task so badges, release links, and example checkout paths match `config/project.toml`.
 - After bumping the Zed version and running `fetch-zed`, run the Zed patch contract test before release work:
   `ZED_I18N_REQUIRE_ZED_PATCH_CONTRACT=1 ZED_I18N_PATCH_CONTRACT_ZED_ROOT=.cache/zed/<version> uv run python -m unittest tests.test_zed_patch_contracts`.

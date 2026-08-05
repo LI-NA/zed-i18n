@@ -1,0 +1,197 @@
+name: Publish Linux builder image
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - config/linux-builder.toml
+      - docker/linux-builder/**
+      - tools/zed_i18n/linux_builder.py
+      - .github/workflows/i18n-linux-builder.yml
+
+concurrency:
+  group: i18n-linux-builder-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    name: Resolve builder contract
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      should-build: ${{ steps.existing.outputs.should-build }}
+      image-repository: ${{ steps.contract.outputs.image-repository }}
+      image-tag: ${{ steps.contract.outputs.image-tag }}
+      tagged-image: ${{ steps.contract.outputs.tagged-image }}
+      context-sha256: ${{ steps.contract.outputs.context-sha256 }}
+      ubuntu-base: ${{ steps.contract.outputs.ubuntu-base }}
+      rust-toolchain: ${{ steps.contract.outputs.rust-toolchain }}
+      rust-profile: ${{ steps.contract.outputs.rust-profile }}
+      rust-components: ${{ steps.contract.outputs.rust-components }}
+      rust-targets: ${{ steps.contract.outputs.rust-targets }}
+      wasi-sdk: ${{ steps.contract.outputs.wasi-sdk }}
+      uv: ${{ steps.contract.outputs.uv }}
+      python: ${{ steps.contract.outputs.python }}
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Resolve content-derived image tag
+        id: contract
+        run: uv run python -m tools.zed_i18n.linux_builder outputs >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
+      - name: Check existing manifest
+        id: existing
+        shell: bash
+        env:
+          TAGGED_IMAGE: ${{ steps.contract.outputs.tagged-image }}
+        run: |
+          set -euo pipefail
+          if resolved="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{.Name}}' 2>/tmp/zed-i18n-builder-inspect-error)"; then
+            if docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
+                | uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
+                    --resolved-reference "$resolved" > /tmp/zed-i18n-existing-builder; then
+              cat /tmp/zed-i18n-existing-builder >> "$GITHUB_OUTPUT"
+              echo "should-build=false" >> "$GITHUB_OUTPUT"
+              echo "Builder manifest already exists: $resolved" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Existing tag does not satisfy the builder contract, rebuilding it." >&2
+          else
+            cat /tmp/zed-i18n-builder-inspect-error >&2
+          fi
+          echo "should-build=true" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build ${{ matrix.platform }}
+    needs: preflight
+    if: needs.preflight.outputs.should-build == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            platform: linux/amd64
+            arch: x86_64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            arch: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Login to GHCR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
+      - name: Create Buildx builder
+        run: docker buildx create --driver docker-container --use
+
+      - name: Build and push native image
+        shell: bash
+        env:
+          IMAGE_REPOSITORY: ${{ needs.preflight.outputs.image-repository }}
+          IMAGE_TAG: ${{ needs.preflight.outputs.image-tag }}
+        run: |
+          set -euo pipefail
+          child_image="${IMAGE_REPOSITORY}:${IMAGE_TAG}-${{ matrix.arch }}"
+          docker buildx build \
+            --platform "${{ matrix.platform }}" \
+            --file docker/linux-builder/Dockerfile \
+            --tag "$child_image" \
+            --push \
+            --provenance=false \
+            --sbom=false \
+            --build-arg UBUNTU_BASE="${{ needs.preflight.outputs.ubuntu-base }}" \
+            --build-arg RUST_TOOLCHAIN="${{ needs.preflight.outputs.rust-toolchain }}" \
+            --build-arg RUST_PROFILE="${{ needs.preflight.outputs.rust-profile }}" \
+            --build-arg RUST_COMPONENTS="${{ needs.preflight.outputs.rust-components }}" \
+            --build-arg RUST_TARGETS="${{ needs.preflight.outputs.rust-targets }}" \
+            --build-arg WASI_SDK_VERSION="${{ needs.preflight.outputs.wasi-sdk }}" \
+            --build-arg UV_VERSION="${{ needs.preflight.outputs.uv }}" \
+            --build-arg PYTHON_VERSION="${{ needs.preflight.outputs.python }}" \
+            --build-arg BUILD_CONTEXT_SHA256="${{ needs.preflight.outputs.context-sha256 }}" \
+            .
+          docker buildx imagetools inspect "$child_image"
+
+  manifest:
+    name: Publish multi-architecture manifest
+    needs:
+      - preflight
+      - build
+    if: >-
+      ${{
+        always() &&
+        needs.preflight.result == 'success' &&
+        needs.preflight.outputs.should-build == 'true' &&
+        needs.build.result == 'success'
+      }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout zed-i18n
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Install Python
+        run: uv python install 3.12
+
+      - name: Login to GHCR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
+      - name: Assemble and validate manifest
+        shell: bash
+        env:
+          IMAGE_REPOSITORY: ${{ needs.preflight.outputs.image-repository }}
+          IMAGE_TAG: ${{ needs.preflight.outputs.image-tag }}
+          TAGGED_IMAGE: ${{ needs.preflight.outputs.tagged-image }}
+        run: |
+          set -euo pipefail
+          sources=()
+          for arch in x86_64 aarch64; do
+            child_image="${IMAGE_REPOSITORY}:${IMAGE_TAG}-${arch}"
+            resolved="$(docker buildx imagetools inspect "$child_image" --format '{{.Name}}')"
+            if [[ ! "$resolved" =~ ^${IMAGE_REPOSITORY}@sha256:[0-9a-f]{64}$ ]]; then
+              echo "Child image did not resolve to an immutable reference: $resolved" >&2
+              exit 1
+            fi
+            sources+=("${resolved}")
+          done
+
+          docker buildx imagetools create --tag "$TAGGED_IMAGE" "${sources[@]}"
+          resolved="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{.Name}}')"
+          docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
+            | uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
+                --resolved-reference "$resolved" > /tmp/zed-i18n-published-builder
+          cat /tmp/zed-i18n-published-builder
+          echo "Published Linux builder: $resolved" >> "$GITHUB_STEP_SUMMARY"

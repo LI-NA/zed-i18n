@@ -50,6 +50,9 @@ jobs:
   prepare:
     name: Prepare build matrix
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       linux-matrix: ${{ steps.matrix.outputs.linux-matrix }}
@@ -61,6 +64,9 @@ jobs:
       linux-build-count: ${{ steps.matrix.outputs.linux-build-count }}
       macos-build-count: ${{ steps.matrix.outputs.macos-build-count }}
       windows-build-count: ${{ steps.matrix.outputs.windows-build-count }}
+      linux-builder-image: ${{ steps.linux-builder.outputs.image }}
+      linux-builder-digest: ${{ steps.linux-builder.outputs.digest }}
+      linux-builder-context-sha256: ${{ steps.linux-builder-contract.outputs.context-sha256 }}
     steps:
       - name: Checkout zed-i18n
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -91,6 +97,34 @@ jobs:
             --platforms "$PLATFORMS" \
             --shard-size "$SHARD_SIZE" >> "$GITHUB_OUTPUT"
 
+      - name: Resolve Linux builder contract
+        id: linux-builder-contract
+        if: steps.matrix.outputs.linux-build-count != '0'
+        run: uv run python -m tools.zed_i18n.linux_builder outputs >> "$GITHUB_OUTPUT"
+
+      - name: Login to GHCR
+        if: steps.matrix.outputs.linux-build-count != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
+      - name: Resolve immutable Linux builder image
+        id: linux-builder
+        if: steps.matrix.outputs.linux-build-count != '0'
+        shell: bash
+        env:
+          TAGGED_IMAGE: ${{ steps.linux-builder-contract.outputs.tagged-image }}
+        run: |
+          set -euo pipefail
+          if ! resolved="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{.Name}}')"; then
+            echo "Linux builder image is not available: $TAGGED_IMAGE" >&2
+            echo "Publish it first with the 'Publish Linux builder image' workflow for this commit." >&2
+            exit 1
+          fi
+          docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
+            | uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
+                --resolved-reference "$resolved" >> "$GITHUB_OUTPUT"
+
       - name: Summarize matrix
         run: |
           echo "Zed version: ${{ steps.matrix.outputs.zed-version }}"
@@ -99,6 +133,9 @@ jobs:
           echo "Linux build jobs: ${{ steps.matrix.outputs.linux-build-count }}"
           echo "macOS build jobs: ${{ steps.matrix.outputs.macos-build-count }}"
           echo "Windows build jobs: ${{ steps.matrix.outputs.windows-build-count }}"
+          if [[ "${{ steps.matrix.outputs.linux-build-count }}" != "0" ]]; then
+            echo "Linux builder: ${{ steps.linux-builder.outputs.image }}"
+          fi
 
   validate:
     name: Validate translations
@@ -146,10 +183,15 @@ jobs:
       matrix: ${{ fromJson(needs.prepare.outputs['linux-matrix']) }}
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
+    permissions:
+      contents: read
+      packages: read
     env:
       ZED_I18N_RELEASE_TAG: ${{ inputs.release_tag || github.ref_name || '' }}
       ZED_I18N_REPOSITORY: ${{ github.repository }}
       DISTRIBUTION_PATCHES_ENABLED: ${{ github.event_name != 'workflow_dispatch' || inputs.distribution_patches }}
+      LINUX_BUILDER_IMAGE: ${{ needs.prepare.outputs.linux-builder-image }}
+      ZED_VERSION: ${{ needs.prepare.outputs.zed-version }}
     steps:
       - name: Checkout zed-i18n
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -187,6 +229,30 @@ jobs:
       - name: Record disk space after Linux cleanup
         run: uv run python -m tools.zed_i18n.ci_release disk-summary --label "after-linux-cleanup"
 
+      - name: Login to GHCR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GH_TOKEN" | docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin
+
+      - name: Pull and validate Linux builder
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull "$LINUX_BUILDER_IMAGE"
+          case "${{ matrix.arch }}" in
+            x86_64) expected_platform="linux/amd64" ;;
+            aarch64) expected_platform="linux/arm64" ;;
+            *) echo "Unsupported Linux architecture: ${{ matrix.arch }}" >&2; exit 1 ;;
+          esac
+          actual_platform="$(docker image inspect "$LINUX_BUILDER_IMAGE" --format '{{.Os}}/{{.Architecture}}')"
+          if [[ "$actual_platform" != "$expected_platform" ]]; then
+            echo "Expected builder platform $expected_platform, got $actual_platform" >&2
+            exit 1
+          fi
+          docker image inspect "$LINUX_BUILDER_IMAGE" --format '{{json .Config.Labels}}' \
+            | uv run python -m tools.zed_i18n.linux_builder validate-labels
+          echo "Using Linux builder $LINUX_BUILDER_IMAGE ($actual_platform)" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Fetch Zed source
         run: uv run zed-i18n fetch-zed
 
@@ -202,27 +268,38 @@ jobs:
             zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-${{ matrix.arch }}-
             zed-rust-deps-${{ runner.os }}-${{ matrix.platform }}-
 
-      - name: Setup Linux dependencies
-        working-directory: .cache/zed/${{ needs.prepare.outputs.zed-version }}
-        run: |
-          ./script/linux
-          ./script/download-wasi-sdk
-
-      - name: Build localized artifacts
+      - name: Build and verify localized artifacts in container
         shell: bash
         run: |
-          distribution_args=()
-          if [[ "$DISTRIBUTION_PATCHES_ENABLED" == "true" ]]; then
-            distribution_args=(--distribution-config config/distribution.toml)
-          fi
-
-          uv run python -m tools.zed_i18n.ci_release build-shard \
-            --platform "${{ matrix.platform }}" \
-            --arch "${{ matrix.arch }}" \
-            --bundle-target "${{ matrix.bundle_target }}" \
-            --languages "${{ matrix.languages }}" \
-            --dist-dir dist \
-            "${distribution_args[@]}"
+          set -euo pipefail
+          container_home="$RUNNER_TEMP/zed-i18n-container-home"
+          cargo_home="${{ steps.rust-cache.outputs.cargo-home }}"
+          mkdir -p "$container_home" "$cargo_home"
+          docker run --rm \
+            --init \
+            --pull never \
+            --user "$(id -u):$(id -g)" \
+            --security-opt no-new-privileges \
+            --cap-drop ALL \
+            --env "HOME=/home/zed-i18n" \
+            --env "CARGO_HOME=/cargo-home" \
+            --env "ZED_VERSION=$ZED_VERSION" \
+            --env "LANGUAGES=${{ matrix.languages }}" \
+            --env "ARCH=${{ matrix.arch }}" \
+            --env "BUNDLE_TARGET=${{ matrix.bundle_target }}" \
+            --env "DIST_DIR=dist" \
+            --env "DISTRIBUTION_PATCHES_ENABLED=$DISTRIBUTION_PATCHES_ENABLED" \
+            --env "ZED_I18N_RELEASE_TAG=$ZED_I18N_RELEASE_TAG" \
+            --env "ZED_I18N_REPOSITORY=$ZED_I18N_REPOSITORY" \
+            --env "CARGO_INCREMENTAL=$CARGO_INCREMENTAL" \
+            --env "CARGO_TERM_COLOR=$CARGO_TERM_COLOR" \
+            --env "RUST_BACKTRACE=$RUST_BACKTRACE" \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --volume "${{ steps.rust-cache.outputs.cargo-home }}:/cargo-home" \
+            --volume "$container_home:/home/zed-i18n" \
+            --workdir /workspace \
+            --entrypoint /usr/local/bin/zed-i18n-run-linux-release \
+            "$LINUX_BUILDER_IMAGE"
 
       - name: Upload shard artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

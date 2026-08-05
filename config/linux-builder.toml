@@ -1,0 +1,11 @@
+image_repository = "ghcr.io/li-na/zed-i18n-linux-builder"
+tag_prefix = "focal"
+context_paths = ["config/linux-builder.toml", "docker/linux-builder"]
+required_platforms = ["linux/amd64", "linux/arm64"]
+
+# Both builder images are Ubuntu 20.04 (glibc 2.31), matching Zed's official Linux
+# builders; keeping the ceiling equal to what the builder produces makes the ABI
+# gate catch an accidental base-image bump.
+[glibc_max]
+x86_64 = "2.31"
+aarch64 = "2.31"
