@@ -364,7 +364,7 @@ class CiReleaseTests(unittest.TestCase):
             notes,
             "Localized Zed build for v1.2.5.\n\n"
             "Full Changelog: [`v1.2.4-i18n.1...v1.2.5-i18n.1`](https://github.com/owner/repo/compare/v1.2.4-i18n.1...v1.2.5-i18n.1)\n\n"
-            "<!-- Add the manually summarized changelog here before publishing. -->\n\n"
+            "<!-- Add the manually summarized changelog here. -->\n\n"
             "| Language | Linux | macOS | Windows |\n"
             "| --- | --- | --- | --- |\n"
             f"| 한국어 (ko-KR) | [aarch64]({base_url}/zed-i18n-ko-KR-linux-aarch64.tar.gz) / [x86_64]({base_url}/zed-i18n-ko-KR-linux-x86_64.tar.gz) | [aarch64]({base_url}/Zed-i18n-ko-KR-macos-aarch64.dmg) | [x86_64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
@@ -395,7 +395,7 @@ class CiReleaseTests(unittest.TestCase):
         self.assertEqual(
             notes,
             "Localized Zed build for v1.2.5.\n\n"
-            "<!-- Add the manually summarized changelog here before publishing. -->\n\n"
+            "<!-- Add the manually summarized changelog here. -->\n\n"
             "| Language | Linux | macOS | Windows |\n"
             "| --- | --- | --- | --- |\n"
             f"| 한국어 (ko-KR) | - | - | [x86_64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n",
@@ -573,6 +573,22 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("mv release-artifacts/release-notes.md release-notes.md", restore_workflow)
         self.assertIn("--notes-file release-notes.md", restore_workflow)
         self.assertNotIn('--notes "Localized Zed build restored', restore_workflow)
+
+    def test_release_workflow_publishes_release_after_validating_assets(self) -> None:
+        release_workflow = (
+            Path.cwd() / ".github" / "workflows" / "i18n-release.yml"
+        ).read_text(encoding="utf-8")
+        restore_workflow = (
+            Path.cwd() / ".github" / "workflows" / "i18n-publish-existing.yml"
+        ).read_text(encoding="utf-8")
+
+        publish_command = 'gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false'
+        self.assertIn(publish_command, release_workflow)
+        self.assertLess(
+            release_workflow.index("All expected release assets are present."),
+            release_workflow.index(publish_command),
+        )
+        self.assertNotIn("--draft=false", restore_workflow)
 
     def test_release_workflow_attests_release_artifacts(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(

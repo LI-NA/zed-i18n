@@ -563,3 +563,11 @@ jobs:
             exit 1
           fi
           echo "All expected release assets are present."
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: |
+          RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
