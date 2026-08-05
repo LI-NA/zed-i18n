@@ -232,7 +232,6 @@ class RepositoryLinuxBuilderContractTests(unittest.TestCase):
             "libxkbcommon-x11-dev",
             "libzstd-dev",
             "make",
-            "cmake",
             "jq",
             "git",
             "curl",
@@ -268,6 +267,28 @@ class RepositoryLinuxBuilderContractTests(unittest.TestCase):
             script,
         )
         self.assertIn('ln -sf "/usr/bin/${tool}-18" "/usr/local/bin/${tool}"', script)
+
+    def test_install_script_pins_a_modern_cmake(self) -> None:
+        script = (Path.cwd() / "docker" / "linux-builder" / "install.sh").read_text(
+            encoding="utf-8"
+        )
+        packages = (Path.cwd() / "docker" / "linux-builder" / "ubuntu-packages.txt").read_text(
+            encoding="utf-8"
+        )
+
+        # focal's apt cmake is 3.16, which predates file(CONFIGURE) required by
+        # wasmtime-c-api; the image must use the pinned Kitware binary instead.
+        self.assertIn("Kitware/CMake/releases/download", script)
+        self.assertRegex(script, r'cmake_version="3\.\d+\.\d+"')
+        self.assertIn("ln -sf /opt/cmake/bin/cmake /usr/local/bin/cmake", script)
+        self.assertNotIn(
+            "cmake",
+            [
+                line.strip()
+                for line in packages.splitlines()
+                if line.strip() and not line.lstrip().startswith("#")
+            ],
+        )
 
     def test_release_script_builds_and_verifies_inside_the_container(self) -> None:
         script = (Path.cwd() / "docker" / "linux-builder" / "run-release.sh").read_text(

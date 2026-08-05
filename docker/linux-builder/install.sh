@@ -40,6 +40,23 @@ for tool in clang clang++ ld.lld lld llvm-ar llvm-nm llvm-objcopy llvm-ranlib ll
     ln -sf "/usr/bin/${tool}-18" "/usr/local/bin/${tool}"
 done
 
+# focal's cmake 3.16 predates file(CONFIGURE), which wasmtime-c-api's build
+# scripts require; install the pinned Kitware binary instead.
+cmake_version="3.31.12"
+case "$(uname -m)" in
+    x86_64) cmake_arch="x86_64" ;;
+    aarch64|arm64) cmake_arch="aarch64" ;;
+    *) echo "Unsupported image architecture: $(uname -m)" >&2; exit 1 ;;
+esac
+cmake_archive="cmake-${cmake_version}-linux-${cmake_arch}.tar.gz"
+curl -fL \
+    "https://github.com/Kitware/CMake/releases/download/v${cmake_version}/${cmake_archive}" \
+    -o "/tmp/${cmake_archive}"
+tar -xzf "/tmp/${cmake_archive}" -C /opt
+mv "/opt/cmake-${cmake_version}-linux-${cmake_arch}" /opt/cmake
+ln -sf /opt/cmake/bin/cmake /usr/local/bin/cmake
+rm -f "/tmp/${cmake_archive}"
+
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     | sh -s -- -y --no-modify-path --profile "${rust_profile}" --default-toolchain "${rust_toolchain}"
 IFS=',' read -r -a rust_components <<< "${rust_components_csv}"

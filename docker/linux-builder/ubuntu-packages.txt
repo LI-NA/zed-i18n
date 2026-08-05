@@ -12,7 +12,8 @@ libx11-xcb-dev
 libxkbcommon-x11-dev
 libzstd-dev
 make
-cmake
+# cmake comes from the pinned Kitware binary in install.sh; focal's 3.16 predates
+# file(CONFIGURE), which wasmtime-c-api's build scripts require.
 # LLVM 18 comes from apt.llvm.org; focal's clang/lld/llvm metapackages stop at LLVM 10.
 clang-18
 lld-18

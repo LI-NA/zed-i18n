@@ -45,6 +45,7 @@ RUN chmod +x /usr/local/bin/zed-i18n-run-linux-release \
     && clang-18 --version \
     && ld.lld --version \
     && llvm-objcopy --version \
+    && cmake --version \
     && test -x /opt/wasi-sdk/bin/clang \
     && uv python find "${PYTHON_VERSION}"
 
