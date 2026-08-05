@@ -1246,13 +1246,9 @@ def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> st
 
     app_links: dict[tuple[str, str, str], str] = {}
     locales: set[str] = set()
-    has_windows_zip = False
     for asset in assets:
         if not isinstance(asset, dict):
             raise ValueError("release manifest assets must be objects")
-        if asset.get("kind") == "portable_app":
-            has_windows_zip = True
-            continue
         if asset.get("kind") != "app":
             continue
 
@@ -1298,13 +1294,12 @@ def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> st
             cells.append(" / ".join(downloads) or "-")
         lines.append(f"| {language} | {' | '.join(cells)} |")
 
-    if has_windows_zip:
-        lines.extend(
-            [
-                "",
-                "Windows ZIP builds are also available in the Assets section below if needed.",
-            ]
-        )
+    lines.extend(
+        [
+            "",
+            f"The full download table is available in the [README](https://github.com/{repository}#downloads).",
+        ]
+    )
     return "\n".join(lines) + "\n"
 
 
