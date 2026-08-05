@@ -100,16 +100,13 @@ class LinuxBuilderTests(unittest.TestCase):
     def test_resolve_manifest_returns_immutable_reference_for_both_platforms(self) -> None:
         manifest = {
             "schemaVersion": 2,
+            "digest": "sha256:" + "c" * 64,
             "manifests": [
                 {"digest": "sha256:" + "a" * 64, "platform": {"os": "linux", "architecture": "amd64"}},
                 {"digest": "sha256:" + "b" * 64, "platform": {"os": "linux", "architecture": "arm64"}},
             ],
         }
-        resolved = resolve_manifest(
-            self.root,
-            "ghcr.io/li-na/test-builder@sha256:" + "c" * 64,
-            manifest,
-        )
+        resolved = resolve_manifest(self.root, manifest)
 
         self.assertEqual(
             resolved["image"],
@@ -118,40 +115,37 @@ class LinuxBuilderTests(unittest.TestCase):
         self.assertEqual(resolved["digest"], "sha256:" + "c" * 64)
 
     def test_resolve_manifest_rejects_missing_or_duplicate_platforms(self) -> None:
+        digest = "sha256:" + "c" * 64
         amd64 = {
             "digest": "sha256:" + "a" * 64,
             "platform": {"os": "linux", "architecture": "amd64"},
         }
-        resolved_ref = "ghcr.io/li-na/test-builder@sha256:" + "c" * 64
 
         with self.assertRaisesRegex(ValueError, "missing required platforms: linux/arm64"):
-            resolve_manifest(self.root, resolved_ref, {"manifests": [amd64]})
+            resolve_manifest(self.root, {"digest": digest, "manifests": [amd64]})
 
         with self.assertRaisesRegex(ValueError, "duplicate platform"):
-            resolve_manifest(self.root, resolved_ref, {"manifests": [amd64, amd64]})
+            resolve_manifest(self.root, {"digest": digest, "manifests": [amd64, amd64]})
 
         invalid_arm64 = {
             "digest": "not-a-digest",
             "platform": {"os": "linux", "architecture": "arm64"},
         }
         with self.assertRaisesRegex(ValueError, "invalid descriptor digest for linux/arm64"):
-            resolve_manifest(self.root, resolved_ref, {"manifests": [amd64, invalid_arm64]})
+            resolve_manifest(self.root, {"digest": digest, "manifests": [amd64, invalid_arm64]})
 
-    def test_resolve_manifest_rejects_wrong_repository_or_mutable_reference(self) -> None:
-        manifest = {
-            "manifests": [
-                {"digest": "sha256:" + "a" * 64, "platform": {"os": "linux", "architecture": "amd64"}},
-                {"digest": "sha256:" + "b" * 64, "platform": {"os": "linux", "architecture": "arm64"}},
-            ]
-        }
+    def test_resolve_manifest_rejects_missing_or_invalid_index_digest(self) -> None:
+        manifests = [
+            {"digest": "sha256:" + "a" * 64, "platform": {"os": "linux", "architecture": "amd64"}},
+            {"digest": "sha256:" + "b" * 64, "platform": {"os": "linux", "architecture": "arm64"}},
+        ]
 
-        with self.assertRaisesRegex(ValueError, "immutable image reference"):
-            resolve_manifest(self.root, "ghcr.io/li-na/test-builder:focal-test", manifest)
-        with self.assertRaisesRegex(ValueError, "unexpected image repository"):
+        with self.assertRaisesRegex(ValueError, "immutable index digest"):
+            resolve_manifest(self.root, {"manifests": manifests})
+        with self.assertRaisesRegex(ValueError, "immutable index digest"):
             resolve_manifest(
                 self.root,
-                "ghcr.io/example/wrong@sha256:" + "c" * 64,
-                manifest,
+                {"digest": "focal-test", "manifests": manifests},
             )
 
     def test_image_labels_must_match_context_and_tool_versions(self) -> None:

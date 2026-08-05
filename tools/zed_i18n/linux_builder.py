@@ -16,7 +16,7 @@ from tools.zed_i18n.config import load_project_config, zed_checkout_path
 CONFIG_PATH = Path("config/linux-builder.toml")
 ENVIRONMENT_PATH = Path("docker/linux-builder/environment.toml")
 SUPPORTED_PLATFORMS = {"linux/amd64", "linux/arm64"}
-IMMUTABLE_REFERENCE_RE = re.compile(r"^(?P<repository>.+)@(?P<digest>sha256:[0-9a-f]{64})$")
+DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 @dataclass(frozen=True)
@@ -158,13 +158,14 @@ def builder_outputs(root: Path) -> dict[str, str]:
     }
 
 
-def resolve_manifest(root: Path, resolved_reference: str, manifest: Mapping[str, object]) -> dict[str, str]:
+def resolve_manifest(root: Path, manifest: Mapping[str, object]) -> dict[str, str]:
     config = load_builder_config(root)
-    match = IMMUTABLE_REFERENCE_RE.fullmatch(resolved_reference.strip())
-    if not match:
-        raise ValueError(f"expected immutable image reference, got: {resolved_reference}")
-    if match.group("repository") != config.image_repository:
-        raise ValueError(f"unexpected image repository: {match.group('repository')}")
+    # `docker buildx imagetools inspect --format '{{json .Manifest}}'` merges the
+    # descriptor into the index, so the index digest is part of the JSON itself;
+    # `--format '{{.Name}}'` only echoes the requested reference and never a digest.
+    digest = manifest.get("digest")
+    if not isinstance(digest, str) or not DIGEST_RE.fullmatch(digest):
+        raise ValueError(f"builder manifest is missing an immutable index digest: {digest!r}")
 
     raw_manifests = manifest.get("manifests")
     if not isinstance(raw_manifests, list):
@@ -184,8 +185,8 @@ def resolve_manifest(root: Path, resolved_reference: str, manifest: Mapping[str,
             platforms.append(platform_name)
             if platform_name in config.required_platforms:
                 descriptor_digest = descriptor.get("digest")
-                if not isinstance(descriptor_digest, str) or not re.fullmatch(
-                    r"sha256:[0-9a-f]{64}", descriptor_digest
+                if not isinstance(descriptor_digest, str) or not DIGEST_RE.fullmatch(
+                    descriptor_digest
                 ):
                     raise ValueError(f"invalid descriptor digest for {platform_name}")
 
@@ -197,8 +198,8 @@ def resolve_manifest(root: Path, resolved_reference: str, manifest: Mapping[str,
         raise ValueError(f"missing required platforms: {', '.join(missing)}")
 
     return {
-        "image": resolved_reference.strip(),
-        "digest": match.group("digest"),
+        "image": f"{config.image_repository}@{digest}",
+        "digest": digest,
         "platforms": ",".join(config.required_platforms),
     }
 
@@ -273,8 +274,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root", type=Path, default=Path.cwd())
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("outputs")
-    resolve = subparsers.add_parser("resolve-manifest")
-    resolve.add_argument("--resolved-reference", required=True)
+    subparsers.add_parser("resolve-manifest")
     subparsers.add_parser("validate-labels")
     validate_zed = subparsers.add_parser("validate-zed")
     validate_zed.add_argument("--zed-root", type=Path)
@@ -300,7 +300,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not isinstance(payload, dict):
         raise ValueError("expected a JSON object on stdin")
     if args.command == "resolve-manifest":
-        _write_outputs(resolve_manifest(args.root, args.resolved_reference, payload))
+        _write_outputs(resolve_manifest(args.root, payload))
     elif args.command == "validate-labels":
         validate_image_labels(args.root, payload)
     return 0

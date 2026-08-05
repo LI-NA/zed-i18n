@@ -718,9 +718,10 @@ class CiReleaseTests(unittest.TestCase):
         self.assertIn("Resolve immutable Linux builder image", workflow)
         self.assertIn("tools.zed_i18n.linux_builder outputs", workflow)
         self.assertIn("docker buildx imagetools inspect", workflow)
-        self.assertIn("--format '{{.Name}}'", workflow)
         self.assertIn("--format '{{json .Manifest}}'", workflow)
         self.assertIn("tools.zed_i18n.linux_builder resolve-manifest", workflow)
+        # `--format '{{.Name}}'` only echoes the requested reference, never a digest.
+        self.assertNotIn("{{.Name}}", workflow)
         self.assertIn("docker login ghcr.io", workflow)
         self.assertIn("packages: read", workflow)
 

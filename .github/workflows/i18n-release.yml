@@ -116,14 +116,13 @@ jobs:
           TAGGED_IMAGE: ${{ steps.linux-builder-contract.outputs.tagged-image }}
         run: |
           set -euo pipefail
-          if ! resolved="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{.Name}}')"; then
+          if ! manifest="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}')"; then
             echo "Linux builder image is not available: $TAGGED_IMAGE" >&2
             echo "Publish it first with the 'Publish Linux builder image' workflow for this commit." >&2
             exit 1
           fi
-          docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
-            | uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
-                --resolved-reference "$resolved" >> "$GITHUB_OUTPUT"
+          printf '%s' "$manifest" \
+            | uv run python -m tools.zed_i18n.linux_builder resolve-manifest >> "$GITHUB_OUTPUT"
 
       - name: Summarize matrix
         run: |

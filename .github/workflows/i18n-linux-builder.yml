@@ -65,13 +65,13 @@ jobs:
           TAGGED_IMAGE: ${{ steps.contract.outputs.tagged-image }}
         run: |
           set -euo pipefail
-          if resolved="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{.Name}}' 2>/tmp/zed-i18n-builder-inspect-error)"; then
-            if docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
-                | uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
-                    --resolved-reference "$resolved" > /tmp/zed-i18n-existing-builder; then
+          if docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
+              > /tmp/zed-i18n-existing-manifest 2>/tmp/zed-i18n-builder-inspect-error; then
+            if uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
+                < /tmp/zed-i18n-existing-manifest > /tmp/zed-i18n-existing-builder; then
               cat /tmp/zed-i18n-existing-builder >> "$GITHUB_OUTPUT"
               echo "should-build=false" >> "$GITHUB_OUTPUT"
-              echo "Builder manifest already exists: $resolved" >> "$GITHUB_STEP_SUMMARY"
+              echo "Builder manifest already exists: $TAGGED_IMAGE" >> "$GITHUB_STEP_SUMMARY"
               exit 0
             fi
             echo "Existing tag does not satisfy the builder contract, rebuilding it." >&2
@@ -180,18 +180,17 @@ jobs:
           sources=()
           for arch in x86_64 aarch64; do
             child_image="${IMAGE_REPOSITORY}:${IMAGE_TAG}-${arch}"
-            resolved="$(docker buildx imagetools inspect "$child_image" --format '{{.Name}}')"
-            if [[ ! "$resolved" =~ ^${IMAGE_REPOSITORY}@sha256:[0-9a-f]{64}$ ]]; then
-              echo "Child image did not resolve to an immutable reference: $resolved" >&2
+            digest="$(docker buildx imagetools inspect "$child_image" --format '{{json .Manifest}}' | jq -r '.digest')"
+            if [[ ! "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+              echo "Child image did not resolve to an immutable digest: ${child_image} -> ${digest}" >&2
               exit 1
             fi
-            sources+=("${resolved}")
+            sources+=("${IMAGE_REPOSITORY}@${digest}")
           done
 
           docker buildx imagetools create --tag "$TAGGED_IMAGE" "${sources[@]}"
-          resolved="$(docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{.Name}}')"
           docker buildx imagetools inspect "$TAGGED_IMAGE" --format '{{json .Manifest}}' \
-            | uv run python -m tools.zed_i18n.linux_builder resolve-manifest \
-                --resolved-reference "$resolved" > /tmp/zed-i18n-published-builder
+            | uv run python -m tools.zed_i18n.linux_builder resolve-manifest > /tmp/zed-i18n-published-builder
           cat /tmp/zed-i18n-published-builder
-          echo "Published Linux builder: $resolved" >> "$GITHUB_STEP_SUMMARY"
+          published="$(sed -n 's/^image=//p' /tmp/zed-i18n-published-builder)"
+          echo "Published Linux builder: ${published}" >> "$GITHUB_STEP_SUMMARY"

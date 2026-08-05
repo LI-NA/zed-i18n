@@ -43,12 +43,14 @@ class LinuxBuilderWorkflowTests(unittest.TestCase):
 
     def test_reuses_valid_manifest_and_assembles_from_immutable_children(self) -> None:
         self.assertIn("docker buildx imagetools inspect", self.workflow)
-        self.assertIn("--format '{{.Name}}'", self.workflow)
         self.assertIn("--format '{{json .Manifest}}'", self.workflow)
         self.assertIn("resolve-manifest", self.workflow)
         self.assertIn("docker buildx imagetools create", self.workflow)
-        self.assertIn('sources+=("${resolved}")', self.workflow)
+        self.assertIn("jq -r '.digest'", self.workflow)
+        self.assertIn('sources+=("${IMAGE_REPOSITORY}@${digest}")', self.workflow)
         self.assertIn("should-build", self.workflow)
+        # `--format '{{.Name}}'` only echoes the requested reference, never a digest.
+        self.assertNotIn("{{.Name}}", self.workflow)
 
     def test_relevant_builder_inputs_trigger_publication(self) -> None:
         for path in [
