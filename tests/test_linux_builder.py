@@ -277,6 +277,10 @@ class RepositoryLinuxBuilderContractTests(unittest.TestCase):
         self.assertIn("tools.zed_i18n.ci_release build-shard", script)
         self.assertIn("tools.zed_i18n.linux_builder validate-zed", script)
         self.assertIn("tools.zed_i18n.linux_abi", script)
+        # Linux matrix entries always ship an empty bundle_target, so the script
+        # must not require it.
+        self.assertIn('BUNDLE_TARGET="${BUNDLE_TARGET:-}"', script)
+        self.assertNotIn("BUNDLE_TARGET:?", script)
         self.assertIn("/opt/wasi-sdk", script)
         self.assertIn("UV_PROJECT_ENVIRONMENT", script)
         self.assertNotIn("sudo", script)

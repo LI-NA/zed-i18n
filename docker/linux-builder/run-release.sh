@@ -4,8 +4,9 @@ set -euo pipefail
 : "${ZED_VERSION:?ZED_VERSION is required}"
 : "${LANGUAGES:?LANGUAGES is required}"
 : "${ARCH:?ARCH is required}"
-: "${BUNDLE_TARGET:?BUNDLE_TARGET is required}"
 : "${DISTRIBUTION_PATCHES_ENABLED:?DISTRIBUTION_PATCHES_ENABLED is required}"
+# Linux builds carry no bundle target; only macOS matrix entries set one.
+BUNDLE_TARGET="${BUNDLE_TARGET:-}"
 
 case "${ARCH}:$(uname -m)" in
     x86_64:x86_64|aarch64:aarch64|aarch64:arm64) ;;
