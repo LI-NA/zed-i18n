@@ -6508,6 +6508,234 @@ class ExtractTests(unittest.TestCase):
             (composite[0].start_byte, composite[0].end_byte),
         )
 
+    def test_extracts_elicitation_validation_limits(self) -> None:
+        source = "\n".join(
+            [
+                "fn validate(title: &str) {",
+                '    return Err(format!("{title} is too long to validate safely"));',
+                '    return Err(format!("{title} has a validation pattern that is too complex"));',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/conversation_view/elicitation.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "{title} is too long to validate safely",
+                "{title} has a validation pattern that is too complex",
+            },
+        )
+
+    def test_extracts_indirect_sandbox_path_captions(self) -> None:
+        source = "\n".join(
+            [
+                "fn render() {",
+                '    captioned_path("Source".into(), requested_display, cx);',
+                '    captioned_path("Target".into(), granted_display, cx);',
+                '    captioned_path("Write Path".into(), requested_display, cx);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/agent_ui/src/conversation_view/thread_view.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"Source", "Target", "Write Path"},
+        )
+
+    def test_extracts_indirect_git_restore_prompt_parts(self) -> None:
+        source = "\n".join(
+            [
+                "fn prompt(entry: Entry) {",
+                "    maybe!({",
+                "    let (message, confirm_text) = if entry.status.is_deleted() {",
+                '        ("Are you sure you want to restore ", "Restore File")',
+                "    } else {",
+                "        (",
+                '            "Are you sure you want to discard changes to ",',
+                '            "Discard Changes",',
+                "        )",
+                "    };",
+                "    window.prompt(",
+                "        &format!(",
+                '            "{}{}?",',
+                "            message,",
+                "            path,",
+                "        ),",
+                '        &[confirm_text, "Cancel"],',
+                "    );",
+                "    });",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/git_ui/src/git_panel.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "Are you sure you want to restore ",
+                "Restore File",
+                "Are you sure you want to discard changes to ",
+                "Discard Changes",
+                "{}{}?",
+                "Cancel",
+            },
+        )
+
+    def test_extracts_project_panel_undo_error_notifications(self) -> None:
+        source = "\n".join(
+            [
+                "fn show_error() {",
+                '    let title = if undo { "Undo Failed" } else { "Redo Failed" };',
+                '    let operation = if is_rename { "rename" } else { "move" };',
+                '    format!("Failed to {operation} `{from_name}`. It no longer exists.");',
+                '    format!("Failed to {operation} `{from_name}` to `{to_name}`. A file or folder already exists there.");',
+                '    format!("Failed to trash `{name}`. It no longer exists.");',
+                '    format!("Failed to trash `{name}`.");',
+                '    let name = path.file_name().unwrap_or("item");',
+                '    format!("Failed to restore `{name}`. Something already exists at its original location.");',
+                '    format!("Failed to restore `{name}`. It may have been permanently deleted.");',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/project_panel/src/undo.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "Undo Failed",
+                "Redo Failed",
+                "rename",
+                "move",
+                "Failed to {operation} `{from_name}`. It no longer exists.",
+                "Failed to {operation} `{from_name}` to `{to_name}`. A file or folder already exists there.",
+                "Failed to trash `{name}`. It no longer exists.",
+                "Failed to trash `{name}`.",
+                "item",
+                "Failed to restore `{name}`. Something already exists at its original location.",
+                "Failed to restore `{name}`. It may have been permanently deleted.",
+            },
+        )
+
+    def test_extracts_csv_filter_header_stored_in_list_entry(self) -> None:
+        source = "\n".join(
+            [
+                "fn build_entries() {",
+                "    entries.push(ColumnFilterListEntry::Header(",
+                '        "Hidden by other filters".into(),',
+                "    ));",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/csv_preview/src/renderer/table_header.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"Hidden by other filters"},
+        )
+
+    def test_extracts_default_base_keymap_option(self) -> None:
+        source = "\n".join(
+            [
+                "const OPTIONS: &'static [(&'static str, BaseKeymap)] = &[",
+                '    ("Zed (Default)", BaseKeymap::Zed),',
+                "];",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/settings/src/base_keymap_setting.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"Zed (Default)"},
+        )
+
+    def test_extracts_call_diagnostic_helper_labels(self) -> None:
+        source = "\n".join(
+            [
+                "fn labels() {",
+                '    let quality = ["Excellent", "Good", "Poor", "Lost"];',
+                '    let rating = ["Normal", "High", "Poor"];',
+                '    let repair_event_label = if count == 1 { "event" } else { "events" };',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/collab_ui/src/call_stats_modal.rs",
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {"Excellent", "Good", "Poor", "Lost", "Normal", "High", "event", "events"},
+        )
+
+    def test_extracts_terminal_sandbox_user_facing_errors(self) -> None:
+        direct_source = "\n".join(
+            [
+                "fn run(error: Error) {",
+                '    ToolResult::text_err("Could not select a Linux Zed release for WSL sandboxing");',
+                '    ToolResult::text_err(format!("Command cancelled: the user declined to run a command whose sandbox writes to a Windows drive ({error})."));',
+                '    ToolResult::text_err(format!("Cannot create a sandbox for this command: {}", error));',
+                "}",
+            ]
+        )
+        policy_source = "\n".join(
+            [
+                "fn to_policy(path: &Path) {",
+                '    anyhow::anyhow!("cannot capture writable sandbox path `{}`", path);',
+                '    anyhow::anyhow!("cannot re-verify approved sandbox write grant `{}` (if the directory was removed, remove the grant or recreate the directory)", path);',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            direct_source,
+            relative_path="crates/agent/src/tools/terminal_tool.rs",
+        )
+        occurrences.extend(
+            extract_ui_strings_from_source(
+                policy_source,
+                relative_path="crates/acp_thread/src/terminal.rs",
+            )
+        )
+
+        self.assertEqual(
+            {occurrence.source for occurrence in occurrences},
+            {
+                "Could not select a Linux Zed release for WSL sandboxing",
+                "Command cancelled: the user declined to run a command whose sandbox writes to a Windows drive ({error}).",
+                "Cannot create a sandbox for this command: {}",
+                "cannot capture writable sandbox path `{}`",
+                "cannot re-verify approved sandbox write grant `{}` (if the directory was removed, remove the grant or recreate the directory)",
+            },
+        )
+
     def test_repository_extract_fails_when_required_composite_rule_is_missing(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

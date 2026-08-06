@@ -185,6 +185,14 @@ GIT_GRAPH_TIMESTAMP_FALLBACK_SOURCES = {
 TERMINAL_TOOL_DENIAL_OUTPUT_SOURCES = {
     "Command cancelled: user denied permission to run outside the sandbox ({error}).",
     "Command cancelled: user denied the requested sandbox permissions ({error}).",
+    "Could not select a Linux Zed release for WSL sandboxing",
+    "Command cancelled: the user declined to run a command whose sandbox writes to a Windows drive ({error}).",
+    "Cannot create a sandbox for this command: {}",
+}
+
+ACP_THREAD_SANDBOX_POLICY_ERROR_SOURCES = {
+    "cannot capture writable sandbox path `{}`",
+    "cannot re-verify approved sandbox write grant `{}` (if the directory was removed, remove the grant or recreate the directory)",
 }
 
 AGENT_THREAD_TOOL_ERROR_SOURCES = {
@@ -574,6 +582,45 @@ CALL_QUALITY_LABEL_SOURCES = {
     "Good",
     "Poor",
     "Lost",
+}
+
+CALL_DIAGNOSTIC_LABEL_SOURCES = {
+    "Excellent",
+    "Good",
+    "Poor",
+    "Lost",
+    "Normal",
+    "High",
+    "event",
+    "events",
+}
+
+AGENT_THREAD_SANDBOX_PATH_CAPTION_SOURCES = {
+    "Source",
+    "Target",
+    "Write Path",
+}
+
+PROJECT_PANEL_UNDO_ERROR_SOURCES = {
+    "Undo Failed",
+    "Redo Failed",
+    "rename",
+    "move",
+    "Failed to {operation} `{from_name}`. It no longer exists.",
+    "Failed to {operation} `{from_name}` to `{to_name}`. A file or folder already exists there.",
+    "Failed to trash `{name}`. It no longer exists.",
+    "Failed to trash `{name}`.",
+    "item",
+    "Failed to restore `{name}`. Something already exists at its original location.",
+    "Failed to restore `{name}`. It may have been permanently deleted.",
+}
+
+CSV_FILTER_LIST_HEADER_SOURCES = {
+    "Hidden by other filters",
+}
+
+BASE_KEYMAP_OPTION_SOURCES = {
+    "Zed (Default)",
 }
 
 AGENT_CONFIG_OPTION_SEPARATOR_SOURCES = {
@@ -1956,6 +2003,53 @@ def _allowed_literal_rules_for_path(
                 TERMINAL_TRUNCATION_TOOLTIP_SOURCES,
                 "tooltip",
                 "TerminalToolHeader.truncated",
+            )
+        )
+        rules.append(
+            (
+                AGENT_THREAD_SANDBOX_PATH_CAPTION_SOURCES,
+                "sandbox_permission_path_caption",
+                "captioned_path",
+            )
+        )
+    if relative_path == "crates/acp_thread/src/terminal.rs":
+        rules.append(
+            (
+                ACP_THREAD_SANDBOX_POLICY_ERROR_SOURCES,
+                "sandbox_error_message",
+                "SandboxWrap.to_policy",
+            )
+        )
+    if relative_path == "crates/project_panel/src/undo.rs":
+        rules.append(
+            (
+                PROJECT_PANEL_UNDO_ERROR_SOURCES,
+                "project_panel_undo_error",
+                "ProjectPanel.undo_error",
+            )
+        )
+    if relative_path == "crates/csv_preview/src/renderer/table_header.rs":
+        rules.append(
+            (
+                CSV_FILTER_LIST_HEADER_SOURCES,
+                "picker_section_header",
+                "ColumnFilterListEntry::Header",
+            )
+        )
+    if relative_path == "crates/settings/src/base_keymap_setting.rs":
+        rules.append(
+            (
+                BASE_KEYMAP_OPTION_SOURCES,
+                "picker_option",
+                "BaseKeymap::OPTIONS",
+            )
+        )
+    if relative_path == "crates/collab_ui/src/call_stats_modal.rs":
+        rules.append(
+            (
+                CALL_DIAGNOSTIC_LABEL_SOURCES,
+                "call_diagnostic_label",
+                "CallDiagnostics.label",
             )
         )
     if relative_path == "crates/git_ui/src/commit_context_menu.rs":
@@ -4215,6 +4309,28 @@ GIT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
         1,
     ),
     LinePattern(
+        re.compile(
+            r'^\s*\(\s*("(?:Are you sure you want to restore |Are you sure you want to discard changes to )")\s*,'
+        ),
+        "git_panel_prompt_fragment",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(
+            r'^\s*\(\s*"(?:Are you sure you want to restore |Are you sure you want to discard changes to )"\s*,\s*("(?:Restore File|Discard Changes)")\s*\),?\s*$'
+        ),
+        "git_panel_prompt_answer",
+        "prompt_answer",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("\{\}\{\}\?"),?\s*$'),
+        "git_panel_prompt_format",
+        "prompt_message",
+        1,
+    ),
+    LinePattern(
         re.compile(r'\bprompt\(\s*("(?:Discard changes to these files\?|Trash these files\?)")'),
         "git_panel_prompt",
         "prompt_message",
@@ -4222,10 +4338,16 @@ GIT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
     ),
     LinePattern(
         re.compile(
-            r'^\s*("(?:Are you sure you want to discard changes to \{\}\?|Discard changes to these files\?|Pick which remote to fetch|Pick which remote to push to|Where would you like to initialize this git repository\?)"),?\s*$'
+            r'^\s*("(?:Are you sure you want to discard changes to \{\}\?|Are you sure you want to discard changes to |Discard changes to these files\?|Pick which remote to fetch|Pick which remote to push to|Where would you like to initialize this git repository\?)"),?\s*$'
         ),
         "git_panel_prompt",
         "prompt_message",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("Discard Changes"),?\s*$'),
+        "git_panel_prompt_answer",
+        "prompt_answer",
         1,
     ),
     LinePattern(
@@ -4236,6 +4358,12 @@ GIT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
     ),
     LinePattern(
         re.compile(r'&\[\s*"(?:\\.|[^"\\])*"\s*,\s*("(?:\\.|[^"\\])*")'),
+        "git_panel_prompt_answer",
+        "prompt_answer",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'&\[\s*[^,\n]+\s*,\s*("Cancel")'),
         "git_panel_prompt_answer",
         "prompt_answer",
         1,
@@ -4639,8 +4767,10 @@ AGENT_ELICITATION_LINE_PATTERNS: tuple[LinePattern, ...] = (
             r'|\{title\} must be an integer'
             r'|\{title\} is too short'
             r'|\{title\} is too long'
+            r'|\{title\} is too long to validate safely'
             r'|\{title\} must be one of the provided options'
             r'|\{title\} has an invalid validation pattern'
+            r'|\{title\} has a validation pattern that is too complex'
             r'|\{title\} has an invalid validation format'
             r'|\{title\} does not match the requested constraints'
             r'|\{title\} does not match the requested pattern'

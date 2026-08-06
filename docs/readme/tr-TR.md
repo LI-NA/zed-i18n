@@ -2,7 +2,7 @@
   <h1>Zed-i18n</h1>
   <p><strong>Zed editörünü kendi dilinize kolayca çevirin.</strong></p>
 
-  [![Zed v1.13.2](https://img.shields.io/badge/Zed-v1.13.2-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.13.2)
+  [![Zed v1.14.2](https://img.shields.io/badge/Zed-v1.14.2-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.14.2)
   [![Python ≥3.12](https://img.shields.io/badge/Python-≥3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
   [![Source: MIT](https://img.shields.io/badge/Source-MIT-brightgreen)](../../LICENSE-MIT)
   [![Release: GPL-3.0](https://img.shields.io/badge/Release-GPL--3.0-orange)](../../LICENSE)
@@ -160,7 +160,7 @@ Windows'ta [Visual Studio Build Tools](https://visualstudio.microsoft.com/downlo
 ```powershell
 $env:CARGO_TARGET_DIR = (Resolve-Path .cache\zed\target).Path
 $env:CARGO_INCREMENTAL = "1"
-cd .cache\zed\v1.13.2
+cd .cache\zed\v1.14.2
 cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 ```
 
