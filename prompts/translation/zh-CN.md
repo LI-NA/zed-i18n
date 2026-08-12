@@ -23,7 +23,7 @@ Example output shape:
 - Markdown code spans — anything inside backticks: `` `settings.json` ``, `` `zed <path>` ``
 - URLs, file paths, file extensions, JSON keys, setting keys, command IDs, action IDs
 - Escape sequences: `\n`, `\t`, `\r`, `\\`
-- Quote characters used as syntax or emphasis
+- For an untranslated technical literal, preserve its content and any quote characters that are part of its syntax. For translated natural-language prose or UI labels, localize the surrounding quote glyphs according to the locale guide.
 - Key bindings: `cmd-shift-p`, `ctrl-k ctrl-s`
 - Product / proper nouns: Zed, GitHub, GitLab, Copilot, Claude, Codex, OpenAI, Anthropic, LSP, Tree-sitter, Wasm, etc.
 - Model names, provider names, extension IDs, telemetry event names
@@ -62,6 +62,7 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Insert a space between Chinese characters and adjacent Latin text, digits, or placeholders: `打开 Zed 设置`, `共 {count} 个文件`.
 - No space between Chinese characters and Chinese punctuation.
 - Use Chinese punctuation in sentences (，、。！？) but Western punctuation in labels and short phrases.
+- Use Chinese quotation marks `“”` for primary quotes and `‘’` for nested quotes in natural-language prose.
 - Do NOT add subjects (你、您) unless the source explicitly uses "you" in a way that requires it.
 - Do NOT use 您 (formal "you"). Use 你 when a pronoun is genuinely needed.
 - Do NOT add 请 ("please") unless the source contains "please".

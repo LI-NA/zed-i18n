@@ -23,7 +23,7 @@ Example output shape:
 - Markdown code spans — anything inside backticks: `` `settings.json` ``, `` `zed <path>` ``
 - URLs, file paths, file extensions, JSON keys, setting keys, command IDs, action IDs
 - Escape sequences: `\n`, `\t`, `\r`, `\\`
-- Quote characters used as syntax or emphasis
+- For an untranslated technical literal, preserve its content and any quote characters that are part of its syntax. For translated natural-language prose or UI labels, localize the surrounding quote glyphs according to the locale guide.
 - Key bindings: `cmd-shift-p`, `ctrl-k ctrl-s`
 - Product / proper nouns: Zed, GitHub, GitLab, Copilot, Claude, Codex, OpenAI, Anthropic, LSP, Tree-sitter, Wasm, etc.
 - Model names, provider names, extension IDs, telemetry event names
@@ -64,6 +64,7 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Buttons and menu items use the perfective infinitive (`Otevřít`, `Uložit`, `Zavřít`) or short noun phrases (`Nastavení`, `Vyhledávání`).
 - Czech has 7 grammatical cases. When a placeholder is followed by a noun that would force awkward declension, REPHRASE so the placeholder sits in nominative or accusative position. Example: `Failed to save {path}` → `Uložení souboru {path} se nezdařilo` rather than forcing a genitive on `{path}`. Treat placeholders as nominative when surrounding wording must agree with them.
 - Use proper Czech diacritics (ě, š, č, ř, ž, ý, á, í, é, ů, ú, ť, ď, ň). Never substitute them with ASCII equivalents (never write `ze` for `že`, `nelze` is fine but `nelze` must keep its `ž` if used as `že`).
+- Use Czech quotation marks `„“` for quoted natural-language prose.
 - Capitalization: only the first word and proper nouns are capitalized in sentences and headings. Do NOT use English-style title case (`Otevřít nastavení`, NOT `Otevřít Nastavení`).
 - Keep product names, provider names, language names, extension IDs, and model names unchanged unless there is a standard Czech form. Add Czech case endings to foreign names with a hyphen only when natural (`ve Finderu`, `na GitHubu`).
 - Match length to UI context. Buttons stay tight, descriptions can breathe.

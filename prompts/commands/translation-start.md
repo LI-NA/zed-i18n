@@ -45,12 +45,6 @@ Output a 5–8 line summary of findings (in Korean) and flag any anomaly. **If n
 - Never modify any pre-existing translation file under `translations/`, regardless of language.
 - Run translation batches in parallel via sub-agents.
 
-## Concurrency rules
-
-- Use as many parallel sub-agents as the environment allows.
-- Hard cap: **25 concurrent sub-agents**. Never exceed this.
-- Ramp up gradually — start with ~5–10, observe completion and any rate-limit signals, then scale up. Do not launch everything at once.
-
 ---
 
 ## Procedure

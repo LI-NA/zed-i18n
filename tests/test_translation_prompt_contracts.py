@@ -9,9 +9,53 @@ GLOSSARY_DIR = TRANSLATION_PROMPTS / "glossary"
 VERSION_DIFF_REPORT = (
     "reports/version-diff/<from-version>-to-<to-version>/key-changes.json"
 )
+QUOTE_PRESERVATION_RULE = (
+    "For an untranslated technical literal, preserve its content and any quote "
+    "characters that are part of its syntax. For translated natural-language prose "
+    "or UI labels, localize the surrounding quote glyphs according to the locale guide."
+)
 
 
 class TranslationPromptContractTests(unittest.TestCase):
+    def test_translation_prompts_share_quote_preservation_rule(self) -> None:
+        prompt_paths = sorted(TRANSLATION_PROMPTS.glob("*.md"))
+        self.assertEqual(len(prompt_paths), 14)
+
+        for prompt_path in prompt_paths:
+            with self.subTest(prompt=prompt_path.name):
+                prompt = prompt_path.read_text(encoding="utf-8")
+                self.assertEqual(prompt.count(QUOTE_PRESERVATION_RULE), 1)
+                self.assertNotIn("Quote characters used as syntax or emphasis", prompt)
+
+        locale_quote_rules = {
+            "cs-CZ.md": "Use Czech quotation marks `„“` for quoted natural-language prose.",
+            "pl-PL.md": "Use Polish quotation marks `„”` for quoted natural-language prose.",
+            "ja-JP.md": (
+                "Use Japanese corner brackets `「」` for primary quotes and `『』` for "
+                "nested quotes in natural-language prose."
+            ),
+            "zh-CN.md": (
+                "Use Chinese quotation marks `“”` for primary quotes and `‘’` for "
+                "nested quotes in natural-language prose."
+            ),
+        }
+        for file_name, quote_rule in locale_quote_rules.items():
+            with self.subTest(locale=file_name):
+                prompt = (TRANSLATION_PROMPTS / file_name).read_text(encoding="utf-8")
+                self.assertIn(quote_rule, prompt)
+
+        existing_locale_quote_rules = {
+            "de-DE.md": "In prose use German-style quotation marks",
+            "es-ES.md": "Use straight quotes",
+            "fr-FR.md": "Use guillemets « » in prose",
+            "ru-RU.md": "Use Russian-style guillemets « »",
+            "zh-TW.md": "Use `「」` for primary quotes",
+        }
+        for file_name, quote_rule in existing_locale_quote_rules.items():
+            with self.subTest(locale=file_name):
+                prompt = (TRANSLATION_PROMPTS / file_name).read_text(encoding="utf-8")
+                self.assertIn(quote_rule, prompt)
+
     def test_language_prompts_keep_preserve_rules_in_disambiguation_section(self) -> None:
         required_tokens = ("SKILL.md", "Agent Client Protocol", "Claude Agent")
         for prompt_path in sorted(TRANSLATION_PROMPTS.glob("*.md")):
@@ -118,6 +162,35 @@ class TranslationPromptContractTests(unittest.TestCase):
         )
         for token in required_tokens:
             self.assertIn(token, audit_prompt)
+
+    def test_translation_audit_generates_strict_review_evidence_contract(self) -> None:
+        audit_prompt = (ROOT / "prompts" / "commands" / "translation-audit.md").read_text(
+            encoding="utf-8"
+        )
+
+        required_tokens = (
+            "schema_version",
+            "sibling_candidates",
+            "shared_short",
+            "sibling_review",
+            "shared_key_review",
+            "defect_type",
+            "evidence",
+            "term_evidence",
+            "family",
+            "preflight_outputs.py",
+            "regenerate only the batch metadata",
+            "does not make a locale-only change an error",
+            "Every changed family member still requires its own exact `key`, `current`, and `proposed` entry",
+        )
+        for token in required_tokens:
+            self.assertIn(token, audit_prompt)
+
+        self.assertIn("never triggers search, replacement, or fan-out", audit_prompt)
+        self.assertLess(
+            audit_prompt.index("preflight_outputs.py <LOCALE>"),
+            audit_prompt.index("apply_changes.py <LOCALE>"),
+        )
 
     def test_version_bump_instructions_use_executable_key_change_workflow(self) -> None:
         instructions = (ROOT / "AGENTS.md").read_text(encoding="utf-8")

@@ -23,7 +23,7 @@ Example output shape:
 - Markdown code spans — anything inside backticks: `` `settings.json` ``, `` `zed <path>` ``
 - URLs, file paths, file extensions, JSON keys, setting keys, command IDs, action IDs
 - Escape sequences: `\n`, `\t`, `\r`, `\\`
-- Quote characters used as syntax or emphasis
+- For an untranslated technical literal, preserve its content and any quote characters that are part of its syntax. For translated natural-language prose or UI labels, localize the surrounding quote glyphs according to the locale guide.
 - Key bindings: `cmd-shift-p`, `ctrl-k ctrl-s`
 - Product / proper nouns: Zed, GitHub, GitLab, Copilot, Claude, Codex, OpenAI, Anthropic, LSP, Tree-sitter, Wasm, etc.
 - Model names, provider names, extension IDs, telemetry event names
@@ -66,6 +66,7 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Insert a half-width space between Japanese text and adjacent Latin text, digits, or placeholders: `Zed の設定`, `{count} 個のファイル`.
 - No space between Japanese text and Japanese punctuation or particles.
 - Use Japanese punctuation in sentences (、。！？) but Western punctuation in short labels and button text.
+- Use Japanese corner brackets `「」` for primary quotes and `『』` for nested quotes in natural-language prose.
 - Match length to UI context. Buttons stay tight, descriptions can breathe.
 - When a placeholder appears mid-sentence, adjust word order so the sentence reads naturally: `Failed to save {path}` → `{path} の保存に失敗しました`, not `保存に失敗しました {path}`.
 - Use modern katakana long-vowel conventions: エディター, サーバー, フォルダー, プロバイダー (include ー for 3+ syllable loanwords ending in -er, -or, -ar).

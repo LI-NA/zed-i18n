@@ -23,7 +23,7 @@ Example output shape:
 - Markdown code spans — anything inside backticks: `` `settings.json` ``, `` `zed <path>` ``
 - URLs, file paths, file extensions, JSON keys, setting keys, command IDs, action IDs
 - Escape sequences: `\n`, `\t`, `\r`, `\\`
-- Quote characters used as syntax or emphasis
+- For an untranslated technical literal, preserve its content and any quote characters that are part of its syntax. For translated natural-language prose or UI labels, localize the surrounding quote glyphs according to the locale guide.
 - Key bindings: `cmd-shift-p`, `ctrl-k ctrl-s`
 - Product / proper nouns: Zed, GitHub, GitLab, Copilot, Claude, Codex, OpenAI, Anthropic, LSP, Tree-sitter, Wasm, etc.
 - Model names, provider names, extension IDs, telemetry event names

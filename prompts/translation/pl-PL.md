@@ -23,7 +23,7 @@ Example output shape:
 - Markdown code spans — anything inside backticks: `` `settings.json` ``, `` `zed <path>` ``
 - URLs, file paths, file extensions, JSON keys, setting keys, command IDs, action IDs
 - Escape sequences: `\n`, `\t`, `\r`, `\\`
-- Quote characters used as syntax or emphasis
+- For an untranslated technical literal, preserve its content and any quote characters that are part of its syntax. For translated natural-language prose or UI labels, localize the surrounding quote glyphs according to the locale guide.
 - Key bindings: `cmd-shift-p`, `ctrl-k ctrl-s`
 - Product / proper nouns: Zed, GitHub, GitLab, Copilot, Claude, Codex, OpenAI, Anthropic, LSP, Tree-sitter, Wasm, etc.
 - Model names, provider names, extension IDs, telemetry event names
@@ -62,6 +62,7 @@ Use `null` as a review signal for strings that are not safe to translate.
 - Descriptions and explanatory text: 3rd person singular present or impersonal — `Określa…`, `Steruje…`, `Wyświetla…`, `Włącza…`.
 - Errors and failure notifications: impersonal `Nie udało się…` (`Nie udało się załadować…`, `Nie udało się zapisać…`), or `Wystąpił błąd…` when fitting.
 - Avoid 2nd person address. Default to impersonal/3rd person constructions. Do NOT add `proszę` ("please") unless the source explicitly contains "please".
+- Use Polish quotation marks `„”` for quoted natural-language prose.
 - Capitalization: sentence case — only the first word and proper nouns are capitalized. Never use English-style title case (`Otwórz ustawienia`, NOT `Otwórz Ustawienia`).
 - Always use proper Polish diacritics: ą, ć, ę, ł, ń, ó, ś, ź, ż. Never substitute (e.g., `ścieżka` not `sciezka`, `rozszerzenie` not `rozszerzenie` without diacritics).
 - Polish has 7 grammatical cases (mianownik, dopełniacz, celownik, biernik, narzędnik, miejscownik, wołacz). When a placeholder represents a noun and the surrounding text demands a specific case, prefer rewrites that put the placeholder in nominative or accusative position so the sentence reads naturally regardless of the inserted word's grammatical form.
