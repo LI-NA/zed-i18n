@@ -3470,7 +3470,7 @@ def _is_git_remote_output_path(relative_path: str) -> bool:
 
 
 def _is_git_worktree_picker_path(relative_path: str) -> bool:
-    return relative_path == "crates/git_ui/src/worktree_picker.rs"
+    return relative_path == "crates/git_ui_core/src/worktree_picker.rs"
 
 
 def _is_git_multi_diff_view_path(relative_path: str) -> bool:
@@ -4186,35 +4186,37 @@ PROJECT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
     ),
     LinePattern(
         re.compile(
-            r'^\s*("(?:Do you want to trash|Are you sure you want to permanently delete)")\s*$'
+            r'("(?:Do you want to trash|Are you sure you want to permanently delete)")'
         ),
         "delete_prompt_message_start",
         "prompt_message",
         1,
     ),
     LinePattern(
-        re.compile(r'^\s*("\{message_start\} \{\}\?\{unsaved_warning\}"),?\s*$'),
+        re.compile(r'("\{message_start\} \{\}\?")'),
         "delete_prompt_format",
         "prompt_message",
         1,
     ),
     LinePattern(
         re.compile(
-            r'^\s*("\{message_start\} the following \{\} files\?\\n\{\}\{unsaved_warning\}"),?\s*$'
+            r'^\s*("\{message_start\} the following \{\} files\?\\n\{\}"),?\s*$'
         ),
         "delete_prompt_format",
         "prompt_message",
         1,
     ),
     LinePattern(
-        re.compile(r'^\s*("\\n\\nIt has unsaved changes, which will be lost\.")'),
+        re.compile(
+            r'\bmessage\.push_str\(\s*("\\n\\nIt has unsaved changes, which will be lost\.")'
+        ),
         "delete_prompt_unsaved_warning",
         "prompt_message",
         1,
     ),
     LinePattern(
         re.compile(
-            r'^\s*("\\n\\n1 of these has unsaved changes, which will be lost\.")\.to_string\(\)'
+            r'\bmessage\.push_str\(\s*("\\n\\n1 of these has unsaved changes, which will be lost\.")'
         ),
         "delete_prompt_unsaved_warning",
         "prompt_message",
@@ -4237,19 +4239,21 @@ PROJECT_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
         1,
     ),
     LinePattern(
-        re.compile(r'\bpaths\.push\(\s*("\.\. 1 file not shown")\.into\(\)'),
+        re.compile(r'\blisted_names\.push\(\s*("\.\. 1 file not shown")\.into\(\)'),
         "delete_prompt_truncated_files",
         "prompt_message",
         1,
     ),
     LinePattern(
-        re.compile(r'\bpaths\.push\(\s*format!\(\s*("\.\. \{\} files not shown")'),
+        re.compile(
+            r'\blisted_names\.push\(\s*format!\(\s*("\.\. \{omitted_count\} files not shown")'
+        ),
         "delete_prompt_truncated_files",
         "prompt_message",
         1,
     ),
     LinePattern(
-        re.compile(r'\bthen_some\(\s*("This cannot be undone\.")'),
+        re.compile(r'\bSome\(\s*("This cannot be undone\.")'),
         "delete_prompt_detail",
         "prompt_detail",
         1,
@@ -4972,6 +4976,12 @@ DEBUGGER_NEW_PROCESS_MODE_LINE_PATTERNS: tuple[LinePattern, ...] = (
 
 
 COPILOT_SIGN_IN_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'^\s*const\s+ERROR_LABEL:\s*&str\s*=\s*("(?:\\.|[^"\\])*");'),
+        "copilot_status_label",
+        "status_message",
+        1,
+    ),
     LinePattern(
         re.compile(r'\blet\s+(?:start_label|no_status_label)\s*=\s*("(?:\\.|[^"\\])*")'),
         "copilot_status_label",

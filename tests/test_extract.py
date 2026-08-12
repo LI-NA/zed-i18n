@@ -1397,8 +1397,7 @@ class ExtractTests(unittest.TestCase):
     def test_extracts_copilot_sign_in_status_messages(self) -> None:
         source = "\n".join(
             [
-                'const ERROR_LABEL: &str =',
-                '    "Copilot had issues starting. You can try reinstalling it and signing in again."; ',
+                'const ERROR_LABEL: &str = "Copilot Edit Predictions had issues starting. You can try reinstalling it and signing in again.";',
                 "fn initiate_sign_out(window: &Window, cx: &mut App) {",
                 '    copilot_toast(Some("Signing out of Copilot…"), window, cx);',
                 "}",
@@ -1420,7 +1419,7 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(
             {occurrence.source for occurrence in occurrences},
             {
-                "Copilot had issues starting. You can try reinstalling it and signing in again.",
+                "Copilot Edit Predictions had issues starting. You can try reinstalling it and signing in again.",
                 "Signing out of Copilot…",
                 "Starting Copilot…",
                 "To use Copilot for edit predictions, you need to be logged in to GitHub.",
@@ -1871,37 +1870,29 @@ class ExtractTests(unittest.TestCase):
     def test_extracts_project_panel_unsaved_delete_warnings(self) -> None:
         source = "\n".join(
             [
-                "fn delete_prompt(dirty_buffers: usize) {",
+                "fn build_removal_prompt(dirty_buffers: usize) {",
                 '    let prompt = format!("Discard changes to {}?", file_name);',
-                "    let message_start = if trash {",
-                '        "Do you want to trash"',
-                "    } else {",
-                '        "Are you sure you want to permanently delete"',
+                "    let (message_start, confirmation_label, detail) = match kind {",
+                '        RemovalKind::Trash => ("Do you want to trash", "Trash", None),',
+                "        RemovalKind::Delete => (",
+                '            "Are you sure you want to permanently delete",',
+                '            "Delete",',
+                '            Some("This cannot be undone."),',
+                "        ),",
                 "    };",
-                "    let single = if dirty_buffers > 0 {",
-                '        "\\n\\nIt has unsaved changes, which will be lost."',
-                "    } else {",
-                '        ""',
-                "    };",
-                "    format!(",
-                '        "{message_start} {}?{unsaved_warning}",',
-                "        MarkdownInlineCode(path)",
-                "    );",
-                "    let many = if dirty_buffers == 1 {",
-                '        "\\n\\n1 of these has unsaved changes, which will be lost.".to_string()',
-                "    } else {",
+                '    [name] => format!("{message_start} {}?", MarkdownInlineCode(name.as_ref())),',
+                '    message.push_str("\\n\\nIt has unsaved changes, which will be lost.");',
+                '    message.push_str("\\n\\n1 of these has unsaved changes, which will be lost.");',
                 "        format!(",
                 '            "\\n\\n{dirty_buffers} of these have unsaved changes, which will be lost."',
                 "        )",
-                "    };",
-                '    paths.push(".. 1 file not shown".into());',
-                '    paths.push(format!(".. {} files not shown", truncated_path_counts));',
+                '    listed_names.push(".. 1 file not shown".into());',
+                '    listed_names.push(format!(".. {omitted_count} files not shown"));',
                 "    format!(",
-                '        "{message_start} the following {} files?\\n{}{unsaved_warning}",',
+                '        "{message_start} the following {} files?\\n{}",',
                 "        file_paths.len(),",
                 "        names.join(\"\\n\")",
                 "    );",
-                '    let detail = (!trash).then_some("This cannot be undone.");',
                 "    let prompt_message = format!(",
                 "        concat!(",
                 '            "A file or folder with name {} ",',
@@ -1928,13 +1919,13 @@ class ExtractTests(unittest.TestCase):
                 "Discard changes to {}?",
                 "already exists in the destination folder. ",
                 "Do you want to replace it?",
-                "{message_start} {}?{unsaved_warning}",
-                "{message_start} the following {} files?\n{}{unsaved_warning}",
+                "{message_start} {}?",
+                "{message_start} the following {} files?\n{}",
                 "\n\nIt has unsaved changes, which will be lost.",
                 "\n\n1 of these has unsaved changes, which will be lost.",
                 "\n\n{dirty_buffers} of these have unsaved changes, which will be lost.",
                 ".. 1 file not shown",
-                ".. {} files not shown",
+                ".. {omitted_count} files not shown",
                 "This cannot be undone.",
             },
         )
@@ -5028,6 +5019,7 @@ class ExtractTests(unittest.TestCase):
             [
                 "fn update_matches(&mut self) {",
                 '    matches.push(WorktreeEntry::SectionHeader("This Window".into()));',
+                '    let default_label = format!("Create new worktree based on {branch_label}");',
                 '    let label = format!("Create \\"{name}\\" based on {branch_label}");',
                 "}",
             ]
@@ -5035,13 +5027,17 @@ class ExtractTests(unittest.TestCase):
 
         occurrences = extract_ui_strings_from_source(
             source,
-            relative_path="crates/git_ui/src/worktree_picker.rs",
+            relative_path="crates/git_ui_core/src/worktree_picker.rs",
         )
 
         by_source = {occurrence.source: occurrence for occurrence in occurrences}
         self.assertEqual(
             set(by_source),
-            {"This Window", 'Create "{name}" based on {branch_label}'},
+            {
+                "This Window",
+                'Create "{name}" based on {branch_label}',
+                "Create new worktree based on {branch_label}",
+            },
         )
         self.assertEqual(by_source["This Window"].kind, "git_worktree_picker_section")
 
@@ -5063,7 +5059,7 @@ class ExtractTests(unittest.TestCase):
 
         occurrences = extract_ui_strings_from_source(
             source,
-            relative_path="crates/git_ui/src/worktree_picker.rs",
+            relative_path="crates/git_ui_core/src/worktree_picker.rs",
         )
 
         by_source = {occurrence.source: occurrence for occurrence in occurrences}

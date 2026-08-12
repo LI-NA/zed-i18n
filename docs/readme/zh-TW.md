@@ -2,7 +2,7 @@
   <h1>Zed-i18n</h1>
   <p><strong>輕鬆將 Zed 編輯器翻譯成你的語言。</strong></p>
 
-  [![Zed v1.14.2](https://img.shields.io/badge/Zed-v1.14.2-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.14.2)
+  [![Zed v1.15.0](https://img.shields.io/badge/Zed-v1.15.0-blue?logo=zedindustries&logoColor=white)](https://github.com/zed-industries/zed/releases/tag/v1.15.0)
   [![Python ≥3.12](https://img.shields.io/badge/Python-≥3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
   [![Source: MIT](https://img.shields.io/badge/Source-MIT-brightgreen)](../../LICENSE-MIT)
   [![Release: GPL-3.0](https://img.shields.io/badge/Release-GPL--3.0-orange)](../../LICENSE)
@@ -160,7 +160,7 @@ git clone https://github.com/microsoft/vscode .cache/vscode-upstream
 ```powershell
 $env:CARGO_TARGET_DIR = (Resolve-Path .cache\zed\target).Path
 $env:CARGO_INCREMENTAL = "1"
-cd .cache\zed\v1.14.2
+cd .cache\zed\v1.15.0
 cargo build --release --package zed --target x86_64-pc-windows-msvc -j 8
 ```
 
