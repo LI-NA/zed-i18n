@@ -110730,6 +110730,14 @@
         "kind": "label",
         "line": 1258,
         "start_byte": 49296
+      },
+      {
+        "call": "MultiBuffer::DEFAULT_TITLE",
+        "end_byte": 69876,
+        "file": "crates/multi_buffer/src/multi_buffer.rs",
+        "kind": "default_title",
+        "line": 2167,
+        "start_byte": 69866
       }
     ],
     "status": "accepted"

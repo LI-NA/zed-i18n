@@ -1927,6 +1927,17 @@ def _extract_exact_line_literal_occurrences(
                 {"untitled"},
             )
         )
+    if relative_path == "crates/multi_buffer/src/multi_buffer.rs":
+        rules.append(
+            (
+                re.compile(
+                    r'\bpub const DEFAULT_TITLE\s*:\s*&str\s*=\s*("(?:\\.|[^"\\])*")'
+                ),
+                "default_title",
+                "MultiBuffer::DEFAULT_TITLE",
+                {"untitled"},
+            )
+        )
     if not rules:
         return []
 

@@ -994,6 +994,30 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(by_source["Commit {sha_short}"].kind, "context_menu_header")
         self.assertEqual(by_source["Total tracked changes"].kind, "tooltip")
 
+    def test_extracts_multibuffer_default_title_without_test_assertions(self) -> None:
+        source = "\n".join(
+            [
+                "impl MultiBuffer {",
+                '    pub const DEFAULT_TITLE: &str = "untitled";',
+                "}",
+                "#[cfg(test)]",
+                "mod tests {",
+                '    assert_eq!(multibuffer.title(cx), "untitled");',
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/multi_buffer/src/multi_buffer.rs",
+        )
+
+        self.assertEqual(len(occurrences), 1)
+        self.assertEqual(occurrences[0].source, "untitled")
+        self.assertEqual(occurrences[0].call, "MultiBuffer::DEFAULT_TITLE")
+        self.assertEqual(occurrences[0].kind, "default_title")
+        self.assertEqual(occurrences[0].line, 2)
+
     def test_extracts_deferred_terminal_permission_denial_outputs(self) -> None:
         source = "\n".join(
             [

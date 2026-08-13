@@ -6867,7 +6867,7 @@
   "tree-sitter and indent-based folding.": "基于 tree-sitter 和缩进的代码折叠",
   "unavailable) or if the LSP doesn't support range formatting,": "不可用），或 LSP 不支持范围格式化，",
   "unrestricted except Git metadata": "除 Git 元数据外不受限制",
-  "untitled": "无标题",
+  "untitled": "未命名",
   "use document's words to show completions.": "使用文档中的词汇提供补全",
   "use the built-in prompts.": "使用内置对话框。",
   "used in this project": "在此项目中使用的",
