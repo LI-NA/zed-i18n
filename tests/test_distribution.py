@@ -294,7 +294,10 @@ fn app_menus() -> Vec<Menu> {
 
         self.assertIn("zed-i18n", about)
         self.assertIn("i18n_build: Option<SharedString>", about)
+        self.assertIn('option_env!("ZED_I18N_RELEASE_TAG").map(|release|', about)
+        self.assertIn('if let Some(locale) = option_env!("ZED_I18N_LOCALE")', about)
         self.assertIn('SharedString::from(format!("zed-i18n {locale} · {release}"))', about)
+        self.assertIn('SharedString::from(format!("zed-i18n · {release}"))', about)
         self.assertIn('lines.push(format!("Build: {}", i18n_build));', about)
         self.assertNotIn("i18n_repository", about)
         self.assertNotIn("Repository:", about)
@@ -385,6 +388,53 @@ fn app_menus() -> Vec<Menu> {
         self.assertLess(app_menus.index("Zed 저장소"), app_menus.index("Zed-i18n 저장소"))
         self.assertLess(app_menus.index("Zed-i18n 저장소"), app_menus.index("Zed Twitter"))
         self.assertIn('url: "https://github.com/LI-NA/zed-i18n".into()', app_menus)
+
+    def test_adds_i18n_repository_menu_after_universal_rewritten_zed_repository(self) -> None:
+        app_menus_path = self.zed_root / "crates/zed/src/zed/app_menus.rs"
+        app_menus = app_menus_path.read_text(encoding="utf-8")
+        app_menus_path.write_text(
+            app_menus.replace(
+                'MenuItem::action("Zed 저장소", feedback::OpenZedRepo),',
+                "MenuItem::action(localization::localized_str!"
+                '("Zed 저장소"), feedback::OpenZedRepo),',
+            ),
+            encoding="utf-8",
+        )
+        config = load_distribution_config(
+            self.write_config('[publisher]\nurl = "https://github.com/LI-NA/zed-i18n"\n')
+        )
+
+        apply_distribution_patches(self.zed_root, config)
+        apply_distribution_patches(self.zed_root, config)
+
+        app_menus = app_menus_path.read_text(encoding="utf-8")
+
+        self.assertIn(
+            'MenuItem::action(localization::localized_str!("Zed 저장소"), feedback::OpenZedRepo),',
+            app_menus,
+        )
+        self.assertEqual(app_menus.count("Zed-i18n 저장소"), 1)
+        self.assertLess(app_menus.index("Zed 저장소"), app_menus.index("Zed-i18n 저장소"))
+        self.assertIn('url: "https://github.com/LI-NA/zed-i18n".into()', app_menus)
+
+    def test_distribution_build_env_omits_locale_for_universal_builds(self) -> None:
+        config = load_distribution_config(self.write_config(""))
+        env = distribution_build_env(
+            config,
+            base_env={"ZED_I18N_LOCALE": "ko-KR", "ZED_UPDATE_EXPLANATION": "disabled"},
+            locale=None,
+            release_tag="v1.2.5-i18n.4",
+            repository="owner/repo",
+        )
+
+        self.assertNotIn("ZED_I18N_LOCALE", env)
+        self.assertNotIn("ZED_UPDATE_EXPLANATION", env)
+        self.assertEqual(env["ZED_I18N_RELEASE_TAG"], "v1.2.5-i18n.4")
+        self.assertEqual(env["ZED_I18N_REVISION"], "4")
+        self.assertEqual(
+            env["ZED_I18N_UPDATE_MANIFEST_URL"],
+            "https://github.com/owner/repo/releases/latest/download/manifest.json",
+        )
 
     def test_distribution_build_env_sets_compile_time_metadata(self) -> None:
         config = load_distribution_config(self.write_config(""))

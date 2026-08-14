@@ -79,12 +79,17 @@ def parse_i18n_revision(release_tag: str | None) -> str:
 def distribution_build_env(
     config: DistributionConfig,
     base_env: dict[str, str] | None,
-    locale: str,
+    locale: str | None,
     release_tag: str | None,
     repository: str | None,
 ) -> dict[str, str]:
     env = dict(base_env or os.environ)
-    env["ZED_I18N_LOCALE"] = locale
+    if locale:
+        env["ZED_I18N_LOCALE"] = locale
+    else:
+        # Universal builds carry every locale at runtime; a baked-in locale
+        # would pin the UI language and re-enable locale manifest matching.
+        env.pop("ZED_I18N_LOCALE", None)
     env["ZED_I18N_RELEASE_TAG"] = release_tag or "local"
     env["ZED_I18N_REVISION"] = parse_i18n_revision(release_tag)
     manifest_url = resolve_update_manifest_url(config, repository)
@@ -121,9 +126,12 @@ def patch_about_window(zed_root: Path, config: DistributionConfig) -> None:
     if "i18n_build: Option<SharedString>" in text:
         return
     message_replacement = f"""            let message: SharedString = format!("{{release_channel_name}} {{version}} {{debug}}").into();
-            let i18n_build = option_env!("ZED_I18N_LOCALE").map(|locale| {{
-                let release = option_env!("ZED_I18N_RELEASE_TAG").unwrap_or("local");
-                SharedString::from(format!("{config.product_slug} {{locale}} · {{release}}"))
+            let i18n_build = option_env!("ZED_I18N_RELEASE_TAG").map(|release| {{
+                if let Some(locale) = option_env!("ZED_I18N_LOCALE") {{
+                    SharedString::from(format!("{config.product_slug} {{locale}} · {{release}}"))
+                }} else {{
+                    SharedString::from(format!("{config.product_slug} · {{release}}"))
+                }}
             }});"""
     replacements = [
         (
@@ -294,8 +302,12 @@ def patch_help_menu_i18n_repository_link(zed_root: Path, config: DistributionCon
     if config.publisher_url in text:
         return
 
+    # `apply-universal` may already have rewritten the label literal into a
+    # runtime lookup, so accept both the plain and the localized form.
     pattern = re.compile(
-        r'(?m)^(\s*)MenuItem::action\("((?:\\.|[^"\\])*)",\s*feedback::OpenZedRepo\),'
+        r'(?m)^(\s*)MenuItem::action\('
+        r'(?:"((?:\\.|[^"\\])*)"|localization::localized_str!\("((?:\\.|[^"\\])*)"\)),'
+        r"\s*feedback::OpenZedRepo\),"
     )
     matches = list(pattern.finditer(text))
     if len(matches) != 1:
@@ -305,7 +317,7 @@ def patch_help_menu_i18n_repository_link(zed_root: Path, config: DistributionCon
 
     match = matches[0]
     indent = match.group(1)
-    zed_label = match.group(2)
+    zed_label = match.group(2) if match.group(2) is not None else match.group(3)
     i18n_brand = config.product_slug[:1].upper() + config.product_slug[1:]
     if "Zed" not in zed_label:
         raise ValueError(f"expected Zed repository label to contain 'Zed' in {path}")

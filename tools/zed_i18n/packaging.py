@@ -56,6 +56,9 @@ def generate_packaging_files(
 
 
 def generate_homebrew_cask(manifest: dict[str, Any]) -> str:
+    if _is_universal_manifest(manifest):
+        return _generate_universal_homebrew_cask(manifest)
+
     version = cask_version(manifest)
     locales = sorted(_locales_for(manifest, platform="macos", kind="app"))
     if not locales:
@@ -98,7 +101,92 @@ def generate_homebrew_cask(manifest: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _generate_universal_homebrew_cask(manifest: dict[str, Any]) -> str:
+    # The cask token stays "zed-i18n": existing installs upgrade in place to
+    # the single build, so the language stanzas simply disappear.
+    version = cask_version(manifest)
+    assets = _universal_assets_for(manifest, platform="macos", kind="app")
+    arm = _required_asset(assets, "aarch64", None, "macos")
+    intel = _required_asset(assets, "x86_64", None, "macos")
+
+    lines = [
+        'cask "zed-i18n" do',
+        '  arch arm: "aarch64", intel: "x86_64"',
+        f'  version "{version}"',
+        f'  sha256 arm: "{arm["sha256"]}", intel: "{intel["sha256"]}"',
+        "",
+        '  url "https://github.com/LI-NA/zed-i18n/releases/download/v#{version.csv.first}-i18n.#{version.csv.second}/Zed-i18n-macos-#{arch}.dmg"',
+        '  name "Zed i18n"',
+        '  desc "Localized build of the Zed editor"',
+        '  homepage "https://github.com/LI-NA/zed-i18n"',
+        "",
+        '  app "Zed i18n.app"',
+        '  binary "#{appdir}/Zed i18n.app/Contents/MacOS/cli", target: "zed-i18n"',
+        "",
+        "  auto_updates true",
+        "end",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+def _scoop_app_manifest(
+    *,
+    version: str,
+    description: str,
+    x64: dict[str, Any],
+    arm64: dict[str, Any],
+    shortcut_name: str,
+    update_message: str,
+    autoupdate_locale: str | None,
+    notes: list[str] | None = None,
+) -> dict[str, Any]:
+    locale_segment = f"-{autoupdate_locale}" if autoupdate_locale else ""
+    app: dict[str, Any] = {
+        "version": version,
+        "description": description,
+        "homepage": "https://github.com/LI-NA/zed-i18n",
+        "license": "GPL-3.0",
+        "architecture": {
+            "64bit": {
+                "url": x64["download_url"],
+                "hash": x64["sha256"],
+            },
+            "arm64": {
+                "url": arm64["download_url"],
+                "hash": arm64["sha256"],
+            },
+        },
+        "bin": [["bin\\zed.exe", "zed-i18n"]],
+        "shortcuts": [["Zed.exe", shortcut_name]],
+        "env_set": {"ZED_UPDATE_EXPLANATION": update_message},
+        "post_install": POST_INSTALL_LINES,
+        "checkver": {
+            "url": "https://github.com/LI-NA/zed-i18n/releases/latest",
+            "regex": r"/releases/tag/v([\d.]+-i18n\.\d+)",
+        },
+        "autoupdate": {
+            "architecture": {
+                "64bit": {
+                    "url": f"https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n{locale_segment}-windows-x86_64.zip"
+                },
+                "arm64": {
+                    "url": f"https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n{locale_segment}-windows-aarch64.zip"
+                },
+            },
+            "hash": {
+                "url": "https://github.com/LI-NA/zed-i18n/releases/download/v$version/SHA256SUMS.txt"
+            },
+        },
+    }
+    if notes:
+        app["notes"] = notes
+    return app
+
+
 def generate_scoop_manifests(manifest: dict[str, Any]) -> dict[str, str]:
+    if _is_universal_manifest(manifest):
+        return _generate_universal_scoop_manifests(manifest)
+
     version = scoop_version(manifest)
     locales = sorted(_locales_for(manifest, platform="windows", kind="portable_app"))
     if not locales:
@@ -114,45 +202,55 @@ def generate_scoop_manifests(manifest: dict[str, Any]) -> dict[str, str]:
         )
         x64 = _required_asset(assets, "x86_64", locale, "windows")
         arm64 = _required_asset(assets, "aarch64", locale, "windows")
-        app = {
-            "version": version,
-            "description": f"Localized build of the Zed editor ({locale})",
-            "homepage": "https://github.com/LI-NA/zed-i18n",
-            "license": "GPL-3.0",
-            "architecture": {
-                "64bit": {
-                    "url": x64["download_url"],
-                    "hash": x64["sha256"],
-                },
-                "arm64": {
-                    "url": arm64["download_url"],
-                    "hash": arm64["sha256"],
-                },
-            },
-            "bin": [["bin\\zed.exe", "zed-i18n"]],
-            "shortcuts": [["Zed.exe", f"Zed i18n ({locale})"]],
-            "env_set": {
-                "ZED_UPDATE_EXPLANATION": f"Run 'scoop update zed-i18n-{locale}' to update."
-            },
-            "post_install": POST_INSTALL_LINES,
-            "checkver": {
-                "url": "https://github.com/LI-NA/zed-i18n/releases/latest",
-                "regex": r"/releases/tag/v([\d.]+-i18n\.\d+)",
-            },
-            "autoupdate": {
-                "architecture": {
-                    "64bit": {
-                        "url": f"https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n-{locale}-windows-x86_64.zip"
-                    },
-                    "arm64": {
-                        "url": f"https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n-{locale}-windows-aarch64.zip"
-                    },
-                },
-                "hash": {
-                    "url": "https://github.com/LI-NA/zed-i18n/releases/download/v$version/SHA256SUMS.txt"
-                },
-            },
-        }
+        app = _scoop_app_manifest(
+            version=version,
+            description=f"Localized build of the Zed editor ({locale})",
+            x64=x64,
+            arm64=arm64,
+            shortcut_name=f"Zed i18n ({locale})",
+            update_message=f"Run 'scoop update zed-i18n-{locale}' to update.",
+            autoupdate_locale=locale,
+        )
+        output[f"zed-i18n-{locale}.json"] = json.dumps(app, indent=2, ensure_ascii=False) + "\n"
+    return output
+
+
+def _generate_universal_scoop_manifests(manifest: dict[str, Any]) -> dict[str, str]:
+    version = scoop_version(manifest)
+    assets = _universal_assets_for(manifest, platform="windows", kind="portable_app")
+    x64 = _required_asset(assets, "x86_64", None, "windows")
+    arm64 = _required_asset(assets, "aarch64", None, "windows")
+    # The manifest keeps one `app` alias per legacy locale; those labels are
+    # exactly the per-locale Scoop manifests that must keep working.
+    legacy_locales = sorted(_locales_for(manifest, platform="windows", kind="app"))
+
+    output = {}
+    universal = _scoop_app_manifest(
+        version=version,
+        description="Localized build of the Zed editor",
+        x64=x64,
+        arm64=arm64,
+        shortcut_name="Zed i18n",
+        update_message="Run 'scoop update zed-i18n' to update.",
+        autoupdate_locale=None,
+    )
+    output["zed-i18n.json"] = json.dumps(universal, indent=2, ensure_ascii=False) + "\n"
+
+    for locale in legacy_locales:
+        app = _scoop_app_manifest(
+            version=version,
+            description=f"Localized build of the Zed editor ({locale})",
+            x64=x64,
+            arm64=arm64,
+            shortcut_name=f"Zed i18n ({locale})",
+            update_message=f"Run 'scoop update zed-i18n-{locale}' to update.",
+            autoupdate_locale=None,
+            notes=[
+                "zed-i18n now ships a single build with every language included,",
+                "and this package installs that build. To switch to the plain",
+                f"package, run: scoop uninstall zed-i18n-{locale}; scoop install zed-i18n",
+            ],
+        )
         output[f"zed-i18n-{locale}.json"] = json.dumps(app, indent=2, ensure_ascii=False) + "\n"
     return output
 
@@ -202,15 +300,16 @@ def _assets_for_locale(
 def _required_asset(
     assets: dict[str, dict[str, Any]],
     arch: str,
-    locale: str,
+    locale: str | None,
     platform: str,
 ) -> dict[str, Any]:
+    label = locale or "universal"
     asset = assets.get(arch)
     if asset is None:
-        raise ValueError(f"missing {platform} asset for {locale} {arch}")
+        raise ValueError(f"missing {platform} asset for {label} {arch}")
     for key in ("sha256", "download_url"):
         if not asset.get(key):
-            raise ValueError(f"{asset.get('name', f'{locale} {platform} {arch}')} missing {key}")
+            raise ValueError(f"{asset.get('name', f'{label} {platform} {arch}')} missing {key}")
     return asset
 
 
@@ -222,10 +321,38 @@ def _locales_for(manifest: dict[str, Any], *, platform: str, kind: str) -> set[s
     }
 
 
+def _is_universal_manifest(manifest: dict[str, Any]) -> bool:
+    return any(
+        asset.get("kind") == "app" and asset.get("locale") is None
+        for asset in manifest.get("assets", [])
+    )
+
+
+def _universal_assets_for(
+    manifest: dict[str, Any],
+    *,
+    platform: str,
+    kind: str,
+) -> dict[str, dict[str, Any]]:
+    assets = {}
+    for asset in manifest.get("assets", []):
+        if (
+            asset.get("locale") is None
+            and asset.get("platform") == platform
+            and asset.get("kind") == kind
+        ):
+            assets[str(asset["arch"])] = asset
+    return assets
+
+
 def _validate_packaging_release(
     manifest: dict[str, Any],
     expected_locales: Iterable[str] | None,
 ) -> None:
+    if _is_universal_manifest(manifest):
+        _validate_universal_packaging_release(manifest, expected_locales)
+        return
+
     macos_locales = _locales_for(manifest, platform="macos", kind="app")
     windows_locales = _locales_for(manifest, platform="windows", kind="portable_app")
     if not macos_locales:
@@ -238,10 +365,47 @@ def _validate_packaging_release(
             f"macos={sorted(macos_locales)}, windows={sorted(windows_locales)}"
         )
 
+    _validate_expected_locales(macos_locales, expected_locales)
+
+
+def _validate_universal_packaging_release(
+    manifest: dict[str, Any],
+    expected_locales: Iterable[str] | None,
+) -> None:
+    for platform, kind, label in (
+        ("macos", "app", "macos app"),
+        ("windows", "portable_app", "windows portable_app"),
+    ):
+        assets = _universal_assets_for(manifest, platform=platform, kind=kind)
+        missing = sorted({"aarch64", "x86_64"} - assets.keys())
+        if missing:
+            raise ValueError(
+                f"release manifest is missing universal {label} assets for: "
+                + ", ".join(missing)
+            )
+
+    # Legacy Scoop manifests are generated from the windows app aliases, so
+    # the alias locales must cover every expected locale.
+    alias_locales = _locales_for(manifest, platform="windows", kind="app")
+    if not alias_locales:
+        raise ValueError("universal release manifest has no locale alias app assets")
+    macos_alias_locales = _locales_for(manifest, platform="macos", kind="app")
+    if alias_locales != macos_alias_locales:
+        raise ValueError(
+            "windows and macos locale alias sets differ: "
+            f"windows={sorted(alias_locales)}, macos={sorted(macos_alias_locales)}"
+        )
+    _validate_expected_locales(alias_locales, expected_locales)
+
+
+def _validate_expected_locales(
+    actual_locales: set[str],
+    expected_locales: Iterable[str] | None,
+) -> None:
     required_locales = {locale for locale in expected_locales or () if locale}
     if required_locales:
-        missing = sorted(required_locales - macos_locales)
-        unexpected = sorted(macos_locales - required_locales)
+        missing = sorted(required_locales - actual_locales)
+        unexpected = sorted(actual_locales - required_locales)
         if missing or unexpected:
             details = []
             if missing:

@@ -15,7 +15,7 @@ from .config import load_project_config, zed_checkout_path, zed_clean_extract_ch
 from .context_groups import build_context_groups, write_context_group_reports
 from .extract import extract_repository
 from .packaging import generate_packaging_files
-from .runtime_bundles import generate_runtime_bundles
+from .runtime_bundles import generate_runtime_bundles, release_locale_ids
 from .translation_pipeline import (
     PrepareTranslationOptions,
     cleanup_translation_workspace,
@@ -544,12 +544,11 @@ def _translation_sources(path: Path) -> set[str]:
 
 
 def _translation_locale_names(root: Path) -> set[str]:
-    translations_dir = root / "translations"
-    if not translations_dir.exists():
-        raise ValueError("translations directory does not exist")
-    locales = {path.stem for path in translations_dir.glob("*.json")}
+    # config/locales.toml is authoritative; translations/*.json stems would
+    # also pick up model-scoped artifacts like ko-KR.<model>.json.
+    locales = set(release_locale_ids(root))
     if not locales:
-        raise ValueError("translations directory has no locale JSON files")
+        raise ValueError("config/locales.toml has no enabled translation locales")
     return locales
 
 

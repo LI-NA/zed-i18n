@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import unittest
 from pathlib import Path
@@ -144,6 +145,34 @@ class ZedPatchContractTests(unittest.TestCase):
         self.assertIn("|| rc=$?", bundle_macos)
         self.assertIn('if mv "${tmp_dir}/git" "${target_binary}"; then', bundle_macos)
         self.assertIn('rm -rf "$tmp_dir"', bundle_macos)
+
+    def test_universal_rewritten_checkout_accepts_distribution_patches(self) -> None:
+        # In universal release builds `apply-universal` runs before the
+        # distribution patches and rewrites the accepted "Zed Repository"
+        # label into a runtime lookup; the help-menu patch must still land.
+        config = load_distribution_config(self.root / "config" / "distribution.toml")
+        app_menus_path = self.zed_root / "crates/zed/src/zed/app_menus.rs"
+        text = app_menus_path.read_text(encoding="utf-8")
+        pattern = re.compile(
+            r'MenuItem::action\("((?:\\.|[^"\\])*)",\s*feedback::OpenZedRepo\)'
+        )
+        matches = list(pattern.finditer(text))
+        self.assertEqual(len(matches), 1)
+        match = matches[0]
+        rewritten = (
+            text[: match.start()]
+            + "MenuItem::action(localization::localized_str!("
+            + f'"{match.group(1)}"), feedback::OpenZedRepo)'
+            + text[match.end() :]
+        )
+        app_menus_path.write_text(rewritten, encoding="utf-8")
+
+        apply_distribution_patches(self.zed_root, config)
+        apply_distribution_patches(self.zed_root, config)
+
+        app_menus = app_menus_path.read_text(encoding="utf-8")
+        self.assertIn("localization::localized_str!", app_menus)
+        self.assertEqual(app_menus.count(config.publisher_url), 1)
 
     def test_clean_extract_checkout_matches_project_rules_composite_contract(self) -> None:
         clean_extract_root = self.resolve_clean_extract_zed_root()

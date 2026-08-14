@@ -40,8 +40,10 @@ VIRTUAL_PACKAGE = "zed-i18n"
 DESKTOP_FILE_NAME = "dev.zed-i18n.Zed.desktop"
 
 DEB_ARCHITECTURES = {"x86_64": "amd64", "aarch64": "arm64"}
-LINUX_TARBALL_PATTERN = re.compile(
-    r"^zed-i18n-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"
+LINUX_TARBALL_PATTERNS = (
+    re.compile(r"^zed-i18n-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
+    # Universal builds drop the locale segment entirely.
+    re.compile(r"^zed-i18n-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
 )
 PACKAGE_NAME_PATTERN = re.compile(r"^[a-z0-9][a-z0-9+.-]+$")
 ZED_VERSION_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
@@ -51,11 +53,15 @@ ICON_SOURCE_PATTERN = re.compile(
 DESKTOP_SOURCE_PATTERN = re.compile(r"^share/applications/[^/]+\.desktop$")
 
 
-def deb_asset_name(language: str, arch: str) -> str:
-    return f"zed-i18n-{language}-linux-{arch}.deb"
+def deb_asset_name(language: str | None, arch: str) -> str:
+    if language:
+        return f"zed-i18n-{language}-linux-{arch}.deb"
+    return f"zed-i18n-linux-{arch}.deb"
 
 
-def deb_package_name(locale: str) -> str:
+def deb_package_name(locale: str | None) -> str:
+    if not locale:
+        return VIRTUAL_PACKAGE
     name = f"zed-i18n-{locale.lower()}"
     if not PACKAGE_NAME_PATTERN.fullmatch(name):
         raise ValueError(f"locale does not form a valid Debian package name: {locale}")
@@ -156,10 +162,45 @@ def control_file(
     version: str,
     deb_arch: str,
     installed_size_kib: int,
-    locale: str,
+    locale: str | None,
     repository: str,
     glibc_floor: str,
 ) -> str:
+    if locale:
+        # Legacy per-locale package: provides the shared zed-i18n name so any
+        # other locale (or the universal package) replaces it.
+        virtual_fields = (
+            f"Provides: {VIRTUAL_PACKAGE}\n"
+            f"Conflicts: {VIRTUAL_PACKAGE}\n"
+            f"Replaces: {VIRTUAL_PACKAGE}\n"
+        )
+        description = (
+            f"Description: Localized build of the Zed editor ({locale})\n"
+            " Zed is a high-performance, multiplayer code editor. This package\n"
+            f" installs the community zed-i18n build localized for {locale}.\n"
+            " .\n"
+            " All locale packages provide the same zed-i18n name, so installing\n"
+            " another locale replaces this one.\n"
+        )
+    else:
+        # The package name itself is now zed-i18n, so no Provides is needed;
+        # Conflicts/Replaces still target the per-locale packages that provide
+        # the same name (dpkg never treats a package as conflicting with
+        # itself), so `apt install ./zed-i18n-linux-<arch>.deb` replaces them.
+        virtual_fields = (
+            f"Conflicts: {VIRTUAL_PACKAGE}\n"
+            f"Replaces: {VIRTUAL_PACKAGE}\n"
+        )
+        description = (
+            "Description: Localized build of the Zed editor\n"
+            " Zed is a high-performance, multiplayer code editor. This package\n"
+            " installs the community zed-i18n build with every supported display\n"
+            " language included. The UI follows the system locale and can be\n"
+            " changed in the settings.\n"
+            " .\n"
+            " Installing this package replaces the earlier per-locale\n"
+            " zed-i18n-<locale> packages.\n"
+        )
     return (
         f"Package: {package}\n"
         f"Version: {version}\n"
@@ -169,18 +210,11 @@ def control_file(
         # libvulkan1 is loaded at runtime by the GPUI renderer; without it Zed
         # cannot open a window, so it is a hard dependency per Debian Policy.
         f"Depends: libc6 (>= {glibc_floor}), libgcc-s1, libasound2 | libasound2t64, libvulkan1\n"
-        f"Provides: {VIRTUAL_PACKAGE}\n"
-        f"Conflicts: {VIRTUAL_PACKAGE}\n"
-        f"Replaces: {VIRTUAL_PACKAGE}\n"
+        f"{virtual_fields}"
         "Section: editors\n"
         "Priority: optional\n"
         f"Homepage: https://github.com/{repository}\n"
-        f"Description: Localized build of the Zed editor ({locale})\n"
-        " Zed is a high-performance, multiplayer code editor. This package\n"
-        f" installs the community zed-i18n build localized for {locale}.\n"
-        " .\n"
-        " All locale packages provide the same zed-i18n name, so installing\n"
-        " another locale replaces this one.\n"
+        f"{description}"
     )
 
 
@@ -285,7 +319,7 @@ def build_deb_from_tarball(
     tarball_path: Path,
     output_path: Path,
     *,
-    locale: str,
+    locale: str | None,
     arch: str,
     version: str,
     repository: str,
@@ -446,7 +480,7 @@ def build_deb_from_tarball(
     return output_path
 
 
-def _build_one(job: tuple[str, str, str, str, str, str, str]) -> str:
+def _build_one(job: tuple[str, str, str | None, str, str, str, str]) -> str:
     tarball, output, locale, arch, version, repository, glibc_floor = job
     build_deb_from_tarball(
         Path(tarball),
@@ -460,14 +494,18 @@ def _build_one(job: tuple[str, str, str, str, str, str, str]) -> str:
     return output
 
 
-def find_linux_tarballs(dist_dir: Path) -> list[tuple[Path, str, str]]:
+def find_linux_tarballs(dist_dir: Path) -> list[tuple[Path, str | None, str]]:
     tarballs = []
     for path in sorted(dist_dir.iterdir()):
         if not path.is_file():
             continue
-        match = LINUX_TARBALL_PATTERN.match(path.name)
-        if match:
-            tarballs.append((path, match.group("locale"), match.group("arch")))
+        for pattern in LINUX_TARBALL_PATTERNS:
+            match = pattern.match(path.name)
+            if match:
+                tarballs.append(
+                    (path, match.groupdict().get("locale"), match.group("arch"))
+                )
+                break
     return tarballs
 
 

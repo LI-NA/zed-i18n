@@ -146,7 +146,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p packaging/homebrew/Casks packaging/scoop/bucket
-          find packaging/scoop/bucket -maxdepth 1 -name 'zed-i18n-*.json' -delete
+          find packaging/scoop/bucket -maxdepth 1 -name 'zed-i18n*.json' -delete
           uv run zed-i18n generate-packaging \
             --manifest release-assets/manifest.json \
             --cask-out packaging/homebrew/Casks/zed-i18n.rb \

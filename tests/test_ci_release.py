@@ -1,7 +1,8 @@
 import json
 import io
 import subprocess
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 import shutil
 import unittest
 from pathlib import Path
@@ -10,12 +11,14 @@ import zipfile
 from tools.zed_i18n.ci_release import (
     app_source_path,
     build_matrix,
+    build_universal,
     bundle_env,
     classify_asset,
     configure_github_rust_cache_env,
     create_windows_portable_zip,
     disk_summary_entries,
     expected_app_asset_names,
+    expected_universal_asset_names,
     generate_release_metadata,
     generate_release_notes,
     github_matrix_outputs,
@@ -47,15 +50,36 @@ class CiReleaseTests(unittest.TestCase):
             'cache_dir = ".cache/zed"\n',
             encoding="utf-8",
         )
+        self.enabled_locales: list[str] = []
+        self.write_locales_config()
 
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_root, ignore_errors=True)
+
+    def write_locales_config(self) -> None:
+        entries = ['source_locale = "en-US"\n']
+        for locale in ["en-US", *self.enabled_locales]:
+            entries.append(
+                "\n[[locale]]\n"
+                f'id = "{locale}"\n'
+                f'english_name = "{locale}"\n'
+                f'native_name = "{locale}"\n'
+                "aliases = []\n"
+                'direction = "ltr"\n'
+                "enabled = true\n"
+            )
+        (self.temp_root / "config" / "locales.toml").write_text(
+            "".join(entries), encoding="utf-8"
+        )
 
     def write_translation(self, language: str) -> None:
         (self.temp_root / "translations" / f"{language}.json").write_text(
             "{}\n",
             encoding="utf-8",
         )
+        if language not in self.enabled_locales:
+            self.enabled_locales.append(language)
+            self.write_locales_config()
 
     def write_zed_cargo_toml(self) -> None:
         cargo_toml = self.temp_root / "crates" / "zed" / "Cargo.toml"
@@ -69,6 +93,23 @@ class CiReleaseTests(unittest.TestCase):
 
         self.assertEqual(list_translation_languages(self.temp_root), ["de-DE", "ko-KR"])
 
+    def test_translation_languages_ignore_model_scoped_artifacts(self) -> None:
+        self.write_translation("ko-KR")
+        # Model-comparison artifacts are a documented storage format and must
+        # never be treated as release locales.
+        (self.temp_root / "translations" / "ko-KR.gpt-5.json").write_text(
+            "{}\n", encoding="utf-8"
+        )
+
+        self.assertEqual(list_translation_languages(self.temp_root), ["ko-KR"])
+
+    def test_translation_languages_require_final_files_for_enabled_locales(self) -> None:
+        self.write_translation("ko-KR")
+        (self.temp_root / "translations" / "ko-KR.json").unlink()
+
+        with self.assertRaisesRegex(ValueError, "missing final translation files: ko-KR"):
+            list_translation_languages(self.temp_root)
+
     def test_build_matrix_shards_languages_for_each_platform(self) -> None:
         for language in ["cs-CZ", "de-DE", "es-ES", "fr-FR", "ko-KR"]:
             self.write_translation(language)
@@ -78,6 +119,7 @@ class CiReleaseTests(unittest.TestCase):
             language_spec="all",
             platform_spec="linux-x86_64,macos-aarch64",
             shard_size=2,
+            mode="per-language",
         )
 
         self.assertEqual(languages, ["cs-CZ", "de-DE", "es-ES", "fr-FR", "ko-KR"])
@@ -107,6 +149,7 @@ class CiReleaseTests(unittest.TestCase):
             language_spec="all",
             platform_spec="linux-x86_64",
             shard_size=1,
+            mode="per-language",
         )
 
         self.assertEqual([row["id"] for row in rows], ["linux-x86_64-de-DE", "linux-x86_64-ko-KR"])
@@ -115,8 +158,9 @@ class CiReleaseTests(unittest.TestCase):
             ["zed-i18n-linux-x86_64-de-DE", "zed-i18n-linux-x86_64-ko-KR"],
         )
         self.assertEqual([row["languages"] for row in rows], ["de-DE", "ko-KR"])
+        self.assertEqual([row["mode"] for row in rows], ["per-language", "per-language"])
 
-    def test_build_matrix_defaults_to_single_language_shards(self) -> None:
+    def test_per_language_matrix_defaults_to_single_language_shards(self) -> None:
         for language in ["de-DE", "ko-KR"]:
             self.write_translation(language)
 
@@ -124,9 +168,72 @@ class CiReleaseTests(unittest.TestCase):
             self.temp_root,
             language_spec="all",
             platform_spec="linux-x86_64",
+            mode="per-language",
         )
 
         self.assertEqual([row["id"] for row in rows], ["linux-x86_64-de-DE", "linux-x86_64-ko-KR"])
+
+    def test_build_matrix_defaults_to_one_universal_build_per_platform(self) -> None:
+        for language in ["de-DE", "ko-KR"]:
+            self.write_translation(language)
+
+        languages, rows = build_matrix(
+            self.temp_root,
+            language_spec="all",
+            platform_spec="linux-x86_64,windows-aarch64",
+        )
+
+        # Universal rows carry no languages; the language list only drives the
+        # validation job.
+        self.assertEqual(languages, ["de-DE", "ko-KR"])
+        self.assertEqual([row["id"] for row in rows], ["linux-x86_64", "windows-aarch64"])
+        self.assertEqual([row["mode"] for row in rows], ["universal", "universal"])
+        self.assertEqual([row["languages"] for row in rows], ["", ""])
+        self.assertEqual(
+            [row["artifact"] for row in rows],
+            ["zed-i18n-linux-x86_64", "zed-i18n-windows-aarch64"],
+        )
+
+    def test_universal_matrix_always_validates_every_release_locale(self) -> None:
+        for language in ["de-DE", "ja-JP", "ko-KR"]:
+            self.write_translation(language)
+
+        # A narrower language filter must not shrink the validation list: the
+        # universal build bundles every enabled translation regardless.
+        languages, rows = build_matrix(
+            self.temp_root,
+            language_spec="ko-KR",
+            platform_spec="linux-x86_64",
+            mode="universal",
+        )
+
+        self.assertEqual(languages, ["de-DE", "ja-JP", "ko-KR"])
+        self.assertEqual(len(rows), 1)
+
+        with self.assertRaisesRegex(ValueError, "unknown language"):
+            build_matrix(
+                self.temp_root,
+                language_spec="xx-XX",
+                platform_spec="linux-x86_64",
+                mode="universal",
+            )
+
+    def test_universal_matrix_outputs_report_six_builds_for_all_platforms(self) -> None:
+        self.write_translation("ko-KR")
+
+        outputs = github_matrix_outputs(
+            self.temp_root,
+            language_spec="all",
+            platform_spec="all",
+            shard_size=1,
+            mode="universal",
+        )
+
+        self.assertEqual(outputs["build-count"], "6")
+        self.assertEqual(outputs["linux-build-count"], "2")
+        self.assertEqual(outputs["macos-build-count"], "2")
+        self.assertEqual(outputs["windows-build-count"], "2")
+        self.assertEqual(outputs["languages"], "ko-KR")
 
     def test_github_matrix_outputs_split_rows_by_platform(self) -> None:
         for language in ["de-DE", "ko-KR"]:
@@ -137,6 +244,7 @@ class CiReleaseTests(unittest.TestCase):
             language_spec="all",
             platform_spec="linux-x86_64,macos-aarch64,windows-x86_64",
             shard_size=1,
+            mode="per-language",
         )
 
         self.assertEqual(outputs["build-count"], "6")
@@ -176,6 +284,7 @@ class CiReleaseTests(unittest.TestCase):
                 self.temp_root,
                 language_spec="ko-KR",
                 platform_spec="windows-x86_64",
+                mode="per-language",
             )
 
         self.assertEqual(rows[0]["runner"], "self-32vcpu-windows-2022")
@@ -189,6 +298,7 @@ class CiReleaseTests(unittest.TestCase):
                 self.temp_root,
                 language_spec="ko-KR",
                 platform_spec="windows-x86_64",
+                mode="per-language",
             )
 
         self.assertEqual(rows[0]["runner"], ["self-hosted", "Windows", "X64"])
@@ -227,6 +337,53 @@ class CiReleaseTests(unittest.TestCase):
                 "platform": "windows",
                 "arch": "x86_64",
             },
+        )
+
+    def test_classifies_universal_assets_without_locale(self) -> None:
+        self.assertEqual(
+            classify_asset(Path("zed-i18n-linux-x86_64.tar.gz")),
+            {
+                "name": "zed-i18n-linux-x86_64.tar.gz",
+                "kind": "app",
+                "locale": None,
+                "platform": "linux",
+                "arch": "x86_64",
+            },
+        )
+        self.assertEqual(
+            classify_asset(Path("zed-i18n-linux-aarch64.deb"))["kind"],
+            "deb_package",
+        )
+        self.assertIsNone(classify_asset(Path("Zed-i18n-macos-aarch64.dmg"))["locale"])
+        self.assertIsNone(classify_asset(Path("Zed-i18n-windows-x86_64.exe"))["locale"])
+        self.assertEqual(
+            classify_asset(Path("Zed-i18n-windows-aarch64.zip")),
+            {
+                "name": "Zed-i18n-windows-aarch64.zip",
+                "kind": "portable_app",
+                "locale": None,
+                "platform": "windows",
+                "arch": "aarch64",
+            },
+        )
+
+    def test_expected_universal_asset_names_cover_all_release_files(self) -> None:
+        platforms = select_platforms("all")
+
+        self.assertEqual(
+            expected_universal_asset_names(platforms),
+            [
+                "Zed-i18n-macos-aarch64.dmg",
+                "Zed-i18n-macos-x86_64.dmg",
+                "Zed-i18n-windows-aarch64.exe",
+                "Zed-i18n-windows-aarch64.zip",
+                "Zed-i18n-windows-x86_64.exe",
+                "Zed-i18n-windows-x86_64.zip",
+                "zed-i18n-linux-aarch64.deb",
+                "zed-i18n-linux-aarch64.tar.gz",
+                "zed-i18n-linux-x86_64.deb",
+                "zed-i18n-linux-x86_64.tar.gz",
+            ],
         )
 
     def test_generates_manifest_and_checksums(self) -> None:
@@ -325,6 +482,86 @@ class CiReleaseTests(unittest.TestCase):
             "https://github.com/owner/repo/releases/download/v1.2.5-i18n.5/Zed-i18n-ko-KR-windows-x86_64.zip",
         )
 
+    def test_universal_metadata_adds_locale_alias_entries_for_legacy_clients(self) -> None:
+        for language in ["de-DE", "ko-KR"]:
+            self.write_translation(language)
+        dist_dir = self.temp_root / "dist"
+        dist_dir.mkdir()
+        (dist_dir / "zed-i18n-linux-x86_64.tar.gz").write_text("app", encoding="utf-8")
+        (dist_dir / "zed-i18n-linux-x86_64.deb").write_text("deb", encoding="utf-8")
+        (dist_dir / "Zed-i18n-windows-x86_64.exe").write_text("exe", encoding="utf-8")
+        (dist_dir / "Zed-i18n-windows-x86_64.zip").write_text("zip", encoding="utf-8")
+
+        generate_release_metadata(
+            root=self.temp_root,
+            dist_dir=dist_dir,
+            manifest_path=dist_dir / "manifest.json",
+            checksums_path=dist_dir / "SHA256SUMS.txt",
+            release_tag="v1.2.5-i18n.6",
+            repository="owner/repo",
+            run_id="123",
+            expected_assets=[
+                "zed-i18n-linux-x86_64.tar.gz",
+                "zed-i18n-linux-x86_64.deb",
+                "Zed-i18n-windows-x86_64.exe",
+                "Zed-i18n-windows-x86_64.zip",
+            ],
+            alias_locales=["de-DE", "ko-KR"],
+        )
+
+        manifest = json.loads((dist_dir / "manifest.json").read_text(encoding="utf-8"))
+        checksums = (dist_dir / "SHA256SUMS.txt").read_text(encoding="utf-8")
+        assets = manifest["assets"]
+
+        # 4 real files + 2 app assets × 2 alias locales.
+        self.assertEqual(manifest["asset_count"], 8)
+        universal_apps = [
+            asset for asset in assets if asset["kind"] == "app" and asset["locale"] is None
+        ]
+        aliases = [
+            asset for asset in assets if asset["kind"] == "app" and asset["locale"] is not None
+        ]
+        self.assertEqual(len(universal_apps), 2)
+        self.assertEqual(len(aliases), 4)
+        self.assertEqual(
+            sorted({alias["locale"] for alias in aliases}), ["de-DE", "ko-KR"]
+        )
+        # Aliases only mirror app assets; portable/deb assets stay universal.
+        self.assertEqual(
+            {asset["kind"] for asset in assets if asset["locale"] is not None},
+            {"app"},
+        )
+        by_name = {}
+        for asset in universal_apps:
+            by_name[asset["name"]] = asset
+        for alias in aliases:
+            original = by_name[alias["name"]]
+            self.assertEqual(alias["sha256"], original["sha256"])
+            self.assertEqual(alias["size"], original["size"])
+            self.assertEqual(alias["download_url"], original["download_url"])
+            self.assertEqual(alias["platform"], original["platform"])
+            self.assertEqual(alias["arch"], original["arch"])
+        # Checksums list only real files, never alias entries.
+        self.assertEqual(len(checksums.strip().splitlines()), 4)
+
+    def test_universal_metadata_rejects_leftover_per_locale_assets(self) -> None:
+        dist_dir = self.temp_root / "dist"
+        dist_dir.mkdir()
+        (dist_dir / "zed-i18n-linux-x86_64.tar.gz").write_text("app", encoding="utf-8")
+        (dist_dir / "zed-i18n-ko-KR-linux-x86_64.tar.gz").write_text("old", encoding="utf-8")
+
+        with self.assertRaisesRegex(ValueError, "unexpected release assets"):
+            generate_release_metadata(
+                root=self.temp_root,
+                dist_dir=dist_dir,
+                manifest_path=dist_dir / "manifest.json",
+                checksums_path=dist_dir / "SHA256SUMS.txt",
+                release_tag="v1.2.5-i18n.6",
+                repository="owner/repo",
+                run_id="123",
+                expected_assets=["zed-i18n-linux-x86_64.tar.gz"],
+            )
+
     def test_generates_draft_release_notes_from_manifest_assets(self) -> None:
         release_tag = "v1.2.5-i18n.1"
         base_url = f"https://github.com/owner/repo/releases/download/{release_tag}"
@@ -416,6 +653,62 @@ class CiReleaseTests(unittest.TestCase):
         )
         self.assertNotIn("Full Changelog", notes)
 
+    def test_generates_universal_release_notes_with_platform_table_and_notice(self) -> None:
+        release_tag = "v1.2.5-i18n.6"
+        base_url = f"https://github.com/owner/repo/releases/download/{release_tag}"
+
+        def universal_asset(kind: str, platform: str, arch: str, name: str) -> dict:
+            return {
+                "kind": kind,
+                "locale": None,
+                "platform": platform,
+                "arch": arch,
+                "download_url": f"{base_url}/{name}",
+            }
+
+        manifest = {
+            "zed_version": "v1.2.5",
+            "release_tag": release_tag,
+            "repository": "owner/repo",
+            "assets": [
+                universal_asset("app", "linux", "x86_64", "zed-i18n-linux-x86_64.tar.gz"),
+                universal_asset("deb_package", "linux", "x86_64", "zed-i18n-linux-x86_64.deb"),
+                universal_asset("app", "macos", "aarch64", "Zed-i18n-macos-aarch64.dmg"),
+                universal_asset("app", "windows", "x86_64", "Zed-i18n-windows-x86_64.exe"),
+                universal_asset(
+                    "portable_app", "windows", "x86_64", "Zed-i18n-windows-x86_64.zip"
+                ),
+                # Locale alias entries for legacy clients must not re-create
+                # the per-language table.
+                {
+                    "kind": "app",
+                    "locale": "ko-KR",
+                    "platform": "windows",
+                    "arch": "x86_64",
+                    "download_url": f"{base_url}/Zed-i18n-windows-x86_64.exe",
+                },
+            ],
+        }
+
+        notes = generate_release_notes(manifest, "v1.2.4-i18n.1")
+
+        self.assertIn("All supported languages are now included in one build", notes)
+        self.assertIn('"Display Language"', notes)
+        self.assertIn("| Platform | arm64 | x64 |", notes)
+        self.assertIn(
+            f"| Linux | - | [tar.gz]({base_url}/zed-i18n-linux-x86_64.tar.gz) / [deb]({base_url}/zed-i18n-linux-x86_64.deb) |",
+            notes,
+        )
+        self.assertIn(f"| macOS | [dmg]({base_url}/Zed-i18n-macos-aarch64.dmg) | - |", notes)
+        self.assertIn(
+            f"| Windows | - | [exe]({base_url}/Zed-i18n-windows-x86_64.exe) / [zip]({base_url}/Zed-i18n-windows-x86_64.zip) |",
+            notes,
+        )
+        self.assertNotIn("| Language |", notes)
+        self.assertNotIn("한국어", notes)
+        self.assertIn("Full Changelog", notes)
+        self.assertIn("#downloads", notes)
+
     def test_windows_app_source_path_uses_distribution_setup_name(self) -> None:
         config = DistributionConfig(windows_setup_name="Zed-i18n")
 
@@ -485,6 +778,129 @@ class CiReleaseTests(unittest.TestCase):
                 self.temp_root / "target" / "Zed-aarch64.zip",
             )
 
+    def test_build_universal_rewrites_runtime_before_distribution_patches(self) -> None:
+        self.write_translation("ko-KR")
+        (self.temp_root / "manifest").mkdir()
+        (self.temp_root / "manifest" / "ui-strings.json").write_text("{}\n", encoding="utf-8")
+        zed_root = self.temp_root / ".cache" / "zed" / "v1.2.5"
+        cargo_toml = zed_root / "crates" / "zed" / "Cargo.toml"
+        cargo_toml.parent.mkdir(parents=True)
+        cargo_toml.write_text('[package]\nname = "zed"\nversion = "1.2.5"\n', encoding="utf-8")
+        distribution_config = self.temp_root / "distribution.toml"
+        distribution_config.write_text("", encoding="utf-8")
+        dist_dir = self.temp_root / "dist"
+
+        manager = MagicMock()
+        environment = {
+            "ZED_I18N_RELEASE_TAG": "v1.2.5-i18n.7",
+            "ZED_I18N_REPOSITORY": "owner/repo",
+            "ZED_I18N_LOCALE": "ko-KR",
+        }
+        with (
+            patch("tools.zed_i18n.ci_release.reset_zed_checkout") as reset,
+            patch("tools.zed_i18n.ci_release.remove_universal_apply_marker") as marker,
+            patch("tools.zed_i18n.ci_release.generate_runtime_bundles") as generate,
+            patch("tools.zed_i18n.ci_release.apply_universal") as apply_universal_mock,
+            patch("tools.zed_i18n.ci_release.apply_distribution_patches") as distribution,
+            patch("tools.zed_i18n.ci_release.patch_remote_server_build") as remote_server,
+            patch("tools.zed_i18n.ci_release.run_bundle_command_with_retry") as bundle,
+            patch("tools.zed_i18n.ci_release.copy_asset") as copy,
+            patch.dict("os.environ", environment, clear=False),
+        ):
+            generate.return_value = SimpleNamespace(
+                locale_count=1, message_count=2, format_count=0, raw_payload_bytes=3
+            )
+            apply_universal_mock.return_value = SimpleNamespace(
+                ok=True,
+                already_applied=False,
+                applied_occurrences=5,
+                dependency_crates=("zed",),
+            )
+            for name, mock in (
+                ("reset", reset),
+                ("marker", marker),
+                ("generate", generate),
+                ("apply_universal", apply_universal_mock),
+                ("distribution", distribution),
+                ("remote_server", remote_server),
+                ("bundle", bundle),
+                ("copy", copy),
+            ):
+                manager.attach_mock(mock, name)
+
+            build_universal(
+                root=self.temp_root,
+                platform="linux",
+                arch="x86_64",
+                bundle_target="",
+                dist_dir=dist_dir,
+                distribution_config=distribution_config,
+            )
+
+        call_names = [name for name, _, _ in manager.mock_calls]
+        # The runtime rewrite must land on the pristine checkout (before the
+        # distribution patches, which would shift manifest byte spans), and a
+        # stale marker must be removed right after each reset.
+        self.assertEqual(
+            call_names,
+            [
+                "reset",
+                "marker",
+                "generate",
+                "apply_universal",
+                "distribution",
+                "remote_server",
+                "bundle",
+                "copy",
+                "reset",
+                "marker",
+            ],
+        )
+
+        bundle_env_arg = bundle.call_args[0][4]
+        self.assertNotIn("ZED_I18N_LOCALE", bundle_env_arg)
+        self.assertEqual(bundle_env_arg["ZED_I18N_RELEASE_TAG"], "v1.2.5-i18n.7")
+        self.assertEqual(bundle_env_arg["ZED_I18N_REVISION"], "7")
+        self.assertEqual(
+            bundle_env_arg["ZED_I18N_UPDATE_MANIFEST_URL"],
+            "https://github.com/owner/repo/releases/latest/download/manifest.json",
+        )
+
+        self.assertEqual(copy.call_args[0][1], dist_dir)
+        self.assertEqual(copy.call_args[0][2], "zed-i18n-linux-x86_64.tar.gz")
+
+    def test_build_universal_fails_when_apply_reports_failure(self) -> None:
+        self.write_translation("ko-KR")
+        (self.temp_root / "manifest").mkdir()
+        (self.temp_root / "manifest" / "ui-strings.json").write_text("{}\n", encoding="utf-8")
+
+        with (
+            patch("tools.zed_i18n.ci_release.reset_zed_checkout"),
+            patch("tools.zed_i18n.ci_release.generate_runtime_bundles") as generate,
+            patch("tools.zed_i18n.ci_release.apply_universal") as apply_universal_mock,
+            patch("tools.zed_i18n.ci_release.run_bundle_command_with_retry") as bundle,
+        ):
+            generate.return_value = SimpleNamespace(
+                locale_count=1, message_count=2, format_count=0, raw_payload_bytes=3
+            )
+            apply_universal_mock.return_value = SimpleNamespace(
+                ok=False,
+                already_applied=False,
+                applied_occurrences=0,
+                dependency_crates=(),
+            )
+
+            with self.assertRaisesRegex(RuntimeError, "universal localization apply failed"):
+                build_universal(
+                    root=self.temp_root,
+                    platform="linux",
+                    arch="x86_64",
+                    bundle_target="",
+                    dist_dir=self.temp_root / "dist",
+                )
+
+        bundle.assert_not_called()
+
     def test_windows_bundle_env_disables_ci_signing_when_values_are_empty(self) -> None:
         self.write_zed_cargo_toml()
         env = {"CI": "true", **{name: "" for name in SIGNING_ENV_VARS}}
@@ -494,6 +910,41 @@ class CiReleaseTests(unittest.TestCase):
             bundle = bundle_env(self.temp_root, "windows")
 
         self.assertNotIn("CI", bundle)
+
+    def test_release_workflow_validates_universal_apply_contract(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Validate universal apply contract", workflow)
+        self.assertIn("if: ${{ (inputs.build_mode || 'universal') == 'universal' }}", workflow)
+        self.assertIn('ZED_I18N_REQUIRE_UNIVERSAL_CONTRACT: "1"', workflow)
+        self.assertIn(
+            "ZED_I18N_UNIVERSAL_CONTRACT_ZED_ROOT: .cache/zed/${{ needs.prepare.outputs.zed-version }}",
+            workflow,
+        )
+        self.assertIn(
+            "uv run python -m unittest tests.test_universal_apply_contracts", workflow
+        )
+        # The contract must run before any build job starts: it lives in the
+        # validate job, which every build job depends on.
+        self.assertLess(
+            workflow.index("Validate universal apply contract"),
+            workflow.index("\n  build-linux:\n"),
+        )
+
+    def test_release_workflow_defaults_to_universal_builds(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("build_mode:", workflow)
+        self.assertIn("- universal\n          - per-language", workflow.replace("\r\n", "\n"))
+        self.assertIn("default: universal", workflow)
+        self.assertIn("BUILD_MODE: ${{ inputs.build_mode || 'universal' }}", workflow)
+        self.assertIn('--mode "$BUILD_MODE"', workflow)
+        self.assertIn('--mode "${{ matrix.mode }}"', workflow)
+        self.assertIn('--env "BUILD_MODE=${{ matrix.mode }}"', workflow)
 
     def test_release_workflow_enables_distribution_patches_for_tag_pushes(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
@@ -774,7 +1225,9 @@ class CiReleaseTests(unittest.TestCase):
         self.assertNotIn("sudo rm -rf /opt/homebrew", workflow)
         self.assertNotIn("sudo rm -rf /Users/runner/hostedtoolcache", workflow)
 
-    def test_release_workflow_defaults_tag_pushes_to_single_language_shards(self) -> None:
+    def test_release_workflow_keeps_single_language_shards_for_rollback_mode(self) -> None:
+        # shard_size only matters in per-language rollback builds; universal
+        # rows carry no languages.
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
         )

@@ -115,6 +115,22 @@ def load_locale_config(path: Path) -> LocaleConfig:
     return LocaleConfig(source_locale=source_locale, locales=tuple(locales))
 
 
+def release_locale_ids(root: Path) -> list[str]:
+    """Enabled translation locales from config/locales.toml, sorted.
+
+    This is the single source of truth for release locales. The stems under
+    translations/ are not authoritative: model-scoped comparison artifacts
+    (translations/<lang>.<model>.json) are a documented storage format and
+    must never leak into build matrices, manifest aliases, or packaging.
+    """
+    config = load_locale_config(root / "config" / "locales.toml")
+    return sorted(
+        locale.id
+        for locale in config.locales
+        if locale.enabled and locale.id != config.source_locale
+    )
+
+
 def compile_format_plan(source: str) -> tuple[FormatSegment, ...]:
     source = _decode_rust_unicode_escapes(source)
     segments: list[FormatSegment] = []

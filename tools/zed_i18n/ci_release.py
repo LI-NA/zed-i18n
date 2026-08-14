@@ -18,6 +18,7 @@ from typing import Iterable
 import zipfile
 
 from .apply import apply_translations
+from .apply_universal import apply_universal
 from .config import load_project_config, zed_checkout_path
 from .deb import build_release_debs, deb_asset_name
 from .distribution import (
@@ -28,12 +29,24 @@ from .distribution import (
     parse_i18n_revision,
     resolve_update_manifest_url,
 )
+from .runtime_bundles import generate_runtime_bundles, release_locale_ids
 from .zed_source import ensure_inside_workspace
 
 
 DEFAULT_UPDATE_EXPLANATION = (
     "Install localized Zed updates from the zed-i18n GitHub Releases page."
 )
+
+# "universal" ships one build per platform/arch with every locale bundled at
+# runtime; "per-language" is the legacy rollback path that bakes one locale
+# into each build.
+BUILD_MODES = ("universal", "per-language")
+
+
+def validate_build_mode(mode: str) -> str:
+    if mode not in BUILD_MODES:
+        raise ValueError(f"unknown build mode: {mode}; available: {', '.join(BUILD_MODES)}")
+    return mode
 
 
 @dataclass(frozen=True)
@@ -104,8 +117,19 @@ def runner_label(platform: BuildPlatform) -> str | list[str]:
 
 
 def list_translation_languages(root: Path) -> list[str]:
-    translation_dir = root / "translations"
-    return sorted(path.stem for path in translation_dir.glob("*.json"))
+    # config/locales.toml is authoritative; translations/*.json stems would
+    # also pick up model-scoped artifacts like ko-KR.<model>.json.
+    locales = release_locale_ids(root)
+    missing = [
+        locale
+        for locale in locales
+        if not (root / "translations" / f"{locale}.json").is_file()
+    ]
+    if missing:
+        raise ValueError(
+            "enabled locales are missing final translation files: " + ", ".join(missing)
+        )
+    return locales
 
 
 def split_csv(value: str | None) -> list[str]:
@@ -174,12 +198,35 @@ def build_matrix(
     language_spec: str | None = None,
     platform_spec: str | None = None,
     shard_size: int = 1,
+    mode: str = "universal",
 ) -> tuple[list[str], list[dict[str, object]]]:
-    languages = select_languages(root, language_spec)
+    validate_build_mode(mode)
     platforms = select_platforms(platform_spec)
-    language_shards = shard_items(languages, shard_size)
 
     rows: list[dict[str, object]] = []
+    if mode == "universal":
+        # A universal build embeds every enabled translation, so the
+        # validation job must always cover the full release locale set;
+        # the requested language filter is only checked for typos.
+        select_languages(root, language_spec)
+        languages = select_languages(root, None)
+        for platform in platforms:
+            rows.append(
+                {
+                    "id": platform.id,
+                    "platform": platform.platform,
+                    "arch": platform.arch,
+                    "runner": runner_label(platform),
+                    "bundle_target": platform.bundle_target,
+                    "mode": mode,
+                    "languages": "",
+                    "artifact": f"zed-i18n-{platform.id}",
+                }
+            )
+        return languages, rows
+
+    languages = select_languages(root, language_spec)
+    language_shards = shard_items(languages, shard_size)
     for platform in platforms:
         for shard_index, shard in enumerate(language_shards, start=1):
             shard_name = shard[0] if shard_size == 1 else f"shard-{shard_index}"
@@ -190,6 +237,7 @@ def build_matrix(
                     "arch": platform.arch,
                     "runner": runner_label(platform),
                     "bundle_target": platform.bundle_target,
+                    "mode": mode,
                     "languages": ",".join(shard),
                     "artifact": f"zed-i18n-{platform.id}-{shard_name}",
                 }
@@ -202,8 +250,10 @@ def write_github_matrix_outputs(
     language_spec: str | None,
     platform_spec: str | None,
     shard_size: int,
+    mode: str = "universal",
 ) -> None:
-    for name, value in github_matrix_outputs(root, language_spec, platform_spec, shard_size).items():
+    outputs = github_matrix_outputs(root, language_spec, platform_spec, shard_size, mode)
+    for name, value in outputs.items():
         print(f"{name}={value}")
 
 
@@ -212,9 +262,10 @@ def github_matrix_outputs(
     language_spec: str | None,
     platform_spec: str | None,
     shard_size: int,
+    mode: str = "universal",
 ) -> dict[str, str]:
     config = load_project_config(root)
-    languages, rows = build_matrix(root, language_spec, platform_spec, shard_size)
+    languages, rows = build_matrix(root, language_spec, platform_spec, shard_size, mode)
     rows_by_platform = {
         platform: [row for row in rows if row["platform"] == platform]
         for platform in ("linux", "macos", "windows")
@@ -278,12 +329,13 @@ def bundle_env(
     language: str | None = None,
     release_tag: str | None = None,
     repository: str | None = None,
+    universal: bool = False,
 ) -> dict[str, str]:
     env = os.environ.copy()
     env.setdefault("CARGO_INCREMENTAL", "0")
     if distribution is None:
         env.setdefault("ZED_UPDATE_EXPLANATION", DEFAULT_UPDATE_EXPLANATION)
-    elif language:
+    elif language or universal:
         env = distribution_build_env(
             distribution,
             env,
@@ -771,21 +823,24 @@ def windows_portable_source_path(
     return zed_root / "target" / f"{setup_name}-{arch}.zip"
 
 
-def app_asset_name(language: str, platform: str, arch: str) -> str:
+def app_asset_name(language: str | None, platform: str, arch: str) -> str:
+    # Universal assets (language=None) drop the locale segment entirely.
+    locale_segment = f"-{language}" if language else ""
     if platform == "linux":
-        return f"zed-i18n-{language}-linux-{arch}.tar.gz"
+        return f"zed-i18n{locale_segment}-linux-{arch}.tar.gz"
     if platform == "macos":
-        return f"Zed-i18n-{language}-macos-{arch}.dmg"
+        return f"Zed-i18n{locale_segment}-macos-{arch}.dmg"
     if platform == "windows":
-        return f"Zed-i18n-{language}-windows-{arch}.exe"
+        return f"Zed-i18n{locale_segment}-windows-{arch}.exe"
     raise ValueError(f"unsupported platform: {platform}")
 
 
-def windows_portable_asset_name(language: str, arch: str) -> str:
-    return f"Zed-i18n-{language}-windows-{arch}.zip"
+def windows_portable_asset_name(language: str | None, arch: str) -> str:
+    locale_segment = f"-{language}" if language else ""
+    return f"Zed-i18n{locale_segment}-windows-{arch}.zip"
 
 
-def app_asset_names(language: str, platform: str, arch: str) -> list[str]:
+def app_asset_names(language: str | None, platform: str, arch: str) -> list[str]:
     names = [app_asset_name(language, platform, arch)]
     if platform == "linux":
         names.append(deb_asset_name(language, arch))
@@ -803,6 +858,14 @@ def expected_app_asset_names(
         for platform in platforms
         for language in languages
         for name in app_asset_names(language, platform.platform, platform.arch)
+    )
+
+
+def expected_universal_asset_names(platforms: Iterable[BuildPlatform]) -> list[str]:
+    return sorted(
+        name
+        for platform in platforms
+        for name in app_asset_names(None, platform.platform, platform.arch)
     )
 
 
@@ -1104,7 +1167,125 @@ def build_shard(
     reset_zed_checkout(zed_root)
 
 
+UNIVERSAL_APPLY_MARKER = ".zed-i18n-universal.json"
+
+
+def remove_universal_apply_marker(zed_root: Path) -> None:
+    # The marker is untracked, so it survives `git reset --hard`. A stale
+    # marker would make `apply_universal` silently skip the rewrite on a
+    # reverted checkout and ship an unlocalized build.
+    (zed_root / UNIVERSAL_APPLY_MARKER).unlink(missing_ok=True)
+
+
+def apply_universal_localization(root: Path, zed_root: Path, config) -> None:
+    remove_universal_apply_marker(zed_root)
+    bundle_report = generate_runtime_bundles(root, zed_root, config)
+    print(
+        f"Generated runtime bundles for {bundle_report.locale_count} locales: "
+        f"{bundle_report.message_count} messages, {bundle_report.raw_payload_bytes} bytes"
+    )
+    manifest = read_json(root / "manifest" / "ui-strings.json")
+    report = apply_universal(root, zed_root, manifest)
+    if not report.ok:
+        raise RuntimeError("universal localization apply failed")
+    print(
+        f"Applied universal localization to {report.applied_occurrences} occurrences "
+        f"across {len(report.dependency_crates)} crates"
+    )
+
+
+def build_universal(
+    root: Path,
+    platform: str,
+    arch: str,
+    bundle_target: str,
+    dist_dir: Path,
+    distribution_config: Path | None = None,
+) -> None:
+    config = load_project_config(root)
+    zed_root = zed_checkout_path(root, config)
+    ensure_inside_workspace(root, zed_root)
+    distribution = (
+        load_distribution_config(distribution_config) if distribution_config is not None else None
+    )
+    release_tag = os.environ.get("ZED_I18N_RELEASE_TAG") or os.environ.get("GITHUB_REF_NAME")
+    repository = os.environ.get("ZED_I18N_REPOSITORY") or os.environ.get("GITHUB_REPOSITORY")
+
+    reset_zed_checkout(zed_root)
+    if platform == "windows":
+        prepare_windows_bundle_script(zed_root)
+    # The runtime rewrite must run on the pristine checkout: distribution
+    # patches would shift the byte spans recorded in the manifest.
+    apply_universal_localization(root, zed_root, config)
+    if distribution is not None:
+        apply_distribution_patches(zed_root, distribution)
+    patch_remote_server_build(zed_root, platform)
+    env = bundle_env(
+        zed_root,
+        platform,
+        distribution=distribution,
+        language=None,
+        release_tag=release_tag,
+        repository=repository,
+        universal=True,
+    )
+    run_bundle_command_with_retry(
+        platform,
+        bundle_target,
+        bundle_command(platform, arch, bundle_target),
+        zed_root,
+        env,
+    )
+    if platform == "windows":
+        create_windows_portable_zip(
+            zed_root,
+            arch,
+            windows_portable_source_path(zed_root, arch, distribution),
+        )
+    copy_asset(
+        app_source_path(zed_root, platform, arch, distribution),
+        dist_dir,
+        app_asset_name(None, platform, arch),
+    )
+    if platform == "windows":
+        copy_asset(
+            windows_portable_source_path(zed_root, arch, distribution),
+            dist_dir,
+            windows_portable_asset_name(None, arch),
+        )
+
+    reset_zed_checkout(zed_root)
+    remove_universal_apply_marker(zed_root)
+
+
 APP_PATTERNS = (
+    # Universal assets: no locale segment, classified with locale=None.
+    (
+        re.compile(r"^zed-i18n-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
+        "linux",
+        "app",
+    ),
+    (
+        re.compile(r"^zed-i18n-linux-(?P<arch>x86_64|aarch64)\.deb$"),
+        "linux",
+        "deb_package",
+    ),
+    (
+        re.compile(r"^Zed-i18n-macos-(?P<arch>x86_64|aarch64)\.dmg$"),
+        "macos",
+        "app",
+    ),
+    (
+        re.compile(r"^Zed-i18n-windows-(?P<arch>x86_64|aarch64)\.exe$"),
+        "windows",
+        "app",
+    ),
+    (
+        re.compile(r"^Zed-i18n-windows-(?P<arch>x86_64|aarch64)\.zip$"),
+        "windows",
+        "portable_app",
+    ),
+    # Legacy per-locale assets.
     (
         re.compile(r"^zed-i18n-(?P<locale>.+)-linux-(?P<arch>x86_64|aarch64)\.tar\.gz$"),
         "linux",
@@ -1152,7 +1333,7 @@ def classify_asset(path: Path) -> dict[str, object]:
             return {
                 "name": name,
                 "kind": kind,
-                "locale": match.group("locale"),
+                "locale": match.groupdict().get("locale"),
                 "platform": platform,
                 "arch": match.group("arch"),
             }
@@ -1164,6 +1345,29 @@ def is_remote_server_asset(path: Path) -> bool:
     return REMOTE_PATTERN.match(path.name) is not None
 
 
+def synthesize_locale_alias_assets(
+    assets: list[dict[str, object]],
+    alias_locales: Iterable[str],
+) -> list[dict[str, object]]:
+    """Duplicate every universal `app` asset once per legacy locale label.
+
+    Pre-universal clients were built with a baked-in ZED_I18N_LOCALE and only
+    match manifest entries carrying their own locale, so each label points at
+    the same universal download. The aliases stay in the manifest indefinitely;
+    removing them later only breaks the update check of leftover old clients,
+    never the installed app.
+    """
+    aliases: list[dict[str, object]] = []
+    for asset in assets:
+        if asset.get("kind") != "app" or asset.get("locale") is not None:
+            continue
+        for locale in sorted(alias_locales):
+            alias = dict(asset)
+            alias["locale"] = locale
+            aliases.append(alias)
+    return aliases
+
+
 def generate_release_metadata(
     root: Path,
     dist_dir: Path,
@@ -1173,6 +1377,7 @@ def generate_release_metadata(
     repository: str | None,
     run_id: str | None,
     expected_assets: Iterable[str] | None = None,
+    alias_locales: Iterable[str] | None = None,
 ) -> None:
     config = load_project_config(root)
     excluded = {manifest_path.resolve(), checksums_path.resolve()}
@@ -1208,6 +1413,9 @@ def generate_release_metadata(
                 details.append("unexpected release assets: " + ", ".join(unexpected))
             raise ValueError("; ".join(details))
 
+    if alias_locales is not None:
+        assets.extend(synthesize_locale_alias_assets(assets, alias_locales))
+
     manifest = {
         "schema": 2,
         "zed_version": config.zed_version,
@@ -1241,9 +1449,25 @@ RELEASE_LOCALE_NAMES = {
     "zh-TW": "繁體中文",
 }
 RELEASE_TABLE_PLATFORMS = ("linux", "macos", "windows")
+RELEASE_TABLE_PLATFORM_LABELS = {"linux": "Linux", "macos": "macOS", "windows": "Windows"}
 RELEASE_TABLE_ARCHES = ("aarch64", "x86_64")
 # Short display labels keep the download table cells from truncating.
 RELEASE_TABLE_ARCH_LABELS = {"aarch64": "arm64", "x86_64": "x64"}
+# (platform, kind) -> download link label for the universal table.
+UNIVERSAL_TABLE_KINDS = {
+    ("linux", "app"): "tar.gz",
+    ("linux", "deb_package"): "deb",
+    ("macos", "app"): "dmg",
+    ("windows", "app"): "exe",
+    ("windows", "portable_app"): "zip",
+}
+UNIVERSAL_RELEASE_NOTES_NOTICE = (
+    "All supported languages are now included in one build, so there is a single "
+    "download per platform. The display language follows your system language and "
+    'can be changed anytime with the "Display Language" setting. If you previously '
+    "used a language different from your system language, re-select it once in the "
+    "settings after updating."
+)
 
 
 def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> str:
@@ -1255,18 +1479,24 @@ def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> st
         raise ValueError("release manifest assets must be a list")
 
     app_links: dict[tuple[str, str, str], str] = {}
+    universal_links: dict[tuple[str, str, str], str] = {}
     locales: set[str] = set()
     for asset in assets:
         if not isinstance(asset, dict):
             raise ValueError("release manifest assets must be objects")
-        if asset.get("kind") != "app":
-            continue
 
-        locale = str(asset["locale"])
+        kind = asset.get("kind")
         platform = str(asset["platform"])
         arch = str(asset["arch"])
-        app_links[(locale, platform, arch)] = str(asset["download_url"])
-        locales.add(locale)
+        locale = asset.get("locale")
+        if locale is None:
+            if (platform, kind) in UNIVERSAL_TABLE_KINDS:
+                universal_links[(platform, arch, str(kind))] = str(asset["download_url"])
+            continue
+        if kind != "app":
+            continue
+        app_links[(str(locale), platform, arch)] = str(asset["download_url"])
+        locales.add(str(locale))
 
     lines = [
         f"Localized Zed build for {zed_version}.",
@@ -1286,23 +1516,51 @@ def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> st
         [
             "<!-- Add the manually summarized changelog here. -->",
             "",
-            "| Language | Linux | macOS | Windows |",
-            "| --- | --- | --- | --- |",
         ]
     )
 
-    for locale in sorted(locales):
-        locale_name = RELEASE_LOCALE_NAMES.get(locale)
-        language = f"{locale_name} ({locale})" if locale_name else locale
-        cells = []
-        for platform in RELEASE_TABLE_PLATFORMS:
-            downloads = [
-                f"[{RELEASE_TABLE_ARCH_LABELS[arch]}]({app_links[(locale, platform, arch)]})"
-                for arch in RELEASE_TABLE_ARCHES
-                if (locale, platform, arch) in app_links
+    if universal_links:
+        lines.extend(
+            [
+                UNIVERSAL_RELEASE_NOTES_NOTICE,
+                "",
+                "| Platform | arm64 | x64 |",
+                "| --- | --- | --- |",
             ]
-            cells.append(" / ".join(downloads) or "-")
-        lines.append(f"| {language} | {' | '.join(cells)} |")
+        )
+        for platform in RELEASE_TABLE_PLATFORMS:
+            cells = []
+            for arch in RELEASE_TABLE_ARCHES:
+                downloads = [
+                    f"[{label}]({universal_links[(platform, arch, kind)]})"
+                    for (kind_platform, kind), label in UNIVERSAL_TABLE_KINDS.items()
+                    if kind_platform == platform and (platform, arch, kind) in universal_links
+                ]
+                cells.append(" / ".join(downloads) or "-")
+            if set(cells) == {"-"}:
+                continue
+            lines.append(
+                f"| {RELEASE_TABLE_PLATFORM_LABELS[platform]} | {' | '.join(cells)} |"
+            )
+    else:
+        lines.extend(
+            [
+                "| Language | Linux | macOS | Windows |",
+                "| --- | --- | --- | --- |",
+            ]
+        )
+        for locale in sorted(locales):
+            locale_name = RELEASE_LOCALE_NAMES.get(locale)
+            language = f"{locale_name} ({locale})" if locale_name else locale
+            cells = []
+            for platform in RELEASE_TABLE_PLATFORMS:
+                downloads = [
+                    f"[{RELEASE_TABLE_ARCH_LABELS[arch]}]({app_links[(locale, platform, arch)]})"
+                    for arch in RELEASE_TABLE_ARCHES
+                    if (locale, platform, arch) in app_links
+                ]
+                cells.append(" / ".join(downloads) or "-")
+            lines.append(f"| {language} | {' | '.join(cells)} |")
 
     lines.extend(
         [
@@ -1372,12 +1630,18 @@ def build_parser() -> argparse.ArgumentParser:
     matrix_parser.add_argument("--languages", default="all")
     matrix_parser.add_argument("--platforms", default="all")
     matrix_parser.add_argument("--shard-size", type=int, default=1)
+    matrix_parser.add_argument("--mode", choices=BUILD_MODES, default="universal")
 
     build_parser = subparsers.add_parser("build-shard")
     build_parser.add_argument("--platform", required=True)
     build_parser.add_argument("--arch", required=True)
     build_parser.add_argument("--bundle-target", default="")
-    build_parser.add_argument("--languages", required=True)
+    build_parser.add_argument("--mode", choices=BUILD_MODES, default="universal")
+    build_parser.add_argument(
+        "--languages",
+        default="",
+        help="Locales to build in per-language mode. Ignored in universal mode.",
+    )
     build_parser.add_argument("--dist-dir", required=True)
     build_parser.add_argument(
         "--distribution-config",
@@ -1397,6 +1661,7 @@ def build_parser() -> argparse.ArgumentParser:
     metadata_parser.add_argument("--release-tag")
     metadata_parser.add_argument("--repository")
     metadata_parser.add_argument("--run-id")
+    metadata_parser.add_argument("--mode", choices=BUILD_MODES, default="universal")
     metadata_parser.add_argument("--languages")
     metadata_parser.add_argument("--platforms")
 
@@ -1422,13 +1687,32 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         if args.command == "matrix":
-            write_github_matrix_outputs(root, args.languages, args.platforms, args.shard_size)
+            write_github_matrix_outputs(
+                root, args.languages, args.platforms, args.shard_size, args.mode
+            )
             return 0
         if args.command == "disk-summary":
             print_disk_summary(root, args.label)
             return 0
         if args.command == "build-shard":
             dist_dir = ensure_inside_workspace(root, Path(args.dist_dir).resolve())
+            distribution_config = (
+                resolve_workspace_path(root, args.distribution_config)
+                if args.distribution_config
+                else None
+            )
+            if args.mode == "universal":
+                build_universal(
+                    root=root,
+                    platform=args.platform,
+                    arch=args.arch,
+                    bundle_target=args.bundle_target,
+                    dist_dir=dist_dir,
+                    distribution_config=distribution_config,
+                )
+                return 0
+            if not args.languages:
+                raise ValueError("per-language build-shard requires --languages")
             build_shard(
                 root=root,
                 platform=args.platform,
@@ -1436,11 +1720,7 @@ def main(argv: list[str] | None = None) -> int:
                 bundle_target=args.bundle_target,
                 languages=select_languages(root, args.languages),
                 dist_dir=dist_dir,
-                distribution_config=(
-                    resolve_workspace_path(root, args.distribution_config)
-                    if args.distribution_config
-                    else None
-                ),
+                distribution_config=distribution_config,
             )
             return 0
         if args.command == "build-debs":
@@ -1468,7 +1748,16 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         if args.command == "metadata":
             expected_assets = None
-            if args.languages or args.platforms:
+            alias_locales = None
+            if args.mode == "universal":
+                # The alias locales must cover every locale a legacy client may
+                # have baked in, independent of this run's language selection.
+                alias_locales = list_translation_languages(root)
+                # No --platforms means a full release: expect every asset.
+                expected_assets = expected_universal_asset_names(
+                    select_platforms(args.platforms)
+                )
+            elif args.languages or args.platforms:
                 expected_assets = expected_app_asset_names(
                     select_languages(root, args.languages),
                     select_platforms(args.platforms),
@@ -1482,6 +1771,7 @@ def main(argv: list[str] | None = None) -> int:
                 repository=args.repository,
                 run_id=args.run_id,
                 expected_assets=expected_assets,
+                alias_locales=alias_locales,
             )
             return 0
         if args.command == "release-notes":

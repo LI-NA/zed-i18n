@@ -80,6 +80,65 @@ def sample_manifest(locales: tuple[str, ...] = ("ja-JP", "ko-KR")) -> dict[str, 
     }
 
 
+def universal_release_asset(
+    name: str,
+    kind: str,
+    platform: str,
+    arch: str,
+    sha256: str,
+    locale: str | None = None,
+) -> dict[str, object]:
+    return {
+        "name": name,
+        "kind": kind,
+        "locale": locale,
+        "platform": platform,
+        "arch": arch,
+        "size": 123,
+        "sha256": sha256,
+        "download_url": f"https://github.com/LI-NA/zed-i18n/releases/download/v1.4.4-i18n.2/{name}",
+    }
+
+
+def sample_universal_manifest(
+    alias_locales: tuple[str, ...] = ("ja-JP", "ko-KR"),
+) -> dict[str, object]:
+    universal_apps = [
+        universal_release_asset("zed-i18n-linux-aarch64.tar.gz", "app", "linux", "aarch64", "lin-arm"),
+        universal_release_asset("zed-i18n-linux-x86_64.tar.gz", "app", "linux", "x86_64", "lin-x64"),
+        universal_release_asset("Zed-i18n-macos-aarch64.dmg", "app", "macos", "aarch64", "mac-arm"),
+        universal_release_asset("Zed-i18n-macos-x86_64.dmg", "app", "macos", "x86_64", "mac-intel"),
+        universal_release_asset("Zed-i18n-windows-aarch64.exe", "app", "windows", "aarch64", "win-arm"),
+        universal_release_asset("Zed-i18n-windows-x86_64.exe", "app", "windows", "x86_64", "win-x64"),
+    ]
+    assets = [
+        *universal_apps,
+        universal_release_asset(
+            "Zed-i18n-windows-aarch64.zip", "portable_app", "windows", "aarch64", "zip-arm"
+        ),
+        universal_release_asset(
+            "Zed-i18n-windows-x86_64.zip", "portable_app", "windows", "x86_64", "zip-x64"
+        ),
+        universal_release_asset(
+            "zed-i18n-linux-x86_64.deb", "deb_package", "linux", "x86_64", "deb-x64"
+        ),
+    ]
+    for locale in alias_locales:
+        for app in universal_apps:
+            alias = dict(app)
+            alias["locale"] = locale
+            assets.append(alias)
+    return {
+        "schema": 2,
+        "zed_version": "v1.4.4",
+        "i18n_revision": 2,
+        "release_tag": "v1.4.4-i18n.2",
+        "repository": "LI-NA/zed-i18n",
+        "asset_count": len(assets),
+        "assets": assets,
+    }
+
+
 class PackagingTests(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = Path.cwd() / "tests" / ".tmp" / self._testMethodName
@@ -170,6 +229,93 @@ class PackagingTests(unittest.TestCase):
 
         self.assertFalse(cask_path.exists())
         self.assertFalse(bucket_path.exists())
+
+    def test_generates_universal_homebrew_cask_without_language_stanzas(self) -> None:
+        cask = generate_homebrew_cask(sample_universal_manifest())
+
+        self.assertIn('cask "zed-i18n" do', cask)
+        self.assertIn('version "1.4.4,2"', cask)
+        self.assertIn('sha256 arm: "mac-arm", intel: "mac-intel"', cask)
+        self.assertIn("Zed-i18n-macos-#{arch}.dmg", cask)
+        self.assertNotIn("language ", cask)
+        self.assertNotIn("#{language}", cask)
+        self.assertIn("auto_updates true", cask)
+        self.assertTrue(cask.endswith("\n"))
+
+    def test_generates_universal_scoop_manifest_with_legacy_locale_aliases(self) -> None:
+        manifests = generate_scoop_manifests(sample_universal_manifest())
+
+        self.assertEqual(
+            sorted(manifests),
+            ["zed-i18n-ja-JP.json", "zed-i18n-ko-KR.json", "zed-i18n.json"],
+        )
+
+        universal = json.loads(manifests["zed-i18n.json"])
+        self.assertEqual(universal["version"], "1.4.4-i18n.2")
+        self.assertEqual(
+            universal["architecture"]["64bit"]["url"],
+            "https://github.com/LI-NA/zed-i18n/releases/download/v1.4.4-i18n.2/Zed-i18n-windows-x86_64.zip",
+        )
+        self.assertEqual(universal["architecture"]["64bit"]["hash"], "zip-x64")
+        self.assertEqual(universal["shortcuts"], [["Zed.exe", "Zed i18n"]])
+        self.assertEqual(
+            universal["env_set"]["ZED_UPDATE_EXPLANATION"],
+            "Run 'scoop update zed-i18n' to update.",
+        )
+        self.assertEqual(
+            universal["autoupdate"]["architecture"]["arm64"]["url"],
+            "https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n-windows-aarch64.zip",
+        )
+        self.assertNotIn("notes", universal)
+
+        legacy = json.loads(manifests["zed-i18n-ko-KR.json"])
+        # Legacy locale manifests now install the universal zip and keep
+        # updating through it, with a migration note.
+        self.assertEqual(
+            legacy["architecture"]["64bit"]["url"],
+            "https://github.com/LI-NA/zed-i18n/releases/download/v1.4.4-i18n.2/Zed-i18n-windows-x86_64.zip",
+        )
+        self.assertEqual(
+            legacy["autoupdate"]["architecture"]["64bit"]["url"],
+            "https://github.com/LI-NA/zed-i18n/releases/download/v$version/Zed-i18n-windows-x86_64.zip",
+        )
+        self.assertEqual(legacy["shortcuts"], [["Zed.exe", "Zed i18n (ko-KR)"]])
+        notes = "\n".join(legacy["notes"])
+        self.assertIn("every language included", notes)
+        self.assertIn("scoop install zed-i18n", notes)
+
+    def test_generate_packaging_files_accepts_universal_manifest_with_expected_locales(
+        self,
+    ) -> None:
+        manifest_path = self.tmp / "manifest.json"
+        cask_path = self.tmp / "homebrew" / "Casks" / "zed-i18n.rb"
+        bucket_path = self.tmp / "scoop" / "bucket"
+        manifest_path.parent.mkdir(parents=True)
+        manifest_path.write_text(json.dumps(sample_universal_manifest()), encoding="utf-8")
+
+        generate_packaging_files(
+            manifest_path,
+            cask_path,
+            bucket_path,
+            expected_locales={"ja-JP", "ko-KR"},
+        )
+
+        self.assertIn('cask "zed-i18n"', cask_path.read_text(encoding="utf-8"))
+        self.assertTrue((bucket_path / "zed-i18n.json").exists())
+        self.assertTrue((bucket_path / "zed-i18n-ja-JP.json").exists())
+        self.assertTrue((bucket_path / "zed-i18n-ko-KR.json").exists())
+
+    def test_universal_manifest_without_alias_locales_fails_validation(self) -> None:
+        manifest_path = self.tmp / "manifest.json"
+        cask_path = self.tmp / "homebrew" / "Casks" / "zed-i18n.rb"
+        bucket_path = self.tmp / "scoop" / "bucket"
+        manifest_path.parent.mkdir(parents=True)
+        manifest_path.write_text(
+            json.dumps(sample_universal_manifest(alias_locales=())), encoding="utf-8"
+        )
+
+        with self.assertRaisesRegex(ValueError, "no locale alias app assets"):
+            generate_packaging_files(manifest_path, cask_path, bucket_path)
 
     def test_missing_required_architecture_fails(self) -> None:
         manifest = sample_manifest(("ko-KR",))

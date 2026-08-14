@@ -7,8 +7,16 @@ on:
       - "v*-i18n.*"
   workflow_dispatch:
     inputs:
+      build_mode:
+        description: "universal ships one build per platform/arch; per-language is the legacy rollback path."
+        required: false
+        type: choice
+        options:
+          - universal
+          - per-language
+        default: universal
       languages:
-        description: "Comma-separated locales to build, or all."
+        description: "Comma-separated locales to build in per-language mode, or all. Universal mode always validates every enabled locale."
         required: false
         default: "all"
       platforms:
@@ -82,6 +90,7 @@ jobs:
       - name: Generate matrix
         id: matrix
         env:
+          BUILD_MODE: ${{ inputs.build_mode || 'universal' }}
           LANGUAGES: ${{ inputs.languages || 'all' }}
           PLATFORMS: ${{ inputs.platforms || 'all' }}
           SHARD_SIZE: ${{ inputs.shard_size || '1' }}
@@ -93,6 +102,7 @@ jobs:
           ZED_I18N_RUNNER_WINDOWS_AARCH64: ${{ vars.ZED_I18N_RUNNER_WINDOWS_AARCH64 || '' }}
         run: |
           uv run python -m tools.zed_i18n.ci_release matrix \
+            --mode "$BUILD_MODE" \
             --languages "$LANGUAGES" \
             --platforms "$PLATFORMS" \
             --shard-size "$SHARD_SIZE" >> "$GITHUB_OUTPUT"
@@ -169,6 +179,13 @@ jobs:
           ZED_I18N_REQUIRE_ZED_PATCH_CONTRACT: "1"
           ZED_I18N_PATCH_CONTRACT_ZED_ROOT: .cache/zed/${{ needs.prepare.outputs.zed-version }}
         run: uv run python -m unittest tests.test_zed_patch_contracts
+
+      - name: Validate universal apply contract
+        if: ${{ (inputs.build_mode || 'universal') == 'universal' }}
+        env:
+          ZED_I18N_REQUIRE_UNIVERSAL_CONTRACT: "1"
+          ZED_I18N_UNIVERSAL_CONTRACT_ZED_ROOT: .cache/zed/${{ needs.prepare.outputs.zed-version }}
+        run: uv run python -m unittest tests.test_universal_apply_contracts
 
   build-linux:
     name: Build Linux ${{ matrix.id }}
@@ -283,6 +300,7 @@ jobs:
             --env "HOME=/home/zed-i18n" \
             --env "CARGO_HOME=/cargo-home" \
             --env "ZED_VERSION=$ZED_VERSION" \
+            --env "BUILD_MODE=${{ matrix.mode }}" \
             --env "LANGUAGES=${{ matrix.languages }}" \
             --env "ARCH=${{ matrix.arch }}" \
             --env "BUNDLE_TARGET=${{ matrix.bundle_target }}" \
@@ -393,6 +411,7 @@ jobs:
             --platform "${{ matrix.platform }}" \
             --arch "${{ matrix.arch }}" \
             --bundle-target "${{ matrix.bundle_target }}" \
+            --mode "${{ matrix.mode }}" \
             --languages "${{ matrix.languages }}" \
             --dist-dir dist \
             "${distribution_args[@]}"
@@ -478,6 +497,7 @@ jobs:
             --platform "${{ matrix.platform }}" \
             --arch "${{ matrix.arch }}" \
             --bundle-target "${{ matrix.bundle_target }}" \
+            --mode "${{ matrix.mode }}" \
             --languages "${{ matrix.languages }}" \
             --dist-dir dist \
             "${distribution_args[@]}"
@@ -558,6 +578,7 @@ jobs:
       - name: Generate manifest and checksums
         env:
           INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+          BUILD_MODE: ${{ inputs.build_mode || 'universal' }}
         run: |
           RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
           uv run python -m tools.zed_i18n.ci_release metadata \
@@ -567,6 +588,7 @@ jobs:
             --release-tag "$RELEASE_TAG" \
             --repository "$GITHUB_REPOSITORY" \
             --run-id "$GITHUB_RUN_ID" \
+            --mode "$BUILD_MODE" \
             --languages "${{ needs.prepare.outputs.languages }}" \
             --platforms "${{ inputs.platforms || 'all' }}"
 

@@ -2,11 +2,16 @@
 set -euo pipefail
 
 : "${ZED_VERSION:?ZED_VERSION is required}"
-: "${LANGUAGES:?LANGUAGES is required}"
 : "${ARCH:?ARCH is required}"
 : "${DISTRIBUTION_PATCHES_ENABLED:?DISTRIBUTION_PATCHES_ENABLED is required}"
 # Linux builds carry no bundle target; only macOS matrix entries set one.
 BUNDLE_TARGET="${BUNDLE_TARGET:-}"
+BUILD_MODE="${BUILD_MODE:-universal}"
+LANGUAGES="${LANGUAGES:-}"
+if [[ "${BUILD_MODE}" == "per-language" && -z "${LANGUAGES}" ]]; then
+    echo "LANGUAGES is required for per-language builds" >&2
+    exit 1
+fi
 
 case "${ARCH}:$(uname -m)" in
     x86_64:x86_64|aarch64:aarch64|aarch64:arm64) ;;
@@ -41,6 +46,7 @@ uv run --frozen python -m tools.zed_i18n.ci_release build-shard \
     --platform linux \
     --arch "${ARCH}" \
     --bundle-target "${BUNDLE_TARGET}" \
+    --mode "${BUILD_MODE}" \
     --languages "${LANGUAGES}" \
     --dist-dir "${dist_dir}" \
     "${distribution_args[@]}"

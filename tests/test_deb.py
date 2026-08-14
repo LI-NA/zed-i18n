@@ -126,9 +126,11 @@ class DebTests(unittest.TestCase):
             deb_asset_name("ko-KR", "x86_64"),
             "zed-i18n-ko-KR-linux-x86_64.deb",
         )
+        self.assertEqual(deb_asset_name(None, "aarch64"), "zed-i18n-linux-aarch64.deb")
 
     def test_deb_package_name_lowercases_locale(self) -> None:
         self.assertEqual(deb_package_name("ko-KR"), "zed-i18n-ko-kr")
+        self.assertEqual(deb_package_name(None), "zed-i18n")
         with self.assertRaises(ValueError):
             deb_package_name("ko KR")
 
@@ -229,6 +231,41 @@ class DebTests(unittest.TestCase):
         self.assertEqual(bundled_lib_info.mode, 0o644)
         self.assertEqual(icon, b"png512")
 
+    def test_build_universal_deb_takes_over_the_virtual_package_name(self) -> None:
+        tarball = self.make_tarball(self.temp_root / "zed-i18n-linux-x86_64.tar.gz")
+        output = self.temp_root / "zed-i18n-linux-x86_64.deb"
+
+        build_deb_from_tarball(
+            tarball,
+            output,
+            locale=None,
+            arch="x86_64",
+            version="1.2.5+i18n.4",
+            repository="owner/repo",
+            glibc_floor="2.31",
+        )
+
+        _, members = read_ar_archive(output)
+        with tarfile.open(fileobj=io.BytesIO(members["control.tar.gz"]), mode="r:gz") as tar:
+            control = tar.extractfile("./control").read().decode("utf-8")
+
+        self.assertIn("Package: zed-i18n\n", control)
+        # The real package name is zed-i18n now, so it must not provide itself;
+        # Conflicts/Replaces still take over the per-locale providers.
+        self.assertNotIn("Provides:", control)
+        self.assertIn("Conflicts: zed-i18n\n", control)
+        self.assertIn("Replaces: zed-i18n\n", control)
+        self.assertIn("Description: Localized build of the Zed editor\n", control)
+        self.assertIn("every supported display", control)
+        self.assertIn("per-locale", control)
+
+        with tarfile.open(fileobj=io.BytesIO(members["data.tar.xz"]), mode="r:xz") as tar:
+            names = tar.getnames()
+            launcher = tar.extractfile("./usr/bin/zed-i18n").read().decode("utf-8")
+
+        self.assertIn("./usr/share/doc/zed-i18n/copyright", names)
+        self.assertIn('sudo apt remove zed-i18n" >&2', launcher)
+
     def test_build_deb_fixes_system_desktop_name_for_unpatched_bundles(self) -> None:
         tarball = self.make_tarball(
             self.temp_root / "zed-i18n-ko-KR-linux-x86_64.tar.gz",
@@ -313,6 +350,30 @@ class DebTests(unittest.TestCase):
         self.assertIn("Package: zed-i18n-ja-jp\n", control)
         self.assertIn("Version: 1.2.5+i18n.4\n", control)
         self.assertIn("Architecture: arm64\n", control)
+
+    def test_build_release_debs_packages_universal_tarballs(self) -> None:
+        self.write_project_configs()
+        dist_dir = self.temp_root / "dist"
+        self.make_tarball(dist_dir / "zed-i18n-linux-x86_64.tar.gz")
+        self.make_tarball(dist_dir / "zed-i18n-linux-aarch64.tar.gz")
+
+        debs = build_release_debs(
+            self.temp_root,
+            dist_dir,
+            release_tag="v1.2.5-i18n.4",
+            repository="owner/repo",
+            max_workers=1,
+        )
+
+        self.assertEqual(
+            sorted(path.name for path in debs),
+            ["zed-i18n-linux-aarch64.deb", "zed-i18n-linux-x86_64.deb"],
+        )
+        _, members = read_ar_archive(dist_dir / "zed-i18n-linux-x86_64.deb")
+        with tarfile.open(fileobj=io.BytesIO(members["control.tar.gz"]), mode="r:gz") as tar:
+            control = tar.extractfile("./control").read().decode("utf-8")
+        self.assertIn("Package: zed-i18n\n", control)
+        self.assertIn("Architecture: amd64\n", control)
 
     def test_build_release_debs_returns_empty_without_linux_archives(self) -> None:
         self.write_project_configs()

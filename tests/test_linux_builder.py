@@ -302,6 +302,12 @@ class RepositoryLinuxBuilderContractTests(unittest.TestCase):
         # must not require it.
         self.assertIn('BUNDLE_TARGET="${BUNDLE_TARGET:-}"', script)
         self.assertNotIn("BUNDLE_TARGET:?", script)
+        # Universal rows carry an empty LANGUAGES value, so only per-language
+        # builds may require it.
+        self.assertIn('BUILD_MODE="${BUILD_MODE:-universal}"', script)
+        self.assertIn('--mode "${BUILD_MODE}"', script)
+        self.assertNotIn("LANGUAGES:?", script)
+        self.assertIn("LANGUAGES is required for per-language builds", script)
         self.assertIn("/opt/wasi-sdk", script)
         self.assertIn("UV_PROJECT_ENVIRONMENT", script)
         self.assertNotIn("sudo", script)
