@@ -17,7 +17,7 @@ If `uv` cannot launch on Windows, fall back to `.\.venv\Scripts\python.exe -m to
 | `merge-translation --language <lang>` | Merge agent result JSONs into `translations/<lang>.json` |
 | `validate --language <lang>` | Validate translations against manifest; on success cleans the workspace unless `--no-cleanup` is passed |
 | `apply --language <lang>` | Patch translated strings into the Zed checkout |
-| `generate-runtime-bundles` | Generate embedded runtime locale bundles into `<zed-root>/assets/locales` from the catalog, manifest, and every enabled translation (experimental universal build) |
+| `generate-runtime-bundles` | Generate embedded runtime locale bundles into `<zed-root>/assets/locales` from the catalog, manifest, and every enabled translation (universal release build) |
 | `apply-universal` | Rewrite accepted strings in the build checkout into runtime `localization` lookups for the single universal build; requires `generate-runtime-bundles` first and a checkout whose byte spans still match the manifest |
 
 Key flags for `prepare-translation`: `--zed-root`, `--batch-size` (default 40), `--context-lines` (default 12), `--missing-only` (explicit default), `--all` (include already-translated strings), `--output-dir`, `--prompt`, `--vscode-loc-root`, `--vscode-source-root`, `--vscode-reference-count` (default 3).
@@ -42,9 +42,13 @@ fetch-zed
   → apply  (on build checkout, not the clean one)
 ```
 
-For the experimental universal runtime build, the last step is replaced by
-`generate-runtime-bundles` followed by `apply-universal`, both against the
-build checkout. The per-language `apply` path remains the production default.
+Release builds are universal: CI replaces the last step with
+`generate-runtime-bundles` followed by `apply-universal` against the build
+checkout (`ci_release build-shard --mode universal`, one build per
+platform/arch, locale-less asset names, locale alias entries in the release
+manifest for legacy clients). The per-language `apply` path remains for local
+inspection and as the `--mode per-language` CI rollback path; delete it once
+universal releases have proven stable for a cycle or two.
 
 ## Zed Checkouts
 
