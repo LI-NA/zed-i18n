@@ -2128,9 +2128,7 @@ def _rewrite_format_macro(
         emitted.add(key)
         target = key_to_argument[key]
         binding = binding_names[target]
-        rendered_arguments.append(
-            f"({rust_string_literal(key)}, format!(\"{{}}\", {binding}))"
-        )
+        rendered_arguments.append(f"({rust_string_literal(key)}, {binding})")
 
     binding_block = "\n        ".join(bindings)
     arguments_block = ",\n                ".join(rendered_arguments)

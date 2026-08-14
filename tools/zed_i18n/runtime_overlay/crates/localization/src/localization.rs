@@ -103,6 +103,7 @@ struct Registry {
 static REGISTRY: OnceLock<Registry> = OnceLock::new();
 
 impl Registry {
+    #[cfg(test)]
     fn build(
         index_json: &str,
         bundle_json: Option<&str>,
@@ -118,6 +119,15 @@ impl Registry {
                 Some(FallbackReason::CorruptIndex),
             );
         };
+        Self::from_index(index, bundle_json, request, system_locales)
+    }
+
+    fn from_index(
+        index: LocaleIndex,
+        bundle_json: Option<&str>,
+        request: InitRequest<'_>,
+        system_locales: &[String],
+    ) -> Self {
         if index.schema_version != 1 || index.source_locale != SOURCE_LOCALE {
             return Self::english(
                 index.locales,
@@ -268,24 +278,31 @@ pub fn initialize(request: InitRequest<'_>) -> &'static InitOutcome {
                 Some(FallbackReason::CorruptIndex),
             );
         };
-        let requested_bundle = serde_json::from_str::<LocaleIndex>(&index_json)
-            .ok()
-            .and_then(|index| {
-                let (resolution, _, _) = resolve_locale(
-                    request.user_preference,
-                    request.legacy_locale,
-                    &system_locales,
-                    &index.locales,
-                );
-                index
-                    .locales
-                    .iter()
-                    .find(|locale| locale.id == resolution.resolved_locale)
-                    .and_then(|locale| locale.bundle.as_deref())
-                    .and_then(embedded_text)
-            });
-        Registry::build(
-            &index_json,
+        let Ok(index) = serde_json::from_str::<LocaleIndex>(&index_json) else {
+            return Registry::english(
+                Vec::new(),
+                HashMap::new(),
+                None,
+                LocaleSource::EnglishFallback,
+                Some(FallbackReason::CorruptIndex),
+            );
+        };
+        let requested_bundle = {
+            let (resolution, _, _) = resolve_locale(
+                request.user_preference,
+                request.legacy_locale,
+                &system_locales,
+                &index.locales,
+            );
+            index
+                .locales
+                .iter()
+                .find(|locale| locale.id == resolution.resolved_locale)
+                .and_then(|locale| locale.bundle.as_deref())
+                .and_then(embedded_text)
+        };
+        Registry::from_index(
+            index,
             requested_bundle.as_deref(),
             request,
             &system_locales,
@@ -456,12 +473,14 @@ fn render_segments(
     segments: &[FormatSegment],
     args: &[(&'static str, String)],
 ) -> Option<String> {
-    let values = args.iter().cloned().collect::<HashMap<_, _>>();
     let mut output = String::new();
     for segment in segments {
         match segment {
             FormatSegment::Text { text } => output.push_str(text),
-            FormatSegment::Arg { arg } => output.push_str(values.get(arg.as_str())?),
+            FormatSegment::Arg { arg } => {
+                let (_, value) = args.iter().find(|(name, _)| *name == arg.as_str())?;
+                output.push_str(value);
+            }
         }
     }
     Some(output)
