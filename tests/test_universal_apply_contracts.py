@@ -103,6 +103,11 @@ class UniversalApplyContractTests(unittest.TestCase):
         self.assertIn("localization::localized_str!", app_menus)
         if config.publisher_url:
             self.assertEqual(app_menus.count(config.publisher_url), 1)
+            self.assertIn(
+                'localization::localized_str!("Zed Repository").replacen(',
+                app_menus,
+            )
+            self.assertNotIn('                "Zed-i18n Repository",', app_menus)
 
         zed_rs = (self.zed_root / "crates" / "zed" / "src" / "zed.rs").read_text(
             encoding="utf-8"

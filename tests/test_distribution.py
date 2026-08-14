@@ -396,7 +396,7 @@ fn app_menus() -> Vec<Menu> {
             app_menus.replace(
                 'MenuItem::action("Zed 저장소", feedback::OpenZedRepo),',
                 "MenuItem::action(localization::localized_str!"
-                '("Zed 저장소"), feedback::OpenZedRepo),',
+                '("Zed Repository"), feedback::OpenZedRepo),',
             ),
             encoding="utf-8",
         )
@@ -410,11 +410,21 @@ fn app_menus() -> Vec<Menu> {
         app_menus = app_menus_path.read_text(encoding="utf-8")
 
         self.assertIn(
-            'MenuItem::action(localization::localized_str!("Zed 저장소"), feedback::OpenZedRepo),',
+            'MenuItem::action(localization::localized_str!("Zed Repository"), '
+            "feedback::OpenZedRepo),",
             app_menus,
         )
-        self.assertEqual(app_menus.count("Zed-i18n 저장소"), 1)
-        self.assertLess(app_menus.index("Zed 저장소"), app_menus.index("Zed-i18n 저장소"))
+        localized_i18n_label = """localization::localized_str!("Zed Repository").replacen(
+                    "Zed",
+                    "Zed-i18n",
+                    1,
+                )"""
+        self.assertEqual(app_menus.count(localized_i18n_label), 1)
+        self.assertNotIn('                "Zed-i18n Repository",', app_menus)
+        self.assertLess(
+            app_menus.index("feedback::OpenZedRepo"),
+            app_menus.index(localized_i18n_label),
+        )
         self.assertIn('url: "https://github.com/LI-NA/zed-i18n".into()', app_menus)
 
     def test_distribution_build_env_omits_locale_for_universal_builds(self) -> None:

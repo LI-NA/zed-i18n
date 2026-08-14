@@ -321,11 +321,22 @@ def patch_help_menu_i18n_repository_link(zed_root: Path, config: DistributionCon
     i18n_brand = config.product_slug[:1].upper() + config.product_slug[1:]
     if "Zed" not in zed_label:
         raise ValueError(f"expected Zed repository label to contain 'Zed' in {path}")
-    i18n_label = zed_label.replace("Zed", i18n_brand, 1)
+    if match.group(3) is not None:
+        i18n_label_expression = (
+            f"localization::localized_str!({_rust_string_literal(zed_label)}).replacen(\n"
+            f'{indent}        "Zed",\n'
+            f"{indent}        {_rust_string_literal(i18n_brand)},\n"
+            f"{indent}        1,\n"
+            f"{indent}    )"
+        )
+    else:
+        i18n_label_expression = _rust_string_literal(
+            zed_label.replace("Zed", i18n_brand, 1)
+        )
     insertion = (
         f'{match.group(0)}\n'
         f'{indent}MenuItem::action(\n'
-        f'{indent}    {_rust_string_literal(i18n_label)},\n'
+        f'{indent}    {i18n_label_expression},\n'
         f'{indent}    super::OpenBrowser {{\n'
         f'{indent}        url: {_rust_string_literal(config.publisher_url)}.into(),\n'
         f'{indent}    }},\n'
