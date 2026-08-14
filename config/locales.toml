@@ -1,0 +1,113 @@
+source_locale = "en-US"
+
+[[locale]]
+id = "en-US"
+english_name = "English (United States)"
+native_name = "English (United States)"
+aliases = ["en"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "cs-CZ"
+english_name = "Czech"
+native_name = "Čeština"
+aliases = ["cs"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "de-DE"
+english_name = "German"
+native_name = "Deutsch"
+aliases = ["de"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "es-ES"
+english_name = "Spanish"
+native_name = "Español"
+aliases = ["es"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "fr-FR"
+english_name = "French"
+native_name = "Français"
+aliases = ["fr"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "it-IT"
+english_name = "Italian"
+native_name = "Italiano"
+aliases = ["it"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "ja-JP"
+english_name = "Japanese"
+native_name = "日本語"
+aliases = ["ja"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "ko-KR"
+english_name = "Korean"
+native_name = "한국어"
+aliases = ["ko"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "pl-PL"
+english_name = "Polish"
+native_name = "Polski"
+aliases = ["pl"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "pt-BR"
+english_name = "Portuguese (Brazil)"
+native_name = "Português (Brasil)"
+aliases = ["pt"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "ru-RU"
+english_name = "Russian"
+native_name = "Русский"
+aliases = ["ru"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "tr-TR"
+english_name = "Turkish"
+native_name = "Türkçe"
+aliases = ["tr"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "zh-CN"
+english_name = "Chinese (Simplified)"
+native_name = "简体中文"
+aliases = ["zh", "zh-Hans", "zh-SG"]
+direction = "ltr"
+enabled = true
+
+[[locale]]
+id = "zh-TW"
+english_name = "Chinese (Traditional)"
+native_name = "繁體中文"
+aliases = ["zh-Hant", "zh-HK", "zh-MO"]
+direction = "ltr"
+enabled = true

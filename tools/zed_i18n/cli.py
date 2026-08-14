@@ -9,11 +9,13 @@ import sys
 from typing import Iterable
 
 from .apply import apply_translations
+from .apply_universal import apply_universal
 from .audit import audit_repository
 from .config import load_project_config, zed_checkout_path, zed_clean_extract_checkout_path
 from .context_groups import build_context_groups, write_context_group_reports
 from .extract import extract_repository
 from .packaging import generate_packaging_files
+from .runtime_bundles import generate_runtime_bundles
 from .translation_pipeline import (
     PrepareTranslationOptions,
     cleanup_translation_workspace,
@@ -138,6 +140,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="Git revision containing the previous version. Defaults to HEAD.",
     )
 
+    generate_runtime_parser = subparsers.add_parser("generate-runtime-bundles")
+    generate_runtime_parser.add_argument(
+        "--zed-root",
+        help="Zed build checkout that will receive embedded locale bundles.",
+    )
+
+    apply_universal_parser = subparsers.add_parser("apply-universal")
+    apply_universal_parser.add_argument(
+        "--zed-root",
+        help="Clean English Zed build checkout to patch for runtime localization.",
+    )
+
     packaging_parser = subparsers.add_parser("generate-packaging")
     packaging_parser.add_argument("--manifest", required=True, help="Release manifest.json path.")
     packaging_parser.add_argument(
@@ -200,6 +214,10 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "generate-version-diff":
         return run_generate_version_diff(root, args.base_ref)
+    if args.command == "generate-runtime-bundles":
+        return run_generate_runtime_bundles(root, args.zed_root)
+    if args.command == "apply-universal":
+        return run_apply_universal(root, args.zed_root)
     if args.command == "generate-packaging":
         return run_generate_packaging(
             root,
@@ -236,7 +254,10 @@ def run_fetch_zed(root: Path) -> int:
 def run_extract(root: Path, zed_root: str | None = None) -> int:
     config = load_project_config(root)
     checkout_path = resolve_zed_root(root, config, zed_root)
-    catalog, manifest = extract_repository(checkout_path)
+    catalog, manifest = extract_repository(
+        checkout_path,
+        root / "tools" / "zed_i18n" / "runtime_overlay",
+    )
     previous_manifest = _read_json_if_exists(root / "manifest" / "ui-strings.json")
     translation_sources = _translation_sources(root / "translations")
     preserve_manifest_statuses(manifest, previous_manifest, translation_sources)
@@ -262,6 +283,8 @@ def preserve_manifest_statuses(
 ) -> None:
     translated_sources = set(translation_sources)
     for source, entry in manifest.items():
+        if entry.get("status") == "accepted":
+            continue
         previous_entry = previous_manifest.get(source, {})
         previous_status = previous_entry.get("status")
         if previous_status in {"accepted", "ignored"}:
@@ -290,6 +313,46 @@ def resolve_zed_root(root: Path, config, zed_root: str | None) -> Path:
     if not checkout_path.is_absolute():
         checkout_path = root / checkout_path
     return ensure_inside_workspace(root, checkout_path)
+
+
+def resolve_runtime_zed_root(root: Path, config, zed_root: str | None) -> Path:
+    checkout_path = Path(zed_root) if zed_root else zed_checkout_path(root, config)
+    if not checkout_path.is_absolute():
+        checkout_path = root / checkout_path
+    return ensure_inside_workspace(root, checkout_path)
+
+
+def run_generate_runtime_bundles(root: Path, zed_root: str | None = None) -> int:
+    config = load_project_config(root)
+    checkout_path = resolve_runtime_zed_root(root, config, zed_root)
+    report = generate_runtime_bundles(root, checkout_path, config)
+    print(
+        f"Generated runtime bundles for {report.locale_count} locales: "
+        f"{report.message_count} messages, {report.format_count} formats, "
+        f"{report.raw_payload_bytes} bytes"
+    )
+    return 0
+
+
+def run_apply_universal(root: Path, zed_root: str | None = None) -> int:
+    config = load_project_config(root)
+    checkout_path = resolve_runtime_zed_root(root, config, zed_root)
+    manifest = _read_json(root / "manifest" / "ui-strings.json")
+    report = apply_universal(root, checkout_path, manifest)
+    if not report.ok:
+        print("Universal localization apply failed")
+        return 1
+    if report.already_applied:
+        print(
+            "Universal localization already applied: "
+            f"{len(report.dependency_crates)} dependency crates"
+        )
+    else:
+        print(
+            f"Applied universal localization to {report.applied_occurrences} occurrences "
+            f"across {len(report.dependency_crates)} crates"
+        )
+    return 0
 
 
 def run_validate(root: Path, language: str, cleanup: bool = True) -> int:

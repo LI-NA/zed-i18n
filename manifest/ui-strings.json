@@ -29339,6 +29339,19 @@
     ],
     "status": "accepted"
   },
+  "Display Language": {
+    "occurrences": [
+      {
+        "call": "localization::localized_str!",
+        "end_byte": 498,
+        "file": "runtime-overlay/crates/settings_ui/src/components/locale_picker.rs",
+        "kind": "runtime_overlay_message",
+        "line": 14,
+        "start_byte": 480
+      }
+    ],
+    "status": "accepted"
+  },
   "Display Mode": {
     "occurrences": [
       {
@@ -57053,6 +57066,14 @@
   "Open Markdown Preview": {
     "occurrences": [
       {
+        "call": "tab_context_menu_action",
+        "end_byte": 43111,
+        "file": "crates/editor/src/items.rs",
+        "kind": "context_menu_action",
+        "line": 1225,
+        "start_byte": 43088
+      },
+      {
         "call": "action",
         "end_byte": 11634,
         "file": "crates/editor/src/mouse_context_menu.rs",
@@ -57353,6 +57374,14 @@
   },
   "Open SVG Preview": {
     "occurrences": [
+      {
+        "call": "tab_context_menu_action",
+        "end_byte": 43300,
+        "file": "crates/editor/src/items.rs",
+        "kind": "context_menu_action",
+        "line": 1232,
+        "start_byte": 43282
+      },
       {
         "call": "action",
         "end_byte": 11781,
@@ -61454,6 +61483,19 @@
     ],
     "status": "accepted"
   },
+  "Plain Text": {
+    "occurrences": [
+      {
+        "call": "localization::localized_str!",
+        "end_byte": 386,
+        "file": "runtime-overlay/crates/language_selector/src/localized_language_name.rs",
+        "kind": "runtime_overlay_message",
+        "line": 8,
+        "start_byte": 374
+      }
+    ],
+    "status": "accepted"
+  },
   "Plan": {
     "occurrences": [
       {
@@ -65468,6 +65510,14 @@
         "kind": "context_menu_action",
         "line": 1204,
         "start_byte": 47925
+      },
+      {
+        "call": "tab_context_menu_action",
+        "end_byte": 63018,
+        "file": "crates/terminal_view/src/terminal_view.rs",
+        "kind": "context_menu_action",
+        "line": 1728,
+        "start_byte": 63010
       }
     ],
     "status": "accepted"
@@ -67000,6 +67050,32 @@
         "kind": "inline_prompt_tooltip",
         "line": 1559,
         "start_byte": 59938
+      }
+    ],
+    "status": "accepted"
+  },
+  "Restart Zed": {
+    "occurrences": [
+      {
+        "call": "localization::localized_str!",
+        "end_byte": 4908,
+        "file": "runtime-overlay/crates/settings_ui/src/components/locale_picker.rs",
+        "kind": "runtime_overlay_message",
+        "line": 126,
+        "start_byte": 4895
+      }
+    ],
+    "status": "accepted"
+  },
+  "Restart Zed to apply the display language.": {
+    "occurrences": [
+      {
+        "call": "localization::localized_str!",
+        "end_byte": 5150,
+        "file": "runtime-overlay/crates/settings_ui/src/components/locale_picker.rs",
+        "kind": "runtime_overlay_message",
+        "line": 131,
+        "start_byte": 5106
       }
     ],
     "status": "accepted"
@@ -71944,6 +72020,19 @@
         "kind": "rust_doc_comment",
         "line": 507,
         "start_byte": 15491
+      }
+    ],
+    "status": "accepted"
+  },
+  "Select the language used by the Zed interface. Changes apply after restarting Zed.": {
+    "occurrences": [
+      {
+        "call": "localization::localized_str!",
+        "end_byte": 648,
+        "file": "runtime-overlay/crates/settings_ui/src/components/locale_picker.rs",
+        "kind": "runtime_overlay_message",
+        "line": 16,
+        "start_byte": 564
       }
     ],
     "status": "accepted"
@@ -82146,6 +82235,19 @@
         "kind": "settings_enum_variant_label",
         "line": 424,
         "start_byte": 13350
+      }
+    ],
+    "status": "accepted"
+  },
+  "System Default ({language}, {locale})": {
+    "occurrences": [
+      {
+        "call": "localization::format_message",
+        "end_byte": 5763,
+        "file": "runtime-overlay/crates/settings_ui/src/components/locale_picker.rs",
+        "kind": "runtime_overlay_message",
+        "line": 148,
+        "start_byte": 5724
       }
     ],
     "status": "accepted"

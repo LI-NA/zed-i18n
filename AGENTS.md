@@ -17,6 +17,8 @@ If `uv` cannot launch on Windows, fall back to `.\.venv\Scripts\python.exe -m to
 | `merge-translation --language <lang>` | Merge agent result JSONs into `translations/<lang>.json` |
 | `validate --language <lang>` | Validate translations against manifest; on success cleans the workspace unless `--no-cleanup` is passed |
 | `apply --language <lang>` | Patch translated strings into the Zed checkout |
+| `generate-runtime-bundles` | Generate embedded runtime locale bundles into `<zed-root>/assets/locales` from the catalog, manifest, and every enabled translation (experimental universal build) |
+| `apply-universal` | Rewrite accepted strings in the build checkout into runtime `localization` lookups for the single universal build; requires `generate-runtime-bundles` first and a checkout whose byte spans still match the manifest |
 
 Key flags for `prepare-translation`: `--zed-root`, `--batch-size` (default 40), `--context-lines` (default 12), `--missing-only` (explicit default), `--all` (include already-translated strings), `--output-dir`, `--prompt`, `--vscode-loc-root`, `--vscode-source-root`, `--vscode-reference-count` (default 3).
 Key flags for `extract-context-groups`: `--language`, `--zed-root`, `--group-type` (`all`, `settings`, `connected`, `prompt`, `prompt-components`; default `all`), `--output-dir`.
@@ -39,6 +41,10 @@ fetch-zed
   → validate
   → apply  (on build checkout, not the clean one)
 ```
+
+For the experimental universal runtime build, the last step is replaced by
+`generate-runtime-bundles` followed by `apply-universal`, both against the
+build checkout. The per-language `apply` path remains the production default.
 
 ## Zed Checkouts
 

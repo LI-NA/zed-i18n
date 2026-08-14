@@ -1,6 +1,7 @@
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools.zed_i18n.extract import extract_repository, extract_ui_strings_from_source
 
@@ -2378,6 +2379,39 @@ class ExtractTests(unittest.TestCase):
         )
 
         self.assertEqual({occurrence.source for occurrence in occurrences}, {" (current)"})
+
+    def test_extracts_tab_context_menu_action_labels(self) -> None:
+        terminal = extract_ui_strings_from_source(
+            '            vec![("Rename".into(), Box::new(RenameTerminal))]',
+            relative_path="crates/terminal_view/src/terminal_view.rs",
+        )
+        editor = extract_ui_strings_from_source(
+            "\n".join(
+                [
+                    "            actions.push((",
+                    '                "Open Markdown Preview".into(),',
+                    "                Box::new(OpenMarkdownPreview) as Box<dyn gpui::Action>,",
+                    "            ));",
+                ]
+            ),
+            relative_path="crates/editor/src/items.rs",
+        )
+
+        self.assertEqual({occurrence.source for occurrence in terminal}, {"Rename"})
+        self.assertEqual(
+            {occurrence.kind for occurrence in terminal}, {"context_menu_action"}
+        )
+        self.assertEqual(
+            {occurrence.source for occurrence in editor}, {"Open Markdown Preview"}
+        )
+
+    def test_ignores_tab_context_menu_tuples_outside_their_files(self) -> None:
+        occurrences = extract_ui_strings_from_source(
+            '            vec![("Rename".into(), Box::new(RenameTerminal))]',
+            relative_path="crates/other/src/other.rs",
+        )
+
+        self.assertEqual(occurrences, [])
 
     def test_extracts_rust_task_template_labels(self) -> None:
         source = "\n".join(
@@ -6768,6 +6802,95 @@ class ExtractTests(unittest.TestCase):
                 "required composite message rules not found: agent.project_rules_count",
             ):
                 extract_repository(root)
+
+    def test_repository_extract_merges_explicit_runtime_overlay_messages_as_accepted(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            zed_root = root / "zed"
+            upstream = zed_root / "crates" / "example" / "src" / "lib.rs"
+            upstream.parent.mkdir(parents=True)
+            upstream.write_text('fn render() { Label::new("Restart Zed to apply"); }', encoding="utf-8")
+            overlay_root = root / "runtime_overlay"
+            overlay = overlay_root / "crates" / "settings_ui" / "src" / "locale_picker.rs"
+            overlay.parent.mkdir(parents=True)
+            overlay.write_text(
+                "\n".join(
+                    [
+                        "fn render(locale: &str) {",
+                        '    Label::new(localization::localized_str!("Restart Zed to apply"));',
+                        '    let _ = localization::format_message("System Default ({locale})", &[]);',
+                        "}",
+                    ]
+                ),
+                encoding="utf-8",
+            )
+
+            with patch(
+                "tools.zed_i18n.extract.required_composite_message_rule_ids",
+                return_value=set(),
+            ):
+                catalog, manifest = extract_repository(zed_root, overlay_root)
+
+        self.assertEqual(
+            set(catalog),
+            {"Restart Zed to apply", "System Default ({locale})"},
+        )
+        self.assertEqual(manifest["Restart Zed to apply"]["status"], "accepted")
+        occurrences = manifest["Restart Zed to apply"]["occurrences"]
+        self.assertEqual(len(occurrences), 2)
+        overlay_occurrence = next(
+            occurrence
+            for occurrence in occurrences
+            if occurrence["file"].startswith("runtime-overlay/")
+        )
+        self.assertEqual(
+            overlay_occurrence["file"],
+            "runtime-overlay/crates/settings_ui/src/locale_picker.rs",
+        )
+        self.assertEqual(overlay_occurrence["call"], "localization::localized_str!")
+        self.assertEqual(overlay_occurrence["kind"], "runtime_overlay_message")
+        self.assertEqual(manifest["System Default ({locale})"]["status"], "accepted")
+
+    def test_repository_extract_rejects_overlay_ui_literals_without_localization_macro(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            zed_root = root / "zed"
+            (zed_root / "crates").mkdir(parents=True)
+            overlay_root = root / "runtime_overlay"
+            overlay = overlay_root / "crates" / "settings_ui" / "src" / "locale_picker.rs"
+            overlay.parent.mkdir(parents=True)
+            overlay.write_text('fn render() { Label::new("Unlocalized overlay text"); }', encoding="utf-8")
+
+            with (
+                patch(
+                    "tools.zed_i18n.extract.required_composite_message_rule_ids",
+                    return_value=set(),
+                ),
+                self.assertRaisesRegex(ValueError, "runtime overlay UI literal is not localized"),
+            ):
+                extract_repository(zed_root, overlay_root)
+
+    def test_repository_extract_rejects_non_literal_overlay_macro_argument(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            zed_root = root / "zed"
+            (zed_root / "crates").mkdir(parents=True)
+            overlay_root = root / "runtime_overlay"
+            overlay = overlay_root / "crates" / "zed" / "src" / "localization.rs"
+            overlay.parent.mkdir(parents=True)
+            overlay.write_text(
+                "fn render(source: &'static str) { localization::localized_str!(source); }",
+                encoding="utf-8",
+            )
+
+            with (
+                patch(
+                    "tools.zed_i18n.extract.required_composite_message_rule_ids",
+                    return_value=set(),
+                ),
+                self.assertRaisesRegex(ValueError, "requires a string literal"),
+            ):
+                extract_repository(zed_root, overlay_root)
 
 
 if __name__ == "__main__":

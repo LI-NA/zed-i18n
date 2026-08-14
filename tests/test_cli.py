@@ -8,12 +8,17 @@ from tools.zed_i18n.cli import (
     build_parser,
     main,
     preserve_manifest_statuses,
+    resolve_runtime_zed_root,
     resolve_zed_root,
+    run_apply_universal,
     run_fetch_zed,
+    run_generate_runtime_bundles,
     run_prepare_translation,
     run_validate,
 )
+from tools.zed_i18n.apply_universal import UniversalApplyReport
 from tools.zed_i18n.config import ProjectConfig
+from tools.zed_i18n.runtime_bundles import RuntimeBundleReport
 from tools.zed_i18n.translation_pipeline import PrepareTranslationReport
 from tools.zed_i18n.version_diff import GeneratedVersionDiff
 
@@ -149,6 +154,90 @@ class CliTests(unittest.TestCase):
         self.assertEqual(default_args.command, "generate-version-diff")
         self.assertEqual(default_args.base_ref, "HEAD")
         self.assertEqual(explicit_args.base_ref, "release/v1")
+
+    def test_parser_accepts_runtime_commands_without_a_locale(self) -> None:
+        parser = build_parser()
+
+        generate = parser.parse_args(
+            ["generate-runtime-bundles", "--zed-root", ".cache/zed/v1.0.1"]
+        )
+        apply = parser.parse_args(["apply-universal"])
+
+        self.assertEqual(generate.command, "generate-runtime-bundles")
+        self.assertEqual(generate.zed_root, ".cache/zed/v1.0.1")
+        self.assertFalse(hasattr(generate, "language"))
+        self.assertEqual(apply.command, "apply-universal")
+        self.assertIsNone(apply.zed_root)
+        self.assertFalse(hasattr(apply, "language"))
+
+    def test_runtime_commands_use_the_build_checkout_and_report_results(self) -> None:
+        config = ProjectConfig(
+            zed_version="v1.0.1",
+            zed_repository="https://github.com/zed-industries/zed",
+            cache_dir=Path(".cache/zed"),
+        )
+        checkout = self.tmp / ".cache/zed/v1.0.1"
+        bundle_report = RuntimeBundleReport(
+            catalog_sha256="abc",
+            locale_count=14,
+            message_count=100,
+            format_count=20,
+            joined_message_count=3,
+            raw_payload_bytes=4096,
+            output_files=("assets/locales/index.json",),
+        )
+        apply_report = UniversalApplyReport(
+            ok=True,
+            already_applied=True,
+            applied_occurrences=0,
+            dependency_crates=("ui",),
+            manifest_sha256="def",
+        )
+        self._write_json(
+            self.tmp / "manifest/ui-strings.json",
+            {"Open Settings": {"status": "accepted", "occurrences": []}},
+        )
+
+        with (
+            patch("tools.zed_i18n.cli.load_project_config", return_value=config),
+            patch(
+                "tools.zed_i18n.cli.resolve_runtime_zed_root",
+                return_value=checkout,
+            ) as resolve,
+            patch(
+                "tools.zed_i18n.cli.generate_runtime_bundles",
+                return_value=bundle_report,
+            ) as generate,
+            patch(
+                "tools.zed_i18n.cli.apply_universal",
+                return_value=apply_report,
+            ) as apply,
+            patch("builtins.print") as print_output,
+        ):
+            self.assertEqual(run_generate_runtime_bundles(self.tmp, None), 0)
+            self.assertEqual(run_apply_universal(self.tmp, None), 0)
+
+        self.assertEqual(resolve.call_args_list, [call(self.tmp, config, None)] * 2)
+        generate.assert_called_once_with(self.tmp, checkout, config)
+        apply.assert_called_once()
+        self.assertEqual(apply.call_args.args[0:2], (self.tmp, checkout))
+        self.assertIn("14 locales", print_output.call_args_list[0].args[0])
+        self.assertIn("already applied", print_output.call_args_list[1].args[0])
+
+    def test_runtime_zed_root_defaults_to_build_checkout_and_stays_in_workspace(self) -> None:
+        root = Path.cwd()
+        config = ProjectConfig(
+            zed_version="v1.0.1",
+            zed_repository="https://github.com/zed-industries/zed",
+            cache_dir=Path(".cache/zed"),
+        )
+
+        self.assertEqual(
+            resolve_runtime_zed_root(root, config, None),
+            (root / ".cache/zed/v1.0.1").resolve(),
+        )
+        with self.assertRaises(ValueError):
+            resolve_runtime_zed_root(root, config, "..")
 
     def test_main_runs_generate_version_diff_and_prints_summary(self) -> None:
         output_path = (

@@ -799,7 +799,10 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
     return _dedupe_occurrences(occurrences)
 
 
-def extract_repository(zed_root: Path) -> tuple[dict[str, str], dict[str, dict[str, object]]]:
+def extract_repository(
+    zed_root: Path,
+    overlay_root: Path | None = None,
+) -> tuple[dict[str, str], dict[str, dict[str, object]]]:
     catalog: dict[str, str] = {}
     manifest: dict[str, dict[str, object]] = {}
     matched_composite_rule_ids: set[str] = set()
@@ -809,20 +812,123 @@ def extract_repository(zed_root: Path) -> tuple[dict[str, str], dict[str, dict[s
         for occurrence in extract_ui_strings_from_source(source, relative_path):
             if occurrence.composite_rule_id is not None:
                 matched_composite_rule_ids.add(occurrence.composite_rule_id)
-            catalog.setdefault(occurrence.source, occurrence.source)
-            entry = manifest.setdefault(
-                occurrence.source,
-                {
-                    "status": "needs_review",
-                    "occurrences": [],
-                },
-            )
-            entry["occurrences"].append(occurrence.to_manifest_occurrence())
+            _add_repository_occurrence(catalog, manifest, occurrence, accepted=False)
     missing_rule_ids = required_composite_message_rule_ids() - matched_composite_rule_ids
     if missing_rule_ids:
         missing = ", ".join(sorted(missing_rule_ids))
         raise ValueError(f"required composite message rules not found: {missing}")
+    if overlay_root is not None and overlay_root.exists():
+        for rust_file in sorted(overlay_root.glob("**/*.rs")):
+            relative_path = rust_file.relative_to(overlay_root).as_posix()
+            manifest_path = f"runtime-overlay/{relative_path}"
+            source = rust_file.read_text(encoding="utf-8")
+            for occurrence in _extract_runtime_overlay_occurrences(source, manifest_path):
+                _add_repository_occurrence(catalog, manifest, occurrence, accepted=True)
     return catalog, manifest
+
+
+def _add_repository_occurrence(
+    catalog: dict[str, str],
+    manifest: dict[str, dict[str, object]],
+    occurrence: StringOccurrence,
+    *,
+    accepted: bool,
+) -> None:
+    catalog.setdefault(occurrence.source, occurrence.source)
+    entry = manifest.setdefault(
+        occurrence.source,
+        {
+            "status": "accepted" if accepted else "needs_review",
+            "occurrences": [],
+        },
+    )
+    if accepted:
+        entry["status"] = "accepted"
+    entry["occurrences"].append(occurrence.to_manifest_occurrence())
+
+
+def _extract_runtime_overlay_occurrences(
+    source: str,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    source_bytes = source.encode("utf-8")
+    tree = _rust_parser().parse(source_bytes)
+    explicit: list[StringOccurrence] = []
+
+    for node in _walk(tree.root_node):
+        if node.type == "macro_invocation":
+            invocation = _node_text(source_bytes, node)
+            macro_name = invocation.split("!", 1)[0].strip()
+            if macro_name != "localization::localized_str":
+                continue
+            literals = [child for child in _walk(node) if child.type == "string_literal"]
+            if len(literals) != 1:
+                raise ValueError(
+                    f"localization::localized_str! requires a string literal: {relative_path}:"
+                    f"{node.start_point[0] + 1}"
+                )
+            literal = literals[0]
+            explicit.append(
+                _runtime_overlay_occurrence(
+                    source_bytes,
+                    literal,
+                    relative_path,
+                    call="localization::localized_str!",
+                )
+            )
+        elif node.type == "call_expression":
+            function = node.child_by_field_name("function")
+            arguments = node.child_by_field_name("arguments")
+            if function is None or arguments is None:
+                continue
+            if _node_text(source_bytes, function) != "localization::format_message":
+                continue
+            named_arguments = list(arguments.named_children)
+            if not named_arguments or named_arguments[0].type != "string_literal":
+                raise ValueError(
+                    f"localization::format_message requires a string literal: {relative_path}:"
+                    f"{node.start_point[0] + 1}"
+                )
+            explicit.append(
+                _runtime_overlay_occurrence(
+                    source_bytes,
+                    named_arguments[0],
+                    relative_path,
+                    call="localization::format_message",
+                )
+            )
+
+    explicit_spans = {(item.start_byte, item.end_byte) for item in explicit}
+    ordinary = [
+        occurrence
+        for occurrence in extract_ui_strings_from_source(source, relative_path)
+        if (occurrence.start_byte, occurrence.end_byte) not in explicit_spans
+    ]
+    if ordinary:
+        first = ordinary[0]
+        raise ValueError(
+            "runtime overlay UI literal is not localized: "
+            f"{relative_path}:{first.line}: {first.source!r}"
+        )
+    return _dedupe_occurrences(explicit)
+
+
+def _runtime_overlay_occurrence(
+    source_bytes: bytes,
+    literal_node,
+    relative_path: str,
+    *,
+    call: str,
+) -> StringOccurrence:
+    return StringOccurrence(
+        source=parse_rust_string_literal(_node_text(source_bytes, literal_node)),
+        file=relative_path,
+        line=literal_node.start_point[0] + 1,
+        call=call,
+        kind="runtime_overlay_message",
+        start_byte=literal_node.start_byte,
+        end_byte=literal_node.end_byte,
+    )
 
 
 def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
@@ -3065,6 +3171,8 @@ def _line_patterns_for_path(
         patterns.extend(ACTIVITY_INDICATOR_LINE_PATTERNS)
     if _is_language_selector_path(relative_path):
         patterns.extend(LANGUAGE_SELECTOR_LINE_PATTERNS)
+    if _is_tab_context_menu_path(relative_path):
+        patterns.extend(TAB_CONTEXT_MENU_LINE_PATTERNS)
     if _is_lsp_button_path(relative_path):
         patterns.extend(LSP_BUTTON_LINE_PATTERNS)
     if _is_inline_prompt_editor_path(relative_path):
@@ -3514,6 +3622,13 @@ def _is_rate_prediction_modal_path(relative_path: str) -> bool:
 
 def _is_language_selector_path(relative_path: str) -> bool:
     return relative_path == "crates/language_selector/src/language_selector.rs"
+
+
+def _is_tab_context_menu_path(relative_path: str) -> bool:
+    return relative_path in (
+        "crates/editor/src/items.rs",
+        "crates/terminal_view/src/terminal_view.rs",
+    )
 
 
 def _is_lsp_button_path(relative_path: str) -> bool:
@@ -4548,6 +4663,25 @@ LANGUAGE_SELECTOR_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(r'\blabel\.push_str\s*\(\s*("(?:\\.|[^"\\])*")'),
         "language_selector_current_suffix",
         "language_selector_label",
+        1,
+    ),
+)
+
+
+# `tab_extra_context_menu_actions` implementations return `(label, action)`
+# tuples whose labels are rendered verbatim as tab context menu entries
+# (`workspace/src/pane.rs`).
+TAB_CONTEXT_MENU_LINE_PATTERNS: tuple[LinePattern, ...] = (
+    LinePattern(
+        re.compile(r'\(("(?:\\.|[^"\\])*")\.into\(\),\s*Box::new\('),
+        "tab_context_menu_action",
+        "context_menu_action",
+        1,
+    ),
+    LinePattern(
+        re.compile(r'^\s*("(?:\\.|[^"\\])*")\.into\(\),\s*$'),
+        "tab_context_menu_action",
+        "context_menu_action",
         1,
     ),
 )
