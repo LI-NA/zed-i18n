@@ -2362,6 +2362,7 @@
   "GlobalElementId of the nearest ancestor with an ID": "最近具有 ID 的祖先元素的 GlobalElementId",
   "Globs to match against file paths to determine if a file is private.": "用于匹配文件路径以判断文件是否为私有的 glob 模式",
   "Globs to match files that will be considered \"hidden\" and can be hidden from the project panel.": "用于匹配被视为“隐藏”文件的 glob 模式，这些文件可在项目面板中隐藏",
+  "Go": "导航",
   "Go Back": "返回",
   "Go Forward": "前进",
   "Go To Definition Fallback": "转到定义回退",

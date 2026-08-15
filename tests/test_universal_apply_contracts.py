@@ -24,7 +24,7 @@ from pathlib import Path
 from tools.zed_i18n.apply_universal import apply_universal
 from tools.zed_i18n.config import load_project_config
 from tools.zed_i18n.distribution import apply_distribution_patches, load_distribution_config
-from tools.zed_i18n.runtime_bundles import generate_runtime_bundles
+from tools.zed_i18n.runtime_bundles import generate_runtime_bundles, release_locale_ids
 
 
 class UniversalApplyContractTests(unittest.TestCase):
@@ -108,6 +108,21 @@ class UniversalApplyContractTests(unittest.TestCase):
                 app_menus,
             )
             self.assertNotIn('                "Zed-i18n Repository",', app_menus)
+
+        # The Go menu title is translated while the identical debug-adapter
+        # language identifier stays a bare literal (registry match target).
+        self.assertIn('name: localization::localized_str!("Go").into()', app_menus)
+        go_adapter = (
+            self.zed_root / "crates" / "dap_adapters" / "src" / "go.rs"
+        ).read_text(encoding="utf-8")
+        self.assertIn('SharedString::new_static("Go")', go_adapter)
+        for locale in release_locale_ids(self.root):
+            bundle = json.loads(
+                (self.zed_root / "assets" / "locales" / f"{locale}.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertIn("Go", bundle["messages"])
 
         zed_rs = (self.zed_root / "crates" / "zed" / "src" / "zed.rs").read_text(
             encoding="utf-8"

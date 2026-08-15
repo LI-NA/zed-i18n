@@ -2362,6 +2362,7 @@
   "GlobalElementId of the nearest ancestor with an ID": "GlobalElementId nejbližšího předka s ID",
   "Globs to match against file paths to determine if a file is private.": "Globy porovnávané s cestami souborů pro určení, zda je soubor soukromý.",
   "Globs to match files that will be considered \"hidden\" and can be hidden from the project panel.": "Globy pro porovnání souborů, které se budou považovat za \"skryté\" a lze je skrýt z panelu projektu.",
+  "Go": "Přejít",
   "Go Back": "Přejít zpět",
   "Go Forward": "Přejít vpřed",
   "Go To Definition Fallback": "Náhradní akce při přechodu na definici",

@@ -2362,6 +2362,7 @@
   "GlobalElementId of the nearest ancestor with an ID": "ID가 있는 가장 가까운 상위 요소의 GlobalElementId",
   "Globs to match against file paths to determine if a file is private.": "파일이 비공개인지 확인하기 위해 파일 경로와 매칭할 글롭 패턴입니다.",
   "Globs to match files that will be considered \"hidden\" and can be hidden from the project panel.": "\"숨김\"으로 간주되어 프로젝트 패널에서 숨길 수 있는 파일을 매칭할 glob 패턴입니다.",
+  "Go": "이동",
   "Go Back": "뒤로",
   "Go Forward": "앞으로",
   "Go To Definition Fallback": "정의로 이동 폴백",

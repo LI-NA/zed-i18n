@@ -730,6 +730,8 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
         for argument_index, kind, call_name in rules:
             if argument_index >= len(arguments):
                 continue
+            if kind == "shared_string" and _is_inside_adapter_language_name(source_bytes, node):
+                continue
 
             argument_node = arguments[argument_index]
             for literal_node in _visible_literal_nodes(
@@ -1240,6 +1242,21 @@ def _prompt_error_call_name(call: str) -> str:
     if _is_method_call(call, "detach_and_prompt_err"):
         return "detach_and_prompt_err"
     return "prompt_err"
+
+
+def _is_inside_adapter_language_name(source_bytes: bytes, node) -> bool:
+    # Debug adapter language names are registry identifiers matched against
+    # `LanguageName`, never display text; language names stay untranslated.
+    current = node.parent
+    while current is not None:
+        if current.type == "function_item":
+            name_node = current.child_by_field_name("name")
+            return (
+                name_node is not None
+                and _node_text(source_bytes, name_node) == "adapter_language_name"
+            )
+        current = current.parent
+    return False
 
 
 def _should_skip_contextual_call_source(source: str, call_name: str) -> bool:

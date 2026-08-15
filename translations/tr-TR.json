@@ -2362,6 +2362,7 @@
   "GlobalElementId of the nearest ancestor with an ID": "Kimliği olan en yakın üst öğenin GlobalElementId değeri",
   "Globs to match against file paths to determine if a file is private.": "Bir dosyanın özel olup olmadığını belirlemek için dosya yollarıyla eşleştirilecek glob desenleri.",
   "Globs to match files that will be considered \"hidden\" and can be hidden from the project panel.": "\"Gizli\" kabul edilecek ve proje panelinden gizlenebilecek dosyalarla eşleştirilecek glob desenleri.",
+  "Go": "Git",
   "Go Back": "Geri Git",
   "Go Forward": "İleri Git",
   "Go To Definition Fallback": "Tanıma Git Yedeği",

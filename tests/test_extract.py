@@ -646,6 +646,30 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(set(by_source), {"Select a Model", "Current Call", "Offline"})
         self.assertEqual(by_source["Select a Model"].kind, "shared_string")
 
+    def test_skips_shared_strings_inside_adapter_language_name(self) -> None:
+        source = "\n".join(
+            [
+                "impl DebugAdapter for GoDebugAdapter {",
+                "    fn adapter_language_name(&self) -> Option<LanguageName> {",
+                '        Some(SharedString::new_static("Go").into())',
+                "    }",
+                "",
+                "    fn transient_label(&self) -> SharedString {",
+                '        SharedString::new_static("Delve")',
+                "    }",
+                "}",
+            ]
+        )
+
+        occurrences = extract_ui_strings_from_source(
+            source,
+            relative_path="crates/dap_adapters/src/go.rs",
+        )
+
+        by_source = {occurrence.source: occurrence for occurrence in occurrences}
+        self.assertNotIn("Go", by_source)
+        self.assertIn("Delve", by_source)
+
     def test_extracts_agent_permission_option_labels(self) -> None:
         source = "\n".join(
             [

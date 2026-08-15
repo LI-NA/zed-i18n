@@ -40392,14 +40392,6 @@
   "Go": {
     "occurrences": [
       {
-        "call": "SharedString::new_static",
-        "end_byte": 4404,
-        "file": "crates/dap_adapters/src/go.rs",
-        "kind": "shared_string",
-        "line": 138,
-        "start_byte": 4400
-      },
-      {
         "call": "Menu.name",
         "end_byte": 9977,
         "file": "crates/zed/src/zed/app_menus.rs",
@@ -40408,7 +40400,7 @@
         "start_byte": 9973
       }
     ],
-    "status": "ignored"
+    "status": "accepted"
   },
   "Go Back": {
     "occurrences": [
@@ -63352,14 +63344,6 @@
   },
   "Python": {
     "occurrences": [
-      {
-        "call": "SharedString::new_static",
-        "end_byte": 15561,
-        "file": "crates/dap_adapters/src/python.rs",
-        "kind": "shared_string",
-        "line": 439,
-        "start_byte": 15553
-      },
       {
         "call": "SharedString::new_static",
         "end_byte": 421,

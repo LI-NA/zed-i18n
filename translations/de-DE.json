@@ -2362,6 +2362,7 @@
   "GlobalElementId of the nearest ancestor with an ID": "GlobalElementId des nächsten Vorfahren mit einer ID",
   "Globs to match against file paths to determine if a file is private.": "Glob-Muster zum Abgleich mit Dateipfaden, um zu bestimmen, ob eine Datei privat ist.",
   "Globs to match files that will be considered \"hidden\" and can be hidden from the project panel.": "Glob-Muster zum Abgleich von Dateien, die als „versteckt“ gelten und im Projektpanel ausgeblendet werden können.",
+  "Go": "Gehe zu",
   "Go Back": "Zurück",
   "Go Forward": "Vorwärts",
   "Go To Definition Fallback": "Fallback für „Zur Definition wechseln“",

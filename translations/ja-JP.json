@@ -2362,6 +2362,7 @@
   "GlobalElementId of the nearest ancestor with an ID": "ID を持つ最も近い祖先の GlobalElementId",
   "Globs to match against file paths to determine if a file is private.": "ファイルが非公開かどうかを判定するために、ファイルパスと照合する glob です。",
   "Globs to match files that will be considered \"hidden\" and can be hidden from the project panel.": "\"hidden\" と見なされ、プロジェクトパネルから非表示にできるファイルに一致する glob です。",
+  "Go": "移動",
   "Go Back": "戻る",
   "Go Forward": "進む",
   "Go To Definition Fallback": "定義へ移動のフォールバック",
