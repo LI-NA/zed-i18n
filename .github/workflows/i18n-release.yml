@@ -627,7 +627,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
-      actions: read
+      actions: write
     environment:
       name: release
     steps:
@@ -688,3 +688,13 @@ jobs:
         run: |
           RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
           gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+
+      - name: Update packaging
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: |
+          RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
+          gh workflow run i18n-update-packaging.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --field release_tag="$RELEASE_TAG"
