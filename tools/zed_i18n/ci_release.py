@@ -1433,70 +1433,10 @@ def generate_release_metadata(
     checksums_path.write_text("\n".join(checksum_lines) + "\n", encoding="utf-8")
 
 
-RELEASE_LOCALE_NAMES = {
-    "cs-CZ": "Čeština",
-    "de-DE": "Deutsch",
-    "es-ES": "Español",
-    "fr-FR": "Français",
-    "it-IT": "Italiano",
-    "ja-JP": "日本語",
-    "ko-KR": "한국어",
-    "pl-PL": "Polski",
-    "pt-BR": "Português",
-    "ru-RU": "Русский",
-    "tr-TR": "Türkçe",
-    "zh-CN": "简体中文",
-    "zh-TW": "繁體中文",
-}
-RELEASE_TABLE_PLATFORMS = ("linux", "macos", "windows")
-RELEASE_TABLE_PLATFORM_LABELS = {"linux": "Linux", "macos": "macOS", "windows": "Windows"}
-RELEASE_TABLE_ARCHES = ("aarch64", "x86_64")
-# Short display labels keep the download table cells from truncating.
-RELEASE_TABLE_ARCH_LABELS = {"aarch64": "arm64", "x86_64": "x64"}
-# (platform, kind) -> download link label for the universal table.
-UNIVERSAL_TABLE_KINDS = {
-    ("linux", "app"): "tar.gz",
-    ("linux", "deb_package"): "deb",
-    ("macos", "app"): "dmg",
-    ("windows", "app"): "exe",
-    ("windows", "portable_app"): "zip",
-}
-UNIVERSAL_RELEASE_NOTES_NOTICE = (
-    "All supported languages are now included in one build, so there is a single "
-    "download per platform. The display language follows your system language and "
-    'can be changed anytime with the "Display Language" setting. If you previously '
-    "used a language different from your system language, re-select it once in the "
-    "settings after updating."
-)
-
-
 def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> str:
     zed_version = str(manifest["zed_version"])
     release_tag = str(manifest["release_tag"])
     repository = str(manifest["repository"])
-    assets = manifest["assets"]
-    if not isinstance(assets, list):
-        raise ValueError("release manifest assets must be a list")
-
-    app_links: dict[tuple[str, str, str], str] = {}
-    universal_links: dict[tuple[str, str, str], str] = {}
-    locales: set[str] = set()
-    for asset in assets:
-        if not isinstance(asset, dict):
-            raise ValueError("release manifest assets must be objects")
-
-        kind = asset.get("kind")
-        platform = str(asset["platform"])
-        arch = str(asset["arch"])
-        locale = asset.get("locale")
-        if locale is None:
-            if (platform, kind) in UNIVERSAL_TABLE_KINDS:
-                universal_links[(platform, arch, str(kind))] = str(asset["download_url"])
-            continue
-        if kind != "app":
-            continue
-        app_links[(str(locale), platform, arch)] = str(asset["download_url"])
-        locales.add(str(locale))
 
     lines = [
         f"Localized Zed build for {zed_version}.",
@@ -1512,62 +1452,7 @@ def generate_release_notes(manifest: dict[str, object], previous_tag: str) -> st
                 "",
             ]
         )
-    lines.extend(
-        [
-            "<!-- Add the manually summarized changelog here. -->",
-            "",
-        ]
-    )
-
-    if universal_links:
-        lines.extend(
-            [
-                UNIVERSAL_RELEASE_NOTES_NOTICE,
-                "",
-                "| Platform | arm64 | x64 |",
-                "| --- | --- | --- |",
-            ]
-        )
-        for platform in RELEASE_TABLE_PLATFORMS:
-            cells = []
-            for arch in RELEASE_TABLE_ARCHES:
-                downloads = [
-                    f"[{label}]({universal_links[(platform, arch, kind)]})"
-                    for (kind_platform, kind), label in UNIVERSAL_TABLE_KINDS.items()
-                    if kind_platform == platform and (platform, arch, kind) in universal_links
-                ]
-                cells.append(" / ".join(downloads) or "-")
-            if set(cells) == {"-"}:
-                continue
-            lines.append(
-                f"| {RELEASE_TABLE_PLATFORM_LABELS[platform]} | {' | '.join(cells)} |"
-            )
-    else:
-        lines.extend(
-            [
-                "| Language | Linux | macOS | Windows |",
-                "| --- | --- | --- | --- |",
-            ]
-        )
-        for locale in sorted(locales):
-            locale_name = RELEASE_LOCALE_NAMES.get(locale)
-            language = f"{locale_name} ({locale})" if locale_name else locale
-            cells = []
-            for platform in RELEASE_TABLE_PLATFORMS:
-                downloads = [
-                    f"[{RELEASE_TABLE_ARCH_LABELS[arch]}]({app_links[(locale, platform, arch)]})"
-                    for arch in RELEASE_TABLE_ARCHES
-                    if (locale, platform, arch) in app_links
-                ]
-                cells.append(" / ".join(downloads) or "-")
-            lines.append(f"| {language} | {' | '.join(cells)} |")
-
-    lines.extend(
-        [
-            "",
-            f"The full download table is available in the [README](https://github.com/{repository}#downloads).",
-        ]
-    )
+    lines.append("<!-- Add the manually summarized changelog here. -->")
     return "\n".join(lines) + "\n"
 
 

@@ -614,11 +614,7 @@ class CiReleaseTests(unittest.TestCase):
             notes,
             "Localized Zed build for v1.2.5.\n\n"
             "Full Changelog: [`v1.2.4-i18n.1...v1.2.5-i18n.1`](https://github.com/owner/repo/compare/v1.2.4-i18n.1...v1.2.5-i18n.1)\n\n"
-            "<!-- Add the manually summarized changelog here. -->\n\n"
-            "| Language | Linux | macOS | Windows |\n"
-            "| --- | --- | --- | --- |\n"
-            f"| 한국어 (ko-KR) | [arm64]({base_url}/zed-i18n-ko-KR-linux-aarch64.tar.gz) / [x64]({base_url}/zed-i18n-ko-KR-linux-x86_64.tar.gz) | [arm64]({base_url}/Zed-i18n-ko-KR-macos-aarch64.dmg) | [x64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
-            "The full download table is available in the [README](https://github.com/owner/repo#downloads).\n",
+            "<!-- Add the manually summarized changelog here. -->\n",
         )
         self.assertNotIn(".zip)", notes)
 
@@ -645,15 +641,11 @@ class CiReleaseTests(unittest.TestCase):
         self.assertEqual(
             notes,
             "Localized Zed build for v1.2.5.\n\n"
-            "<!-- Add the manually summarized changelog here. -->\n\n"
-            "| Language | Linux | macOS | Windows |\n"
-            "| --- | --- | --- | --- |\n"
-            f"| 한국어 (ko-KR) | - | - | [x64]({base_url}/Zed-i18n-ko-KR-windows-x86_64.exe) |\n\n"
-            "The full download table is available in the [README](https://github.com/owner/repo#downloads).\n",
+            "<!-- Add the manually summarized changelog here. -->\n",
         )
         self.assertNotIn("Full Changelog", notes)
 
-    def test_generates_universal_release_notes_with_platform_table_and_notice(self) -> None:
+    def test_generates_universal_release_notes_without_notice_or_download_table(self) -> None:
         release_tag = "v1.2.5-i18n.6"
         base_url = f"https://github.com/owner/repo/releases/download/{release_tag}"
 
@@ -692,22 +684,12 @@ class CiReleaseTests(unittest.TestCase):
 
         notes = generate_release_notes(manifest, "v1.2.4-i18n.1")
 
-        self.assertIn("All supported languages are now included in one build", notes)
-        self.assertIn('"Display Language"', notes)
-        self.assertIn("| Platform | arm64 | x64 |", notes)
-        self.assertIn(
-            f"| Linux | - | [tar.gz]({base_url}/zed-i18n-linux-x86_64.tar.gz) / [deb]({base_url}/zed-i18n-linux-x86_64.deb) |",
+        self.assertEqual(
             notes,
+            "Localized Zed build for v1.2.5.\n\n"
+            "Full Changelog: [`v1.2.4-i18n.1...v1.2.5-i18n.6`](https://github.com/owner/repo/compare/v1.2.4-i18n.1...v1.2.5-i18n.6)\n\n"
+            "<!-- Add the manually summarized changelog here. -->\n",
         )
-        self.assertIn(f"| macOS | [dmg]({base_url}/Zed-i18n-macos-aarch64.dmg) | - |", notes)
-        self.assertIn(
-            f"| Windows | - | [exe]({base_url}/Zed-i18n-windows-x86_64.exe) / [zip]({base_url}/Zed-i18n-windows-x86_64.zip) |",
-            notes,
-        )
-        self.assertNotIn("| Language |", notes)
-        self.assertNotIn("한국어", notes)
-        self.assertIn("Full Changelog", notes)
-        self.assertIn("#downloads", notes)
 
     def test_windows_app_source_path_uses_distribution_setup_name(self) -> None:
         config = DistributionConfig(windows_setup_name="Zed-i18n")
