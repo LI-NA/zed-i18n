@@ -56,7 +56,10 @@ def apply_translations(
             if not isinstance(occurrence, dict) or not isinstance(occurrence.get("file"), str):
                 stale_sources.add(source)
                 continue
-            occurrences_by_file[occurrence["file"]].append((source, translation, occurrence))
+            relative_file = occurrence["file"]
+            if relative_file.startswith("runtime-overlay/"):
+                continue
+            occurrences_by_file[relative_file].append((source, translation, occurrence))
 
     for occurrences in occurrences_by_file.values():
         for source, translation, occurrence in sorted(

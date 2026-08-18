@@ -103,6 +103,27 @@ class ApplyTests(unittest.TestCase):
         self.assertEqual(report.stale, ["Welcome"])
         self.assertFalse(report.ok)
 
+    def test_ignores_runtime_overlay_occurrences_during_per_language_apply(self) -> None:
+        manifest = {
+            "Restart Zed": {
+                "status": "accepted",
+                "occurrences": [
+                    {
+                        "file": "runtime-overlay/crates/settings_ui/src/locale_picker.rs",
+                        "line": 1,
+                        "call": "localization::localized_str!",
+                        "kind": "runtime_overlay_message",
+                    }
+                ],
+            }
+        }
+
+        report = apply_translations(self.root, manifest, {"Restart Zed": "Zed 다시 시작"})
+
+        self.assertTrue(report.ok)
+        self.assertEqual(report.applied, [])
+        self.assertEqual(report.stale, [])
+
     def test_stale_fallback_does_not_rewrite_later_matching_literals(self) -> None:
         source_path = self.root / "main.rs"
         source_path.write_text(
