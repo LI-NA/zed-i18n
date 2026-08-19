@@ -4911,7 +4911,7 @@ AGENT_THREAD_VIEW_LINE_PATTERNS: tuple[LinePattern, ...] = (
 
 COLLAB_PANEL_LINE_PATTERNS: tuple[LinePattern, ...] = (
     LinePattern(
-        re.compile(r'\bformat!\(\s*("(?:Invite \{\} to Join Call|Call \{\})")'),
+        re.compile(r'\bformat!\(\s*("(?:Invite \{username\} to Join Call|Call \{username\})")'),
         "contact_call_tooltip",
         "tooltip",
         1,

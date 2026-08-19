@@ -1,5 +1,5 @@
 ubuntu_base = "ubuntu:20.04@sha256:8feb4d8ca5354def3d8fce243717141ce31e2c428701f6682bd2fafe15388214"
-rust_toolchain = "1.95.0"
+rust_toolchain = "1.97.1"
 rust_profile = "minimal"
 rust_components = ["rustfmt", "clippy", "rust-analyzer", "rust-src"]
 rust_targets = ["wasm32-wasip2", "wasm32-unknown-unknown", "x86_64-unknown-linux-musl"]

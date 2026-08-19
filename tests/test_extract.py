@@ -2929,15 +2929,15 @@ class ExtractTests(unittest.TestCase):
                 "fn render(online: bool, busy: bool, cx: &mut App) {",
                 "    div().tooltip(move |_, cx| {",
                 "        let text = if !online {",
-                '            format!(" {} is Offline", &username)',
+                '            format!(" {username} is Offline")',
                 "        } else if busy {",
-                '            format!(" {} is on a Call", &username)',
+                '            format!(" {username} is on a Call")',
                 "        } else {",
                 "            let room = ActiveCall::global(cx).read(cx).room();",
                 "            if room.is_some() {",
-                '                format!("Invite {} to Join Call", &username)',
+                '                format!("Invite {username} to Join Call")',
                 "            } else {",
-                '                format!("Call {}", &username)',
+                '                format!("Call {username}")',
                 "            }",
                 "        };",
                 "        Tooltip::simple(text, cx)",
@@ -2955,14 +2955,14 @@ class ExtractTests(unittest.TestCase):
         self.assertEqual(
             set(by_source),
             {
-                " {} is Offline",
-                " {} is on a Call",
-                "Invite {} to Join Call",
-                "Call {}",
+                " {username} is Offline",
+                " {username} is on a Call",
+                "Invite {username} to Join Call",
+                "Call {username}",
             },
         )
-        self.assertEqual(by_source["Invite {} to Join Call"].kind, "tooltip")
-        self.assertEqual(by_source["Call {}"].call, "contact_call_tooltip")
+        self.assertEqual(by_source["Invite {username} to Join Call"].kind, "tooltip")
+        self.assertEqual(by_source["Call {username}"].call, "contact_call_tooltip")
 
     def test_extracts_git_panel_dynamic_labels(self) -> None:
         source = "\n".join(
