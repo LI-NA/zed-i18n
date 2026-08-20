@@ -577,6 +577,8 @@ jobs:
         env:
           INPUT_RELEASE_TAG: ${{ inputs.release_tag || '' }}
           BUILD_MODE: ${{ inputs.build_mode || 'universal' }}
+          LANGUAGES: ${{ needs.prepare.outputs.languages }}
+          PLATFORMS: ${{ inputs.platforms || 'all' }}
         run: |
           RELEASE_TAG="${INPUT_RELEASE_TAG:-$GITHUB_REF_NAME}"
           uv run python -m tools.zed_i18n.ci_release metadata \
@@ -587,8 +589,8 @@ jobs:
             --repository "$GITHUB_REPOSITORY" \
             --run-id "$GITHUB_RUN_ID" \
             --mode "$BUILD_MODE" \
-            --languages "${{ needs.prepare.outputs.languages }}" \
-            --platforms "${{ inputs.platforms || 'all' }}"
+            --languages "$LANGUAGES" \
+            --platforms "$PLATFORMS"
 
       - name: Generate artifact attestation
         uses: actions/attest@281a49d4cbb0a72c9575a50d18f6deb515a11deb # v4

@@ -1088,6 +1088,21 @@ class CiReleaseTests(unittest.TestCase):
         self.assertGreater(entries[0].total_bytes, 0)
         self.assertGreater(entries[0].free_bytes, 0)
 
+    def test_release_workflow_passes_metadata_filters_through_environment(self) -> None:
+        workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
+            encoding="utf-8"
+        )
+        metadata_step = workflow.split(
+            "      - name: Generate manifest and checksums\n", 1
+        )[1].split("\n      - name: Generate artifact attestation", 1)[0]
+
+        self.assertIn("LANGUAGES: ${{ needs.prepare.outputs.languages }}", metadata_step)
+        self.assertIn("PLATFORMS: ${{ inputs.platforms || 'all' }}", metadata_step)
+        self.assertIn('--languages "$LANGUAGES"', metadata_step)
+        self.assertIn('--platforms "$PLATFORMS"', metadata_step)
+        self.assertNotIn('--languages "${{ needs.prepare.outputs.languages }}"', metadata_step)
+        self.assertNotIn('--platforms "${{ inputs.platforms || \'all\' }}"', metadata_step)
+
     def test_release_workflow_configures_github_actions_rust_cache(self) -> None:
         workflow = (Path.cwd() / ".github" / "workflows" / "i18n-release.yml").read_text(
             encoding="utf-8"
