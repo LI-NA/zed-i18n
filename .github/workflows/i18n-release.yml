@@ -238,8 +238,6 @@ jobs:
           sudo rm -rf /usr/local/share/powershell
           sudo rm -rf /usr/local/share/chromium
           docker system prune --all --force || true
-          sudo swapoff -a || true
-          sudo rm -f /mnt/swapfile /swapfile || true
           df -h "$GITHUB_WORKSPACE"
 
       - name: Record disk space after Linux cleanup
