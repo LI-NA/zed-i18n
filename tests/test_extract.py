@@ -7,6 +7,92 @@ from tools.zed_i18n.extract import extract_repository, extract_ui_strings_from_s
 
 
 class ExtractTests(unittest.TestCase):
+    def test_extracts_v1_25_ui_errors_only_in_production_functions(self) -> None:
+        cases = [
+            (
+                "crates/agent_ui/src/conversation_view.rs",
+                ["handle_thread_event"],
+                'let error = anyhow!("Agent stopped because of an error");',
+                {"Agent stopped because of an error"},
+            ),
+            (
+                "crates/agent/src/agent.rs",
+                ["legacy_native_completion"],
+                'anyhow!("Native agent stopped with an error"); '
+                'anyhow::bail!("Native agent returned an unsupported stop reason");',
+                {"Native agent stopped with an error", "Native agent returned an unsupported stop reason"},
+            ),
+            (
+                "crates/agent/src/thread.rs",
+                ["push_acp_agent_block", "validate_content_block", "from_content_block"],
+                'anyhow::bail!("Native agent does not support this embedded resource variant"); '
+                'anyhow::bail!("Native agent does not support this content block variant");',
+                {
+                    "Native agent does not support this embedded resource variant",
+                    "Native agent does not support this content block variant",
+                },
+            ),
+            (
+                "crates/language_models/src/provider/bedrock.rs",
+                ["into_bedrock"],
+                'anyhow::bail!("{model} does not support forced tool use");',
+                {"{model} does not support forced tool use"},
+            ),
+            (
+                "crates/remote/src/transport/ssh.rs",
+                ["parse_posix"],
+                'fields.next().context("Missing remote shell")?; '
+                'fields.next().context("Missing remote platform")?; '
+                'fields.next().context("Missing remote OS version")?; '
+                'fields.next().context("Missing remote OS version exit status")?;',
+                {
+                    "Missing remote shell", "Missing remote platform",
+                    "Missing remote OS version", "Missing remote OS version exit status",
+                },
+            ),
+            (
+                "crates/remote/src/transport/ssh.rs",
+                ["parse_windows"],
+                'fields.next().context("Missing remote shell")?; '
+                'fields.next().context("Missing remote Windows architecture")?; '
+                'fields.next().context("Missing remote OS version")?; '
+                'fields.next().context("Missing remote OS version exit status")?; '
+                'anyhow::bail!("Prebuilt remote servers are not yet available for windows-{architecture}. See https://zed.dev/docs/remote-development");',
+                {
+                    "Missing remote shell", "Missing remote Windows architecture",
+                    "Missing remote OS version", "Missing remote OS version exit status",
+                    "Prebuilt remote servers are not yet available for windows-{architecture}. See https://zed.dev/docs/remote-development",
+                },
+            ),
+            (
+                "crates/remote/src/transport/ssh.rs",
+                ["environment_posix"],
+                'output.context("Failed to determine remote environment")?;',
+                {"Failed to determine remote environment"},
+            ),
+        ]
+        for path, functions, body, expected in cases:
+            for function in functions:
+                with self.subTest(path=path, function=function):
+                    logs = " ".join(f'log::warn!("{message}");' for message in sorted(expected))
+                    source = (
+                        f"fn {function}() {{ {body} {logs} }}\n"
+                        f"fn diagnostic() {{ {body} }}\n"
+                        f"#[cfg(test)] mod tests {{ fn {function}() {{ {body} }} }}\n"
+                        f"#[gpui::test] fn {function}() {{ {body} }}\n"
+                    )
+                    occurrences = extract_ui_strings_from_source(source, relative_path=path)
+                    self.assertEqual({o.source for o in occurrences}, expected)
+                    self.assertEqual(len(occurrences), len(expected))
+                    self.assertEqual({o.line for o in occurrences}, {1})
+                    for occurrence in occurrences:
+                        literal = source.encode()[occurrence.start_byte:occurrence.end_byte]
+                        self.assertEqual(literal.decode(), f'"{occurrence.source}"')
+                    self.assertEqual(
+                        extract_ui_strings_from_source(source, relative_path="crates/protocol/src/lib.rs"),
+                        [],
+                    )
+
     def test_extracts_acp_v1_prompt_validation_error_only_in_production_function(self) -> None:
         message = "This prompt contains content not supported by ACP v1"
         source = f'''pub fn validate_prompt_content_for_v1() {{ bail!("{message}"); }}

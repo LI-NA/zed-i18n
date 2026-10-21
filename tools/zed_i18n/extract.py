@@ -2393,6 +2393,11 @@ def _extract_exact_line_literal_occurrences(
 # Indirect UI values whose consumers are outside the literal's expression.
 # Scope these to their production function, since several files repeat the
 # same text in assertions, protocol handling, or diagnostic output.
+NATIVE_CONTENT_ERROR_SOURCES = {
+    "Native agent does not support this embedded resource variant",
+    "Native agent does not support this content block variant",
+}
+
 FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
     "crates/markdown_preview/src/markdown_preview_view.rs": {
         "tab_extra_context_menu_actions": ({"Show Source"}, "context_menu_action"),
@@ -2405,6 +2410,43 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
     },
     "crates/agent_ui/src/conversation_view.rs": {
         "plan_summary_label": ({"All Done", "Cancelled", "Finished", "{entry_count} Tasks"}, "label"),
+        "handle_thread_event": ({"Agent stopped because of an error"}, "thread_error_message"),
+    },
+    "crates/agent/src/agent.rs": {
+        "legacy_native_completion": (
+            {"Native agent stopped with an error", "Native agent returned an unsupported stop reason"},
+            "thread_error_message",
+        ),
+    },
+    "crates/agent/src/thread.rs": {
+        "push_acp_agent_block": (NATIVE_CONTENT_ERROR_SOURCES, "thread_error_message"),
+        "validate_content_block": (NATIVE_CONTENT_ERROR_SOURCES, "thread_error_message"),
+        "from_content_block": (NATIVE_CONTENT_ERROR_SOURCES, "thread_error_message"),
+    },
+    "crates/language_models/src/provider/bedrock.rs": {
+        "into_bedrock": ({"{model} does not support forced tool use"}, "provider_model_error"),
+    },
+    "crates/remote/src/transport/ssh.rs": {
+        "parse_posix": (
+            {
+                "Missing remote shell",
+                "Missing remote platform",
+                "Missing remote OS version",
+                "Missing remote OS version exit status",
+            },
+            "workspace_error_message",
+        ),
+        "parse_windows": (
+            {
+                "Missing remote shell",
+                "Missing remote Windows architecture",
+                "Missing remote OS version",
+                "Missing remote OS version exit status",
+                "Prebuilt remote servers are not yet available for windows-{architecture}. See https://zed.dev/docs/remote-development",
+            },
+            "workspace_error_message",
+        ),
+        "environment_posix": ({"Failed to determine remote environment"}, "workspace_error_message"),
     },
     "crates/agent_ui/src/conversation_view/thread_view.rs": {
         "submission_text_parts": ({"[Resource attachment]", "[Image attachment]", "[Audio attachment]", "[Unsupported attachment]"}, "label"),
