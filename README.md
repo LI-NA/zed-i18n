@@ -103,6 +103,8 @@ All commands are run as `uv run zed-i18n <command>`.
 
 The target Zed version is set in `config/project.toml`. `fetch-zed` prepares both the checkout used for applying translations and building, and the clean checkout used for string extraction and review.
 
+`zed_ref` is optional. Set it when the Zed source is a fork that carries its own changes on a branch or tag. `zed_version` is the release being built, and it names the checkout directory, the package version, and the reports, so a separate ref lets a fork keep all of those named after the upstream release while checking out its own source. `zed_commit` pins the exact commit either way, and leaving `zed_ref` unset keeps the current behaviour.
+
 ```powershell
 uv run zed-i18n fetch-zed
 uv run zed-i18n extract --zed-root .cache/zed/<version>-clean-extract

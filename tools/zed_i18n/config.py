@@ -11,6 +11,10 @@ class ProjectConfig:
     zed_repository: str
     cache_dir: Path
     zed_commit: str | None = None
+    # zed_ref names the ref to check out, while zed_version stays the release version used
+    # for cache paths, package versions, and reports. A fork keeps its own changes on a
+    # separate ref so the version string can remain that of the upstream release.
+    zed_ref: str | None = None
 
 
 def load_project_config(root: Path) -> ProjectConfig:
@@ -21,6 +25,7 @@ def load_project_config(root: Path) -> ProjectConfig:
         zed_repository=data["zed_repository"],
         cache_dir=Path(data["cache_dir"]),
         zed_commit=data.get("zed_commit"),
+        zed_ref=data.get("zed_ref"),
     )
 
 

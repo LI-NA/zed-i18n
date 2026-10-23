@@ -21,7 +21,7 @@ def build_clone_command(config: ProjectConfig, checkout_path: Path) -> list[str]
         "git",
         "clone",
         "--branch",
-        config.zed_version,
+        config.zed_ref or config.zed_version,
         "--depth",
         "1",
         config.zed_repository,
