@@ -17,10 +17,11 @@ class ExtractTests(unittest.TestCase):
             ),
             (
                 "crates/agent/src/agent.rs",
-                ["legacy_native_completion"],
+                ["send"],
                 'anyhow!("Native agent stopped with an error"); '
-                'anyhow::bail!("Native agent returned an unsupported stop reason");',
-                {"Native agent stopped with an error", "Native agent returned an unsupported stop reason"},
+                'anyhow::bail!("Native subagent returned an unsupported stop reason"); '
+                'anyhow!("Subagent connection is not native");',
+                {"Native agent stopped with an error", "Native subagent returned an unsupported stop reason", "Subagent connection is not native"},
             ),
             (
                 "crates/agent/src/thread.rs",
@@ -67,8 +68,8 @@ class ExtractTests(unittest.TestCase):
             (
                 "crates/remote/src/transport/ssh.rs",
                 ["environment_posix"],
-                'output.context("Failed to determine remote environment")?;',
-                {"Failed to determine remote environment"},
+                'output.context("determining remote environment")?;',
+                {"determining remote environment"},
             ),
         ]
         for path, functions, body, expected in cases:
@@ -92,6 +93,143 @@ class ExtractTests(unittest.TestCase):
                         extract_ui_strings_from_source(source, relative_path="crates/protocol/src/lib.rs"),
                         [],
                     )
+
+    def test_extracts_v1_26_indirect_ui_values(self) -> None:
+        cases = [
+            (
+                "crates/agent_ui/src/conversation_view.rs", "initial_state",
+                'Task::ready(Err(anyhow!("Reconnecting requires full history replay. Saved input has been kept.")));',
+                {"Reconnecting requires full history replay. Saved input has been kept."},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view.rs", "handle_thread_event",
+                'LoadError::Other("Agent connection lost. Reconnect to restore the conversation.".into());',
+                {"Agent connection lost. Reconnect to restore the conversation."},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view.rs", "authentication_failed",
+                'let description = format!("Sign-in did not complete: {message}").into();',
+                {"Sign-in did not complete: {message}"},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view.rs", "copy_saved_input_button",
+                'LoadError::Other(format!("Failed to copy saved input: {error}").into());',
+                {"Failed to copy saved input: {error}"},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view/thread_view.rs", "render_recoverable_submissions",
+                'match receipt { Some(_) => ("Message accepted; agent connection lost".into(), true), '
+                'None => ("Connection lost; message acceptance is unknown".into(), true) };',
+                {"Message accepted; agent connection lost", "Connection lost; message acceptance is unknown"},
+            ),
+            (
+                "crates/agent_servers/src/acp/v2.rs", "apply_new_session_defaults",
+                'let detail = format!("Failed to apply default config option {config_id}"); '
+                'thread.push_notice("Saved config default was not applied".into(), detail);',
+                {"Failed to apply default config option {config_id}", "Saved config default was not applied"},
+            ),
+            (
+                "crates/acp_thread/src/acp_thread.rs", "reject_agent_owned_submission",
+                'Err(anyhow!("The agent owns this session, so it does not accept prompts"));',
+                {"The agent owns this session, so it does not accept prompts"},
+            ),
+            (
+                "crates/project/src/project.rs", "load_debugger_hover_children",
+                'Task::ready(Err(anyhow!("debug session is no longer available")));',
+                {"debug session is no longer available"},
+            ),
+            (
+                "crates/dap_adapters/src/javascript.rs", "install_dwarf_debugging",
+                'delegate.output_to_console(format!("Installing {} for WebAssembly debugging...", package));',
+                {"Installing {} for WebAssembly debugging..."},
+            ),
+            (
+                "crates/dap_adapters/src/javascript.rs", "get_binary",
+                'delegate.output_to_console(format!("Failed to install {}: {error:#}", package)); '
+                'log::error!("failed to install {}: {error:#}", package);',
+                {"Failed to install {}: {error:#}"},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view/subagent_card.rs", "title",
+                'match status { Canceled => "Subagent Canceled".into(), Failed => "Subagent Failed".into(), _ => "Spawning Agent…".into() }',
+                {"Subagent Canceled", "Subagent Failed", "Spawning Agent…"},
+            ),
+            (
+                "crates/editor/src/debugger_hover.rs", "add_watch",
+                'self.operation_error = Some("The debug session is no longer paused here".into()); '
+                'result.err().map(|error| format!("Could not add watch: {error}"));',
+                {"The debug session is no longer paused here", "Could not add watch: {error}"},
+            ),
+            (
+                "crates/editor/src/debugger_hover.rs", "load_children",
+                'Err(anyhow!("project is no longer available").to_string());',
+                {"project is no longer available"},
+            ),
+            (
+                "crates/editor/src/debugger_hover.rs", "render_entries",
+                'entries.push(self.render_status_row("Loading…", depth + 1, cx));',
+                {"Loading…"},
+            ),
+            (
+                "crates/workspace/src/security_modal.rs", "validate_trust_scope",
+                'return Err("Home directory not available".into());',
+                {"Home directory not available"},
+            ),
+            (
+                "crates/opencode/src/catalog.rs", "parse_model_catalog",
+                'catalog.ok_or_else(|| anyhow!("OpenCode catalog is missing {provider_key}"))?; '
+                'bail!("OpenCode model metadata did not contain any compatible models");',
+                {"OpenCode catalog is missing {provider_key}", "OpenCode model metadata did not contain any compatible models"},
+            ),
+        ]
+        for path, function, body, expected in cases:
+            with self.subTest(path=path, function=function):
+                logs = " ".join(f'log::warn!("{message}");' for message in sorted(expected))
+                source = (
+                    f"fn {function}() {{ {body} {logs} }}\n"
+                    f"fn diagnostic() {{ {body} }}\n"
+                    f"#[cfg(test)] mod tests {{ fn {function}() {{ {body} }} }}\n"
+                )
+                occurrences = extract_ui_strings_from_source(source, relative_path=path)
+                self.assertEqual({o.source for o in occurrences}, expected)
+                self.assertEqual(len(occurrences), len(expected))
+                self.assertEqual({o.line for o in occurrences}, {1})
+                for occurrence in occurrences:
+                    literal = source.encode()[occurrence.start_byte:occurrence.end_byte]
+                    self.assertEqual(literal.decode(), f'"{occurrence.source}"')
+
+    def test_extracts_v1_26_git_discard_scopes_and_prompt_fragments(self) -> None:
+        source = '''fn revert_entries() {
+    let changes = if unstaged { "unstaged changes" } else { "changes" };
+    let (message, confirm_text) = if deleted {
+        (
+            "Are you sure you want to restore ".to_string(),
+            "Restore File",
+        )
+    } else {
+        (format!("Are you sure you want to discard {changes} to "), "Discard Changes")
+    };
+    let prompts = (
+        format!("Discard {changes} to {tracked_count} files?"),
+        format!(
+            "Discard {changes} to {tracked_count} files and trash {untracked_count} files?"
+        ),
+    );
+}'''
+        occurrences = extract_ui_strings_from_source(
+            source, relative_path="crates/git_ui/src/git_panel.rs"
+        )
+        expected = {
+            "changes", "unstaged changes", "Are you sure you want to restore ",
+            "Restore File", "Are you sure you want to discard {changes} to ",
+            "Discard Changes", "Discard {changes} to {tracked_count} files?",
+            "Discard {changes} to {tracked_count} files and trash {untracked_count} files?",
+        }
+        self.assertEqual({o.source for o in occurrences}, expected)
+        self.assertEqual(len(occurrences), len(expected))
+        for occurrence in occurrences:
+            literal = source.encode()[occurrence.start_byte:occurrence.end_byte]
+            self.assertEqual(literal.decode(), f'"{occurrence.source}"')
 
     def test_extracts_acp_v1_prompt_validation_error_only_in_production_function(self) -> None:
         message = "This prompt contains content not supported by ACP v1"

@@ -2410,13 +2410,40 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
     },
     "crates/agent_ui/src/conversation_view.rs": {
         "plan_summary_label": ({"All Done", "Cancelled", "Finished", "{entry_count} Tasks"}, "label"),
-        "handle_thread_event": ({"Agent stopped because of an error"}, "thread_error_message"),
+        "handle_thread_event": ({"Agent stopped because of an error", "Agent connection lost. Reconnect to restore the conversation."}, "thread_error_message"),
+        "initial_state": ({"Reconnecting requires full history replay. Saved input has been kept."}, "thread_error_message"),
+        "authentication_failed": ({"Sign-in did not complete: {message}"}, "thread_error_message"),
+        "copy_saved_input_button": ({"Failed to copy saved input: {error}"}, "thread_error_message"),
     },
     "crates/agent/src/agent.rs": {
-        "legacy_native_completion": (
-            {"Native agent stopped with an error", "Native agent returned an unsupported stop reason"},
+        "send": (
+            {"Native agent stopped with an error", "Native subagent returned an unsupported stop reason", "Subagent connection is not native"},
             "thread_error_message",
         ),
+    },
+    "crates/agent_ui/src/conversation_view/subagent_card.rs": {
+        "title": ({"Subagent Canceled", "Subagent Failed", "Spawning Agent…"}, "label"),
+    },
+    "crates/editor/src/debugger_hover.rs": {
+        "add_watch": ({"The debug session is no longer paused here", "Could not add watch: {error}"}, "input_error"),
+        "load_children": ({"project is no longer available"}, "input_error"),
+        "render_entries": ({"Loading…"}, "label"),
+    },
+    "crates/workspace/src/security_modal.rs": {
+        "validate_trust_scope": ({"Home directory not available"}, "workspace_security_error"),
+    },
+    "crates/opencode/src/catalog.rs": {
+        "parse_model_catalog": ({"OpenCode catalog is missing {provider_key}", "OpenCode model metadata did not contain any compatible models"}, "provider_model_error"),
+    },
+    "crates/project/src/project.rs": {
+        "load_debugger_hover_children": ({"debug session is no longer available"}, "input_error"),
+    },
+    "crates/agent_servers/src/acp/v2.rs": {
+        "apply_new_session_defaults": ({"Failed to apply default config option {config_id}", "Saved config default was not applied"}, "thread_error_message"),
+    },
+    "crates/dap_adapters/src/javascript.rs": {
+        "install_dwarf_debugging": ({"Installing {} for WebAssembly debugging..."}, "status_message"),
+        "get_binary": ({"Failed to install {}: {error:#}"}, "status_message"),
     },
     "crates/agent/src/thread.rs": {
         "push_acp_agent_block": (NATIVE_CONTENT_ERROR_SOURCES, "thread_error_message"),
@@ -2446,11 +2473,11 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
             },
             "workspace_error_message",
         ),
-        "environment_posix": ({"Failed to determine remote environment"}, "workspace_error_message"),
+        "environment_posix": ({"determining remote environment"}, "workspace_error_message"),
     },
     "crates/agent_ui/src/conversation_view/thread_view.rs": {
         "submission_text_parts": ({"[Resource attachment]", "[Image attachment]", "[Audio attachment]", "[Unsupported attachment]"}, "label"),
-        "render_recoverable_submissions": ({"Sending message…", "Waiting for message to appear…", "Message failed to send: {}", "Message cancelled", "Message"}, "label"),
+        "render_recoverable_submissions": ({"Sending message…", "Waiting for message to appear…", "Message accepted; agent connection lost", "Connection lost; message acceptance is unknown", "Message failed to send: {}", "Message cancelled", "Message"}, "label"),
         "regenerate": ({"The conversation was rewound, but the message became read-only and was not resent."}, "thread_error_message"),
     },
     "crates/agent_ui/src/message_editor.rs": {
@@ -2459,13 +2486,14 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
     "crates/acp_thread/src/acp_thread.rs": {
         "unsupported": ({"Audio content is not supported.", "Unknown content type is not supported.", "This content is not supported."}, "thread_error_message"),
         "from_prepared": ({"Unsupported tool call content."}, "thread_error_message"),
+        "reject_agent_owned_submission": ({"The agent owns this session, so it does not accept prompts"}, "thread_error_message"),
     },
     "crates/acp_thread/src/diff.rs": {
         "new": ({"Diff preview unavailable: {error}\n\n{}"}, "thread_error_message"),
         "diff_change_label": ({"Added {}", "Deleted {}", "Modified {}", "Moved {} → {}", "Copied {} → {}", "Unsupported file operation"}, "label"),
     },
     "crates/git_ui/src/git_panel.rs": {
-        "revert_entries": ({"Trash ", "Trash", "Discard changes to {tracked_count} files?", "Discard", "Trash {untracked_count} files?", "Discard changes to {tracked_count} files and trash {untracked_count} files?", "Discard and Trash", "Failed to revert changes"}, "prompt_message"),
+        "revert_entries": ({"Trash ", "Trash", "changes", "unstaged changes", "Are you sure you want to restore ", "Restore File", "Are you sure you want to discard {changes} to ", "Discard Changes", "Discard {changes} to {tracked_count} files?", "Discard", "Trash {untracked_count} files?", "Discard {changes} to {tracked_count} files and trash {untracked_count} files?", "Discard and Trash", "Failed to revert changes"}, "prompt_message"),
         "build_context_menu": ({"File", "Files"}, "label"),
     },
     "crates/tabular_data_preview/src/parser.rs": {
