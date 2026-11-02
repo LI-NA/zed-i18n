@@ -101,7 +101,7 @@ Todos os comandos são executados como `uv run zed-i18n <command>`.
 
 ## Uso
 
-A versão alvo do Zed é definida em `config/project.toml`. O comando `fetch-zed` prepara tanto o checkout usado para aplicação/compilação quanto o checkout limpo utilizado para extração de strings e revisão.
+A versão alvo do Zed é definida em `config/project.toml`. O comando `fetch-zed` prepara tanto o checkout usado para aplicação/compilação quanto o checkout limpo utilizado para extração de strings e revisão. Se você for compilar a partir de um fork do Zed, altere `zed_repository` para a URL do repositório do fork e informe em `zed_ref` o nome do branch ou da tag do fork para obter o código-fonte dele. Nesse caso, também é necessário alterar `zed_commit` para o commit correspondente do fork.
 
 ```powershell
 uv run zed-i18n fetch-zed

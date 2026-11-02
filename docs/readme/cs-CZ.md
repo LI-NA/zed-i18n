@@ -101,7 +101,7 @@ Všechny příkazy se spouštějí jako `uv run zed-i18n <command>`.
 
 ## Použití
 
-Cílová verze Zed je nastavena v `config/project.toml`. Příkaz `fetch-zed` připraví checkout pro aplikování překladů a sestavení i čistý checkout používaný pro extrakci a kontrolu řetězců.
+Cílová verze Zed je nastavena v `config/project.toml`. Příkaz `fetch-zed` připraví checkout pro aplikování překladů a sestavení i čistý checkout používaný pro extrakci a kontrolu řetězců. Pokud sestavujete z forku Zed, změňte `zed_repository` na adresu repozitáře forku a v `zed_ref` uveďte název větve nebo tagu forku, čímž se načte zdrojový kód forku. V takovém případě je nutné změnit i `zed_commit` na příslušný commit forku.
 
 ```powershell
 uv run zed-i18n fetch-zed

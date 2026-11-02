@@ -101,7 +101,7 @@ uv sync
 
 ## 사용법
 
-대상 Zed 버전은 `config/project.toml`에서 지정합니다. `fetch-zed`는 번역 적용·빌드용 checkout과 문자열 추출·검토용 clean checkout을 함께 준비합니다.
+대상 Zed 버전은 `config/project.toml`에서 지정합니다. `fetch-zed`는 번역 적용·빌드용 checkout과 문자열 추출·검토용 clean checkout을 함께 준비합니다. 만약 Zed 포크를 기반으로 빌드하는 경우 `zed_repository`를 포크 저장소 주소로 바꾸고 `zed_ref`에 포크의 브랜치나 태그 이름을 지정하면 포크의 소스를 가져옵니다. 이때 `zed_commit`도 포크의 커밋으로 바꿔야 합니다.
 
 ```powershell
 uv run zed-i18n fetch-zed

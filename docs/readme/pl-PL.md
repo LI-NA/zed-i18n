@@ -101,7 +101,7 @@ Wszystkie polecenia uruchamia się jako `uv run zed-i18n <command>`.
 
 ## Użycie
 
-Docelowa wersja Zed jest określona w `config/project.toml`. Polecenie `fetch-zed` przygotowuje zarówno kopię do stosowania tłumaczeń i kompilacji, jak i czystą kopię używaną do wyodrębniania i przeglądu ciągów.
+Docelowa wersja Zed jest określona w `config/project.toml`. Polecenie `fetch-zed` przygotowuje zarówno kopię do stosowania tłumaczeń i kompilacji, jak i czystą kopię używaną do wyodrębniania i przeglądu ciągów. Jeśli kompilujesz Zed na podstawie forka, zmień `zed_repository` na adres repozytorium forka i podaj w `zed_ref` nazwę gałęzi lub tagu forka, aby pobrać jego kod źródłowy. W takim przypadku zmień również `zed_commit` na odpowiedni commit forka.
 
 ```powershell
 uv run zed-i18n fetch-zed

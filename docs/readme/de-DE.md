@@ -101,7 +101,7 @@ Alle Befehle werden als `uv run zed-i18n <command>` ausgeführt.
 
 ## Verwendung
 
-Die Ziel-Zed-Version wird in `config/project.toml` festgelegt. `fetch-zed` bereitet sowohl den Checkout zum Anwenden der Übersetzungen und für Builds als auch den sauberen Checkout für die String-Extraktion und -Überprüfung vor.
+Die Ziel-Zed-Version wird in `config/project.toml` festgelegt. `fetch-zed` bereitet sowohl den Checkout zum Anwenden der Übersetzungen und für Builds als auch den sauberen Checkout für die String-Extraktion und -Überprüfung vor. Wenn Sie einen Zed-Fork bauen, setzen Sie `zed_repository` auf die URL des Fork-Repositorys und `zed_ref` auf den Branch- oder Tag-Namen des Forks, damit die Quellen des Forks abgerufen werden. In diesem Fall muss auch `zed_commit` auf den entsprechenden Commit des Forks geändert werden.
 
 ```powershell
 uv run zed-i18n fetch-zed

@@ -101,7 +101,7 @@ uv sync
 
 ## 使用方法
 
-目标 Zed 版本在 `config/project.toml` 中设置。`fetch-zed` 会同时准备用于应用翻译和构建的检出目录，以及用于字符串提取与审查的干净检出目录。
+目标 Zed 版本在 `config/project.toml` 中设置。`fetch-zed` 会同时准备用于应用翻译和构建的检出目录，以及用于字符串提取与审查的干净检出目录。如果基于 Zed 的 fork 进行构建，请将 `zed_repository` 改为 fork 仓库的地址，并在 `zed_ref` 中指定 fork 的分支或标签名称，即可获取 fork 的源码。此时还需要将 `zed_commit` 改为 fork 中对应的提交。
 
 ```powershell
 uv run zed-i18n fetch-zed

@@ -101,7 +101,7 @@ Tüm komutlar `uv run zed-i18n <command>` şeklinde çalıştırılır.
 
 ## Kullanım
 
-Hedef Zed sürümü `config/project.toml` dosyasında belirlenir. `fetch-zed`, hem çeviri uygulama ve derleme için kullanılan çalışma kopyasını hem de dize çıkarma ve inceleme için kullanılan temiz çalışma kopyasını hazırlar.
+Hedef Zed sürümü `config/project.toml` dosyasında belirlenir. `fetch-zed`, hem çeviri uygulama ve derleme için kullanılan çalışma kopyasını hem de dize çıkarma ve inceleme için kullanılan temiz çalışma kopyasını hazırlar. Zed'in bir fork'unu temel alarak derleme yapıyorsanız `zed_repository` değerini fork deposunun adresiyle değiştirin ve `zed_ref` içinde fork'un dal veya etiket adını belirtin; böylece fork'un kaynak kodu alınır. Bu durumda `zed_commit` değerini de fork'taki ilgili commit ile değiştirmeniz gerekir.
 
 ```powershell
 uv run zed-i18n fetch-zed
