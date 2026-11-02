@@ -45,6 +45,20 @@ class ZedSourceTests(unittest.TestCase):
             ],
         )
 
+    def test_clones_zed_ref_when_configured(self) -> None:
+        config = ProjectConfig(
+            zed_version="v1.0.0",
+            zed_repository="https://github.com/example/zed",
+            cache_dir=Path(".cache/zed"),
+            zed_ref="l10n",
+        )
+        checkout = self.root / ".cache" / "zed" / "v1.0.0"
+
+        command = build_clone_command(config, checkout)
+
+        self.assertEqual(command[2], "--branch")
+        self.assertEqual(command[3], "l10n")
+
     def test_rejects_paths_outside_workspace(self) -> None:
         outside = self.root.parent / "outside"
 
