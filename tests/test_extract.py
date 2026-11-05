@@ -7,6 +7,65 @@ from tools.zed_i18n.extract import extract_repository, extract_ui_strings_from_s
 
 
 class ExtractTests(unittest.TestCase):
+    def test_extracts_v1_27_indirect_ui_literals_in_production_only(self) -> None:
+        cases = [
+            (
+                "crates/agent_ui/src/config_options.rs", "render",
+                'let value = if current { "On" } else { "Off" };',
+                {"On", "Off"},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view/subagent_card.rs", "from_reported_state",
+                'let errors = (Some("The subagent reached its token limit.".into()), '
+                'Some("The subagent reached its limit of model requests.".into()), '
+                'Some("The subagent\'s model refused to continue.".into()));',
+                {"The subagent reached its token limit.",
+                 "The subagent reached its limit of model requests.",
+                 "The subagent's model refused to continue."},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view/thread_view.rs", "subagent_label",
+                'thread.title().unwrap_or_else(|| "Subagent".into());',
+                {"Subagent"},
+            ),
+            (
+                "crates/agent_ui/src/conversation_view/thread_view.rs", "session_participant_label",
+                'Some(if is_parent { "Main Agent".into() } else { subagent_label(thread) });',
+                {"Main Agent"},
+            ),
+            (
+                "crates/git_ui_core/src/notifications.rs", "git_error_toast_title",
+                'if rejected { "Push rejected: fetch and integrate remote changes before pushing again".into() } '
+                'else { format!("git {action} failed").into() }',
+                {"Push rejected: fetch and integrate remote changes before pushing again", "git {action} failed"},
+            ),
+            (
+                "crates/project_panel/src/project_panel.rs", "explain_move_error",
+                'err.context(format!("Failed to move `{from}` to `{to}`. A file or folder already exists there."));',
+                {"Failed to move `{from}` to `{to}`. A file or folder already exists there."},
+            ),
+            (
+                "crates/agent/src/agent.rs", "build_available_commands_for_project",
+                'acp_v2::Command::new(COMPACT_COMMAND_NAME, "Summarize the conversation so far to free up context");',
+                {"Summarize the conversation so far to free up context"},
+            ),
+        ]
+        for path, function, body, expected in cases:
+            with self.subTest(path=path, function=function):
+                logs = " ".join(f'log::warn!("{message}");' for message in sorted(expected))
+                source = (
+                    f"fn {function}() {{ {body} {logs} }}\n"
+                    f"fn diagnostic() {{ {body} }}\n"
+                    f"#[cfg(test)] mod tests {{ fn {function}() {{ {body} }} }}\n"
+                )
+                occurrences = extract_ui_strings_from_source(source, relative_path=path)
+                self.assertEqual({o.source for o in occurrences}, expected)
+                self.assertEqual(len(occurrences), len(expected))
+                self.assertEqual({o.line for o in occurrences}, {1})
+                for occurrence in occurrences:
+                    literal = source.encode()[occurrence.start_byte:occurrence.end_byte]
+                    self.assertEqual(literal.decode(), f'"{occurrence.source}"')
+
     def test_extracts_v1_25_ui_errors_only_in_production_functions(self) -> None:
         cases = [
             (
@@ -6663,14 +6722,17 @@ fn group_bindings() {
                 "    }",
                 "}",
                 "impl GutterButtonTooltip {",
-                "    fn meta_text(&self) -> String {",
+                "    fn meta_text(&self, cx: &App) -> String {",
                 '        const RIGHT_CLICK_HINT: &str = "right-click for more options";',
                 "        let secondary = match self.secondary {",
                 '            GutterButtonIntent::SetBookmark => "bookmark",',
                 '            GutterButtonIntent::SetBreakpoint => "breakpoint",',
                 "        };",
                 '        let unrelated = "bookmark";',
-                '        format!("{modifier_as_text}-click to add a {secondary}\\n{RIGHT_CLICK_HINT}")',
+                '        format!(',
+                '            "{}-click to add a {secondary}\\n{RIGHT_CLICK_HINT}",',
+                '            modifier_as_text.display(cx.platform_info().os)',
+                '        )',
                 "    }",
                 "}",
             ]
@@ -6688,8 +6750,8 @@ fn group_bindings() {
             ),
             "breakpoint": ("GutterButtonTooltip.meta_text", "tooltip_meta"),
             "bookmark": ("GutterButtonTooltip.meta_text", "tooltip_meta"),
-            "{modifier_as_text}-click to add a {secondary}\n{RIGHT_CLICK_HINT}": (
-                "GutterButtonTooltip.meta_text",
+            "{}-click to add a {secondary}\n{RIGHT_CLICK_HINT}": (
+                "meta_text.ui",
                 "tooltip_meta",
             ),
         }

@@ -2399,6 +2399,27 @@ NATIVE_CONTENT_ERROR_SOURCES = {
 }
 
 FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
+    "crates/agent_ui/src/config_options.rs": {
+        "render": ({"On", "Off"}, "label"),
+    },
+    "crates/editor/src/editor.rs": {
+        "meta_text": (
+            {"{}-click to add a {secondary}\n{RIGHT_CLICK_HINT}"},
+            "tooltip_meta",
+        ),
+    },
+    "crates/git_ui_core/src/notifications.rs": {
+        "git_error_toast_title": (
+            {"Push rejected: fetch and integrate remote changes before pushing again", "git {action} failed"},
+            "status_toast",
+        ),
+    },
+    "crates/project_panel/src/project_panel.rs": {
+        "explain_move_error": (
+            {"Failed to move `{from}` to `{to}`. A file or folder already exists there."},
+            "notification",
+        ),
+    },
     "crates/markdown_preview/src/markdown_preview_view.rs": {
         "tab_extra_context_menu_actions": ({"Show Source"}, "context_menu_action"),
     },
@@ -2416,6 +2437,10 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
         "copy_saved_input_button": ({"Failed to copy saved input: {error}"}, "thread_error_message"),
     },
     "crates/agent/src/agent.rs": {
+        "build_available_commands_for_project": (
+            {"Summarize the conversation so far to free up context"},
+            "prompt_local_command_description",
+        ),
         "send": (
             {"Native agent stopped with an error", "Native subagent returned an unsupported stop reason", "Subagent connection is not native"},
             "thread_error_message",
@@ -2423,6 +2448,12 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
     },
     "crates/agent_ui/src/conversation_view/subagent_card.rs": {
         "title": ({"Subagent Canceled", "Subagent Failed", "Spawning Agent…"}, "label"),
+        "from_reported_state": (
+            {"The subagent reached its token limit.",
+             "The subagent reached its limit of model requests.",
+             "The subagent's model refused to continue."},
+            "thread_error_message",
+        ),
     },
     "crates/editor/src/debugger_hover.rs": {
         "add_watch": ({"The debug session is no longer paused here", "Could not add watch: {error}"}, "input_error"),
@@ -2476,6 +2507,8 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
         "environment_posix": ({"determining remote environment"}, "workspace_error_message"),
     },
     "crates/agent_ui/src/conversation_view/thread_view.rs": {
+        "subagent_label": ({"Subagent"}, "label"),
+        "session_participant_label": ({"Main Agent"}, "label"),
         "submission_text_parts": ({"[Resource attachment]", "[Image attachment]", "[Audio attachment]", "[Unsupported attachment]"}, "label"),
         "render_recoverable_submissions": ({"Sending message…", "Waiting for message to appear…", "Message accepted; agent connection lost", "Connection lost; message acceptance is unknown", "Message failed to send: {}", "Message cancelled", "Message"}, "label"),
         "regenerate": ({"The conversation was rewound, but the message became read-only and was not resent."}, "thread_error_message"),
@@ -5271,17 +5304,6 @@ EDITOR_GUTTER_TOOLTIP_LINE_PATTERNS: tuple[LinePattern, ...] = (
         re.compile(
             r'^\s*GutterButtonIntent::Set(?:Bookmark|Breakpoint)\s*=>\s*'
             r'("(?:breakpoint|bookmark)")\s*,?\s*$'
-        ),
-        "GutterButtonTooltip.meta_text",
-        "tooltip_meta",
-        1,
-    ),
-    LinePattern(
-        re.compile(
-            r'\bformat!\(\s*('
-            r'"\{modifier_as_text\}-click to add a \{secondary\}'
-            r'\\n\{RIGHT_CLICK_HINT\}"'
-            r')\s*\)'
         ),
         "GutterButtonTooltip.meta_text",
         "tooltip_meta",

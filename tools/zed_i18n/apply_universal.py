@@ -931,21 +931,21 @@ fn observe_text(text: &str) {
     patch(
         "crates/gpui/src/elements/text.rs",
         '''    ) -> (LayoutId, Self::RequestLayoutState) {
-        let mut state = TextLayout::default();
+        let state = TextLayout::default();
         let layout_id = state.layout(SharedString::from(*self), None, window, cx);''',
         '''    ) -> (LayoutId, Self::RequestLayoutState) {
         observe_text(*self);
-        let mut state = TextLayout::default();
+        let state = TextLayout::default();
         let layout_id = state.layout(SharedString::from(*self), None, window, cx);''',
     )
     patch(
         "crates/gpui/src/elements/text.rs",
         '''    ) -> (LayoutId, Self::RequestLayoutState) {
-        let mut state = TextLayout::default();
+        let state = TextLayout::default();
         let layout_id = state.layout(self.clone(), None, window, cx);''',
         '''    ) -> (LayoutId, Self::RequestLayoutState) {
         observe_text(self.as_ref());
-        let mut state = TextLayout::default();
+        let state = TextLayout::default();
         let layout_id = state.layout(self.clone(), None, window, cx);''',
     )
 

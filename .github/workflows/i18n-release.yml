@@ -337,6 +337,8 @@ jobs:
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 360
     env:
+      # Zed's bundle script requires macOS SDK 26 or newer.
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
       ZED_CLIENT_CHECKSUM_SEED: ${{ secrets.ZED_CLIENT_CHECKSUM_SEED }}
       ZED_MINIDUMP_ENDPOINT: ${{ secrets.ZED_SENTRY_MINIDUMP_ENDPOINT }}
       MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}

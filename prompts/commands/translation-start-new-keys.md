@@ -78,6 +78,12 @@ uv run zed-i18n prepare-translation \
 
 Do not pass `--all`. If `.cache/vscode-loc` exists, preparation may add `vscode_references`; `.cache/vscode-upstream` may improve their English source context. Both checkouts are optional.
 
+The CLI also writes `reports/translation/<LANG>/prepare-summary.json`, even when
+`--output-dir` is supplied. This preparation summary is an explicitly allowed
+exception to the model-scoped report workspace restriction and requires no
+additional confirmation. Other generated run files must stay in the specified
+`reports/translation-runs/<LANG>/<MODEL_SLUG>/` workspace.
+
 `prepare-translation` automatically includes locale-specific `previous_version_references` in generated batch entries when a usable current-version report is available. These are optional historical translation hints and do not guarantee equivalent meaning. Translation and validation agents must follow the interpretation rule in the generated batch: decide whether to reuse, adapt, or ignore a hint using current source context, context groups, the style guide, and glossary; current placeholders and protected tokens win, and only the current source key may be output. No historical reference is required for normal translation.
 
 Generated entries may also contain `context_group` siblings for settings, connected lines, or composed prompts. These siblings and their translations are read-only context, not additional output keys. For short settings enum labels, `source_comment` may clarify the Rust enum variant.
@@ -195,7 +201,7 @@ Stop and wait for the user only when:
 - a locale style guide is missing;
 - the translation CLI behavior has diverged from this prompt;
 - preparation is not missing-only;
-- a process attempts to write outside the approved report workspace or model artifact;
+- a process attempts to write outside the approved report workspace or model artifact, except for the CLI's `reports/translation/<LANG>/prepare-summary.json` allowed in Step 2;
 - a process attempts to write or merge into a final locale file;
 - a model artifact would include pre-existing keys;
 - generated batches are unavailable or repeatedly fail;

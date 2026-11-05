@@ -182,6 +182,7 @@ class RuntimeOverlayPatchTests(unittest.TestCase):
 
         gpui_text = self._read("crates/gpui/src/elements/text.rs")
         self.assertIn("pub fn set_text_observer", gpui_text)
+        self.assertIn("observe_text(*self);", gpui_text)
         self.assertIn("observe_text(self.as_ref());", gpui_text)
 
         helper = self._read("crates/auto_update_helper/src/auto_update_helper.rs")
