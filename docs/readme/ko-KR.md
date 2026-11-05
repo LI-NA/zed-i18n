@@ -17,6 +17,7 @@
     <a href="../../README.md">English</a> ·
     <a href="es-ES.md">Español</a> ·
     <a href="fr-FR.md">Français</a> ·
+    <a href="id-ID.md">Bahasa Indonesia</a> ·
     <a href="it-IT.md">Italiano</a> ·
     <a href="ja-JP.md">日本語</a> ·
     한국어 ·
@@ -37,9 +38,9 @@ Zed-i18n은 [Zed](https://zed.dev) 에디터의 릴리즈 버전에서 UI 문자
 
 ## 지원 언어
 
-현재 13개 언어의 번역이 `translations/`에 포함되어 있습니다. 모든 번역은 AI로 진행된 상태이며, 각각의 언어에 대해 원어민의 기여를 환영합니다.
+현재 14개 언어의 번역이 `translations/`에 포함되어 있습니다. 모든 번역은 AI로 진행된 상태이며, 각각의 언어에 대해 원어민의 기여를 환영합니다.
 
-cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
+cs-CZ · de-DE · es-ES · fr-FR · id-ID · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## 다운로드
 

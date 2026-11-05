@@ -19,7 +19,7 @@ QUOTE_PRESERVATION_RULE = (
 class TranslationPromptContractTests(unittest.TestCase):
     def test_translation_prompts_share_quote_preservation_rule(self) -> None:
         prompt_paths = sorted(TRANSLATION_PROMPTS.glob("*.md"))
-        self.assertEqual(len(prompt_paths), 14)
+        self.assertEqual(len(prompt_paths), 15)
 
         for prompt_path in prompt_paths:
             with self.subTest(prompt=prompt_path.name):

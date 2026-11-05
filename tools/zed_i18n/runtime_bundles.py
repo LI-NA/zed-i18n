@@ -25,7 +25,7 @@ from .rust_strings import (
 
 
 BUNDLE_SCHEMA_VERSION = 1
-RAW_PAYLOAD_BUDGET = 12 * 1024 * 1024
+RAW_PAYLOAD_BUDGET = 16 * 1024 * 1024
 _METADATA_KINDS = {
     "rust_doc_comment",
     "action_description",
