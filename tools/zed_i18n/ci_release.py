@@ -441,18 +441,14 @@ def patch_linux_remote_server_build(path: Path) -> None:
         flags=re.MULTILINE | re.DOTALL,
     )
     script = re.sub(
-        r' \\\n[ \t]+"\$\{target_dir\}/\$\{remote_server_triple\}"/release/remote_server(?=; then|$)',
+        r' \\\n[ \t]+"\$\{target_dir\}/\$\{remote_server_triple\}"/release/remote-server(?=; then|$)',
         "",
         script,
         flags=re.MULTILINE,
     )
-    script = script.replace(
-        'llvm-objcopy --strip-debug "${target_dir}/${remote_server_triple}/release/remote_server"\n',
-        "",
-    )
     script = re.sub(
         r"\n# Ensure that remote_server does not depend on libssl nor libcrypto, as we got rid of these deps\.\n"
-        r"if ldd \"\$\{target_dir\}/\$\{remote_server_triple\}/release/remote_server\" \| grep -q 'libcrypto\\\|libssl'; then\n"
+        r"if ldd \"\$\{target_dir\}/\$\{remote_server_triple\}/release/remote-server\" \| grep -q 'libcrypto\\\|libssl'; then\n"
         r"    if \[\[ \"\$remote_server_triple\" == \*-musl \]\]; then\n"
         r"        echo \"Error: remote_server still depends on libssl or libcrypto\" && exit 1\n"
         r"    else\n"
@@ -463,7 +459,7 @@ def patch_linux_remote_server_build(path: Path) -> None:
         script,
     )
     script = re.sub(
-        r'^gzip -f --stdout --best "\$\{target_dir\}/\$\{remote_server_triple\}/release/remote_server" > "\$\{target_dir\}/zed-remote-server-linux-\$\{arch\}\.gz"\r?\n',
+        r'^gzip -f --stdout --best "\$\{temp_dir\}/remote_server" > "\$\{target_dir\}/zed-remote-server-linux-\$\{arch\}\.gz"\r?\n',
         "",
         script,
         flags=re.MULTILINE,
@@ -473,10 +469,13 @@ def patch_linux_remote_server_build(path: Path) -> None:
         for line in script.splitlines(keepends=True)
         if "--package remote_server" not in line
         and "zed-remote-server-linux" not in line
-        and not ("llvm-objcopy " in line and "/remote_server" in line)
+        and not ("llvm-objcopy " in line and "/remote-server" in line)
     )
-    if "remote_server" in script or "zed-remote-server-linux" in script:
-        remaining = [line.strip() for line in script.splitlines() if "remote_server" in line]
+    if "remote_server" in script or "remote-server" in script:
+        remaining = [
+            line.strip() for line in script.splitlines()
+            if "remote_server" in line or "remote-server" in line
+        ]
         raise ValueError(f"failed to remove Linux remote_server build steps: {remaining}")
     path.write_text(script, encoding="utf-8")
 
@@ -497,7 +496,7 @@ def patch_macos_remote_server_build(path: Path) -> None:
         flags=re.MULTILINE | re.DOTALL,
     )
     script = re.sub(
-        r'\n[ \t]+if ! dsymutil --flat "target/\$\{target_triple\}/\$\{target_dir\}/remote_server" 2> target/dsymutil\.log; then\r?\n'
+        r'\n[ \t]+if ! dsymutil --flat "target/\$\{target_triple\}/\$\{target_dir\}/remote-server" 2> target/dsymutil\.log; then\r?\n'
         r"[ \t]+echo \"dsymutil failed\"\r?\n"
         r"[ \t]+cat target/dsymutil\.log\r?\n"
         r"[ \t]+exit 1\r?\n"
@@ -506,17 +505,17 @@ def patch_macos_remote_server_build(path: Path) -> None:
         script,
     )
     script = script.replace(
-        ' \\\n                "target/${target_triple}/${target_dir}/remote_server.dwarf"',
+        ' \\\n                "target/${target_triple}/${target_dir}/remote-server.dwarf"',
         "",
     )
     script = re.sub(
-        r'^sign_binary "target/\$target_triple/release/remote_server"\r?\n',
+        r'^sign_binary "target/\$target_triple/release/remote-server"\r?\n',
         "",
         script,
         flags=re.MULTILINE,
     )
     script = re.sub(
-        r"^gzip -f --stdout --best target/\$target_triple/release/remote_server > target/zed-remote-server-macos-\$arch_suffix\.gz\r?\n",
+        r"^gzip -f --stdout --best target/\$target_triple/release/remote-server > target/zed-remote-server-macos-\$arch_suffix\.gz\r?\n",
         "",
         script,
         flags=re.MULTILINE,
@@ -526,10 +525,13 @@ def patch_macos_remote_server_build(path: Path) -> None:
         for line in script.splitlines(keepends=True)
         if "--package remote_server" not in line
         and "zed-remote-server-macos" not in line
-        and not (line.lstrip().startswith("strip ") and "/remote_server" in line)
+        and not (line.lstrip().startswith("strip ") and "/remote-server" in line)
     )
-    if "remote_server" in script or "zed-remote-server-macos" in script:
-        remaining = [line.strip() for line in script.splitlines() if "remote_server" in line]
+    if "remote_server" in script or "remote-server" in script:
+        remaining = [
+            line.strip() for line in script.splitlines()
+            if "remote_server" in line or "remote-server" in line
+        ]
         raise ValueError(f"failed to remove macOS remote_server build steps: {remaining}")
     path.write_text(script, encoding="utf-8")
 
@@ -785,8 +787,9 @@ def patch_windows_remote_server_build(path: Path) -> None:
     Write-Output "Building remote_server for $target"
     cargo --config .cargo/bundle-config.toml build --release --package remote_server --target $target
 
-    # Create zipped remote server binary
-    $remoteServerSrc = (Resolve-Path ".\\$CargoOutDir\\remote_server.exe").Path
+    # SSH clients expect remote_server.exe inside the archive.
+    Copy-Item -Path ".\\$CargoOutDir\\remote-server.exe" -Destination "$innoDir\\remote_server.exe" -Force
+    $remoteServerSrc = (Resolve-Path "$innoDir\\remote_server.exe").Path
 
     if ($canCodeSign) {
         Write-Output "Code signing remote_server.exe"
@@ -796,6 +799,7 @@ def patch_windows_remote_server_build(path: Path) -> None:
     $remoteServerDst = "$env:ZED_WORKSPACE\\target\\zed-remote-server-windows-$Architecture.zip"
     Write-Output "Compressing remote_server to $remoteServerDst"
     Compress-Archive -Path $remoteServerSrc -DestinationPath $remoteServerDst -Force
+    Remove-Item -Path $remoteServerSrc -Force
 
     Write-Output "Remote server compressed successfully"
 }
@@ -809,8 +813,8 @@ def patch_windows_remote_server_build(path: Path) -> None:
         r"\1",
         script,
     )
-    if re.search(r"^\s*BuildRemoteServer\s*$", script, flags=re.MULTILINE):
-        raise ValueError("failed to remove Windows remote_server build invocation")
+    if any(token in script for token in ("BuildRemoteServer", "remote_server", "remote-server")):
+        raise ValueError("failed to remove Windows remote_server build steps")
     path.write_text(script, encoding="utf-8")
 
 

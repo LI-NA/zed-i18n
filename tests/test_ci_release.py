@@ -1436,7 +1436,7 @@ class CiReleaseTests(unittest.TestCase):
     for attempt in 1 2 3; do
         if sentry-cli debug-files upload --include-sources --wait -p zed -o zed-dev \
             "${target_dir}/${target_triple}"/release/zed \
-            "${target_dir}/${remote_server_triple}"/release/remote_server; then
+            "${target_dir}/${remote_server_triple}"/release/remote-server; then
             break
         fi
         if [ "$attempt" -eq 3 ]; then
@@ -1465,6 +1465,22 @@ fi
         patch_remote_server_build(self.temp_root, "linux")
         self.assertEqual(script.read_text(encoding="utf-8"), expected)
 
+    def test_remote_server_patch_rejects_unrecognized_binary_steps(self) -> None:
+        script_dir = self.temp_root / "script"
+        script_dir.mkdir(parents=True)
+        for platform, filename in (
+            ("linux", "bundle-linux"),
+            ("macos", "bundle-mac"),
+            ("windows", "bundle-windows.ps1"),
+        ):
+            with self.subTest(platform=platform):
+                script = script_dir / filename
+                source = 'new_packaging_step "target/remote-server"\n'
+                script.write_text(source, encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "failed to remove"):
+                    patch_remote_server_build(self.temp_root, platform)
+                self.assertEqual(script.read_text(encoding="utf-8"), source)
+
     def test_patches_bundle_scripts_to_skip_remote_server_build(self) -> None:
         script_dir = self.temp_root / "script"
         script_dir.mkdir(parents=True)
@@ -1487,9 +1503,9 @@ if [[ "$remote_server_triple" == "$musl_triple" ]]; then
     export "$musl_cc_var"=musl-gcc
 fi
 cargo --config .cargo/bundle-config.toml build --release --target "${remote_server_triple}" --package remote_server
-llvm-objcopy --only-keep-debug "${target_dir}/${remote_server_triple}/release/remote_server" "${target_dir}/${remote_server_triple}/release/remote_server.dbg"
-llvm-objcopy --strip-debug --discard-all "${target_dir}/${remote_server_triple}/release/remote_server"
-gzip -f --stdout --best "${target_dir}/${remote_server_triple}/release/remote_server" > "${target_dir}/zed-remote-server-linux-${arch}.gz"
+llvm-objcopy --only-keep-debug "${target_dir}/${remote_server_triple}/release/remote-server" "${target_dir}/${remote_server_triple}/release/remote-server.dbg"
+llvm-objcopy --strip-debug --discard-all "${target_dir}/${remote_server_triple}/release/remote-server" "${temp_dir}/remote_server"
+gzip -f --stdout --best "${temp_dir}/remote_server" > "${target_dir}/zed-remote-server-linux-${arch}.gz"
 """.lstrip(),
             encoding="utf-8",
         )
@@ -1554,15 +1570,15 @@ function sign_app_binaries() {
         hdiutil create -volname Zed -srcfolder "${dmg_source_directory}" -ov -format UDZO "${dmg_file_path}"
 }
 function extract_debug_symbols() {
-    if ! dsymutil --flat "target/${target_triple}/${target_dir}/remote_server" 2> target/dsymutil.log; then
+    if ! dsymutil --flat "target/${target_triple}/${target_dir}/remote-server" 2> target/dsymutil.log; then
         echo "dsymutil failed"
         cat target/dsymutil.log
         exit 1
     fi
 }
-strip -x "target/${target_triple}/${target_dir}/remote_server"
-sign_binary "target/$target_triple/release/remote_server"
-gzip -f --stdout --best target/$target_triple/release/remote_server > target/zed-remote-server-macos-$arch_suffix.gz
+strip -x "target/${target_triple}/${target_dir}/remote-server"
+sign_binary "target/$target_triple/release/remote-server"
+gzip -f --stdout --best target/$target_triple/release/remote-server > target/zed-remote-server-macos-$arch_suffix.gz
 """.lstrip(),
             encoding="utf-8",
         )
@@ -1572,8 +1588,9 @@ function BuildRemoteServer {
     Write-Output "Building remote_server for $target"
     cargo --config .cargo/bundle-config.toml build --release --package remote_server --target $target
 
-    # Create zipped remote server binary
-    $remoteServerSrc = (Resolve-Path ".\\$CargoOutDir\\remote_server.exe").Path
+    # SSH clients expect remote_server.exe inside the archive.
+    Copy-Item -Path ".\\$CargoOutDir\\remote-server.exe" -Destination "$innoDir\\remote_server.exe" -Force
+    $remoteServerSrc = (Resolve-Path "$innoDir\\remote_server.exe").Path
 
     if ($canCodeSign) {
         Write-Output "Code signing remote_server.exe"
@@ -1583,6 +1600,7 @@ function BuildRemoteServer {
     $remoteServerDst = "$env:ZED_WORKSPACE\\target\\zed-remote-server-windows-$Architecture.zip"
     Write-Output "Compressing remote_server to $remoteServerDst"
     Compress-Archive -Path $remoteServerSrc -DestinationPath $remoteServerDst -Force
+    Remove-Item -Path $remoteServerSrc -Force
 
     Write-Output "Remote server compressed successfully"
 }
@@ -1609,8 +1627,10 @@ ZipZedAndItsFriendsDebug
         macos = (script_dir / "bundle-mac").read_text(encoding="utf-8")
         windows = (script_dir / "bundle-windows.ps1").read_text(encoding="utf-8")
         self.assertNotIn("remote_server", linux)
+        self.assertNotIn("remote-server", linux)
         self.assertNotIn("zed-remote-server-linux", linux)
         self.assertNotIn("remote_server", macos)
+        self.assertNotIn("remote-server", macos)
         self.assertNotIn("zed-remote-server-macos", macos)
         self.assertIn('zed_features="--features util/debug-embed"', macos)
         self.assertIn("${zed_features} --package zed --package cli", macos)

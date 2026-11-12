@@ -1,4 +1,4 @@
-zed_version = "v1.27.0"
-zed_commit = "c84af5b99cbc366d675064e52b23664a015b6e35"
+zed_version = "v1.28.1"
+zed_commit = "e8bc16acee5ae1937600d571d441c4b5d7b0d288"
 zed_repository = "https://github.com/zed-industries/zed"
 cache_dir = ".cache/zed"

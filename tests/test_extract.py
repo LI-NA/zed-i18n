@@ -126,7 +126,7 @@ class ExtractTests(unittest.TestCase):
             ),
             (
                 "crates/remote/src/transport/ssh.rs",
-                ["environment_posix"],
+                ["probe_environment_posix"],
                 'output.context("determining remote environment")?;',
                 {"determining remote environment"},
             ),
@@ -177,9 +177,9 @@ class ExtractTests(unittest.TestCase):
             ),
             (
                 "crates/agent_ui/src/conversation_view/thread_view.rs", "render_recoverable_submissions",
-                'match receipt { Some(_) => ("Message accepted; agent connection lost".into(), true), '
-                'None => ("Connection lost; message acceptance is unknown".into(), true) };',
-                {"Message accepted; agent connection lost", "Connection lost; message acceptance is unknown"},
+                'match receipt { Some(_) => ("Connection lost".into(), Some("The agent accepted this message, then the connection was lost.".into()), true), '
+                'None => ("Connection lost".into(), Some("The connection was lost before the agent confirmed this message.".into()), true) };',
+                {"Connection lost", "The agent accepted this message, then the connection was lost.", "The connection was lost before the agent confirmed this message."},
             ),
             (
                 "crates/agent_servers/src/acp/v2.rs", "apply_new_session_defaults",
@@ -337,6 +337,41 @@ fn diagnostic() {{ log::info!("{message}"); }}
         )
         self.assertEqual([o.source for o in occurrences], ["Show Source"])
 
+    def test_extracts_v1_28_indirect_ui_values(self) -> None:
+        cases = [
+            ("crates/agent_ui/src/conversation_view/thread_view.rs", "render_recoverable_submissions", 'let status = ("Waiting…".into(), Some("The agent accepted this message but hasn\'t shown it yet.".into())); let cancelled = "Cancelled";', {"Waiting…", "The agent accepted this message but hasn't shown it yet.", "Cancelled"}),
+            ("crates/agent_ui/src/ui/terminal_tool_header.rs", "new", 'Self { stop_description: "Also possible by placing your cursor inside the terminal and using regular terminal bindings.".into() }', {"Also possible by placing your cursor inside the terminal and using regular terminal bindings."}),
+            ("crates/settings_ui/src/pages/skill_creator.rs", "write_skill_to_worktree", 'anyhow::bail!("You can\'t create skills in a project someone shared with you.");', {"You can't create skills in a project someone shared with you."}),
+            ("crates/workspace/src/security_modal.rs", "validate_trust_scope", 'anyhow::bail!("Path must be relative to the home directory");', {"Path must be relative to the home directory"}),
+            ("crates/agent/src/agent.rs", "send", 'let error = "The subagent stopped without a reason";', {"The subagent stopped without a reason"}),
+            ("crates/acp_thread/src/acp_thread.rs", "cancel_tool_call", 'anyhow!("Unknown tool call"); anyhow!("This tool call cannot be stopped");', {"Unknown tool call", "This tool call cannot be stopped"}),
+            ("crates/acp_thread/src/acp_thread.rs", "cancel_terminal", 'anyhow!("This terminal cannot be stopped");', {"This terminal cannot be stopped"}),
+            ("crates/acp_thread/src/connection.rs", "cancel_tool_call", 'anyhow::anyhow!("Cancelling tool calls is not supported");', {"Cancelling tool calls is not supported"}),
+            ("crates/acp_thread/src/connection.rs", "cancel_terminal", 'anyhow::anyhow!("Cancelling terminals is not supported");', {"Cancelling terminals is not supported"}),
+        ]
+        for path, function, body, expected in cases:
+            with self.subTest(path=path, function=function):
+                source = f"fn {function}() {{ {body} }}"
+                occurrences = extract_ui_strings_from_source(source, relative_path=path)
+                self.assertEqual({o.source for o in occurrences}, expected)
+                self.assertEqual(len(occurrences), len(expected))
+                for occurrence in occurrences:
+                    self.assertEqual(source.encode()[occurrence.start_byte:occurrence.end_byte].decode(), f'"{occurrence.source}"')
+                self.assertEqual(extract_ui_strings_from_source(source, relative_path="crates/protocol/src/lib.rs"), [])
+                self.assertEqual(extract_ui_strings_from_source(f"#[cfg(test)] mod tests {{ {source} }}", relative_path=path), [])
+
+    def test_extracts_v1_28_ui_helper_arguments_in_their_source_paths(self) -> None:
+        cases = [
+            ("crates/search/src/project_search.rs", 'render_landing_action_button("search-id", "Search in Open Buffers", icon, action, focus, cx, handler);', "Search in Open Buffers"),
+            ("crates/agent_ui/src/conversation_view/thread_view.rs", 'header.stop_description("Asks the agent to stop this process. Its output stays here.");', "Asks the agent to stop this process. Its output stays here."),
+        ]
+        for path, body, expected in cases:
+            with self.subTest(path=path):
+                source = f"fn render() {{ {body} }}"
+                occurrences = extract_ui_strings_from_source(source, relative_path=path)
+                self.assertEqual([o.source for o in occurrences], [expected])
+                self.assertEqual(extract_ui_strings_from_source(source, relative_path="crates/protocol/src/lib.rs"), [])
+
     def test_extracts_pending_bindings_header_constant(self) -> None:
         source = '''const HEADER_LABEL: &str = "is waiting for more keys…";
 const INTERNAL_ID: &str = "pending-bindings";
@@ -359,7 +394,7 @@ const INTERNAL_ID: &str = "pending-bindings";
         cases = [
             ("crates/agent_ui/src/conversation_view.rs", "plan_summary_label", 'if done { "All Done".to_owned() } else { format!("{entry_count} Tasks") }', {"All Done", "{entry_count} Tasks"}),
             ("crates/agent_ui/src/conversation_view/thread_view.rs", "submission_text_parts", 'match block { Image => "[Image attachment]", _ => "[Unsupported attachment]" }', {"[Image attachment]", "[Unsupported attachment]"}),
-            ("crates/agent_ui/src/conversation_view/thread_view.rs", "render_recoverable_submissions", 'match state { Pending => ("Sending message…".into(), false), Failed => (format!("Message failed to send: {}", error).into(), true) }', {"Sending message…", "Message failed to send: {}"}),
+            ("crates/agent_ui/src/conversation_view/thread_view.rs", "render_recoverable_submissions", 'match state { Pending => ("Sending…".into(), None, false), Failed => ("Failed".into(), Some(error.into()), true) }', {"Sending…", "Failed"}),
             ("crates/agent_ui/src/message_editor.rs", "set_source_message", r'let value = "\n[Unsupported message content — this message cannot be edited or resent]";', {"\n[Unsupported message content — this message cannot be edited or resent]"}),
             ("crates/acp_thread/src/acp_thread.rs", "unsupported", 'match content { Audio => "Audio content is not supported.", _ => "Unknown content type is not supported." }', {"Audio content is not supported.", "Unknown content type is not supported."}),
             ("crates/acp_thread/src/diff.rs", "diff_change_label", 'match op { Move => format!("Moved {} → {}", old, new), _ => "Unsupported file operation".to_owned() }', {"Moved {} → {}", "Unsupported file operation"}),
@@ -4154,7 +4189,7 @@ fn group_bindings() {
                 "        rate_latency,",
                 "    );",
                 '    self.render_loading("Connecting Server…");',
-                "    render_action_button(",
+                "    render_local_action_button(",
                 '        "search",',
                 "        IconName::X,",
                 "        None,",

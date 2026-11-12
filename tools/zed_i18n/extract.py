@@ -1156,8 +1156,8 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
         return ((0, "loading_label", "render_loading"),)
     if canonical.endswith(".render_feature_upsell_banner") or canonical == "render_feature_upsell_banner":
         return ((0, "feature_upsell", "render_feature_upsell_banner"),)
-    if canonical.endswith("render_action_button"):
-        return ((3, "tooltip", "render_action_button"),)
+    if canonical.endswith("render_local_action_button"):
+        return ((3, "tooltip", "render_local_action_button"),)
     if canonical.endswith("render_edit_prediction_end_of_line_popover"):
         return ((0, "edit_prediction_popover", "render_edit_prediction_end_of_line_popover"),)
     if canonical.endswith("render_edit_prediction_line_popover"):
@@ -1236,6 +1236,10 @@ def _rules_for_call(call: str) -> tuple[tuple[int, str, str], ...]:
 
 def _contextual_rules_for_call(call: str, relative_path: str) -> tuple[tuple[int, str, str], ...]:
     canonical = _canonical_call(call)
+    if relative_path == "crates/search/src/project_search.rs" and canonical == "render_landing_action_button":
+        return ((1, "button", "render_landing_action_button"),)
+    if _is_agent_thread_view_path(relative_path) and canonical.endswith(".stop_description"):
+        return ((0, "tooltip_meta", "stop_description"),)
     if (
         relative_path == "crates/editor/src/git.rs"
         and _is_method_call(canonical, "show_blame_revision_toast")
@@ -2442,7 +2446,7 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
             "prompt_local_command_description",
         ),
         "send": (
-            {"Native agent stopped with an error", "Native subagent returned an unsupported stop reason", "Subagent connection is not native"},
+            {"Native agent stopped with an error", "Native subagent returned an unsupported stop reason", "Subagent connection is not native", "The subagent stopped without a reason"},
             "thread_error_message",
         ),
     },
@@ -2461,7 +2465,10 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
         "render_entries": ({"Loading…"}, "label"),
     },
     "crates/workspace/src/security_modal.rs": {
-        "validate_trust_scope": ({"Home directory not available"}, "workspace_security_error"),
+        "validate_trust_scope": ({"Home directory not available", "Path must be relative to the home directory"}, "workspace_security_error"),
+    },
+    "crates/settings_ui/src/pages/skill_creator.rs": {
+        "write_skill_to_worktree": ({"You can't create skills in a project someone shared with you."}, "skill_creator_error"),
     },
     "crates/opencode/src/catalog.rs": {
         "parse_model_catalog": ({"OpenCode catalog is missing {provider_key}", "OpenCode model metadata did not contain any compatible models"}, "provider_model_error"),
@@ -2504,22 +2511,39 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
             },
             "workspace_error_message",
         ),
-        "environment_posix": ({"determining remote environment"}, "workspace_error_message"),
+        "probe_environment_posix": ({"determining remote environment"}, "workspace_error_message"),
     },
     "crates/agent_ui/src/conversation_view/thread_view.rs": {
         "subagent_label": ({"Subagent"}, "label"),
         "session_participant_label": ({"Main Agent"}, "label"),
         "submission_text_parts": ({"[Resource attachment]", "[Image attachment]", "[Audio attachment]", "[Unsupported attachment]"}, "label"),
-        "render_recoverable_submissions": ({"Sending message…", "Waiting for message to appear…", "Message accepted; agent connection lost", "Connection lost; message acceptance is unknown", "Message failed to send: {}", "Message cancelled", "Message"}, "label"),
+        "render_recoverable_submissions": (
+            {
+                "Sending…", "Waiting…", "Connection lost", "Failed", "Cancelled", "Message",
+                "The agent accepted this message but hasn't shown it yet.",
+                "The agent accepted this message, then the connection was lost.",
+                "The connection was lost before the agent confirmed this message.",
+            },
+            "label",
+        ),
         "regenerate": ({"The conversation was rewound, but the message became read-only and was not resent."}, "thread_error_message"),
     },
     "crates/agent_ui/src/message_editor.rs": {
         "set_source_message": ({"[Unsupported message content — this message cannot be edited or resent]", "\n[Unsupported message content — this message cannot be edited or resent]"}, "thread_error_message"),
     },
+    "crates/agent_ui/src/ui/terminal_tool_header.rs": {
+        "new": ({"Also possible by placing your cursor inside the terminal and using regular terminal bindings."}, "tooltip_meta"),
+    },
     "crates/acp_thread/src/acp_thread.rs": {
+        "cancel_tool_call": ({"Unknown tool call", "This tool call cannot be stopped"}, "thread_error_message"),
+        "cancel_terminal": ({"This terminal cannot be stopped"}, "thread_error_message"),
         "unsupported": ({"Audio content is not supported.", "Unknown content type is not supported.", "This content is not supported."}, "thread_error_message"),
         "from_prepared": ({"Unsupported tool call content."}, "thread_error_message"),
         "reject_agent_owned_submission": ({"The agent owns this session, so it does not accept prompts"}, "thread_error_message"),
+    },
+    "crates/acp_thread/src/connection.rs": {
+        "cancel_tool_call": ({"Cancelling tool calls is not supported"}, "thread_error_message"),
+        "cancel_terminal": ({"Cancelling terminals is not supported"}, "thread_error_message"),
     },
     "crates/acp_thread/src/diff.rs": {
         "new": ({"Diff preview unavailable: {error}\n\n{}"}, "thread_error_message"),
