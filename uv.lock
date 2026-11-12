@@ -1,10 +1,6 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
-
-[options]
-exclude-newer = "2026-04-27T07:54:20.7777495Z"
-exclude-newer-span = "P7D"
 
 [[package]]
 name = "tree-sitter"

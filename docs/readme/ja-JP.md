@@ -17,6 +17,7 @@
     <a href="../../README.md">English</a> ·
     <a href="es-ES.md">Español</a> ·
     <a href="fr-FR.md">Français</a> ·
+    <a href="id-ID.md">Bahasa Indonesia</a> ·
     <a href="it-IT.md">Italiano</a> ·
     日本語 ·
     <a href="ko-KR.md">한국어</a> ·
@@ -37,9 +38,9 @@ Zed-i18n は、[Zed](https://zed.dev) エディターのリリース版から UI
 
 ## 対応言語
 
-現在、`translations/` 以下に 13 言語の翻訳が収録されています。すべての翻訳は AI によって生成されており、各言語のネイティブスピーカーによる貢献を歓迎します。
+現在、`translations/` 以下に 14 言語の翻訳が収録されています。すべての翻訳は AI によって生成されており、各言語のネイティブスピーカーによる貢献を歓迎します。
 
-cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
+cs-CZ · de-DE · es-ES · fr-FR · id-ID · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## ダウンロード
 
