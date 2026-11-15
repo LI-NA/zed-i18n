@@ -775,6 +775,10 @@ GIT_NOTIFY_ERROR_SOURCES = {
     "failed to unstage file",
 }
 
+BINARY_FILES_ERROR_SOURCES = {
+    "Binary files are not supported",
+}
+
 GIT_GRAPH_CHANGED_FILES_COUNT_SOURCES = {
     "{} Changed {}",
 }
@@ -923,6 +927,7 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
     occurrences.extend(_extract_exact_line_literal_occurrences(source, relative_path))
     occurrences.extend(_extract_text_for_keystroke_occurrences(source, relative_path))
     occurrences.extend(_extract_prompt_error_detail_occurrences(source_bytes, relative_path))
+    occurrences.extend(_extract_binary_files_error_occurrences(source_bytes, relative_path))
     occurrences.extend(_extract_settings_enum_variant_labels(source, relative_path))
     composite_matches = find_composite_message_matches(source_bytes, relative_path)
     claimed_spans = {
@@ -3333,6 +3338,48 @@ def _extract_prompt_error_detail_occurrences(
                     line=literal_node.start_point[0] + 1,
                     call=f"{_prompt_error_call_name(call)}.detail",
                     kind="error_detail",
+                    start_byte=literal_node.start_byte,
+                    end_byte=literal_node.end_byte,
+                )
+            )
+    return occurrences
+
+
+def _extract_binary_files_error_occurrences(
+    source_bytes: bytes,
+    relative_path: str,
+) -> list[StringOccurrence]:
+    if relative_path not in {
+        "crates/project/src/git_store.rs",
+        "crates/worktree/src/worktree.rs",
+        "crates/language/src/buffer.rs",
+    }:
+        return []
+
+    tree = _rust_parser().parse(source_bytes)
+    if tree is None:
+        return []
+
+    occurrences: list[StringOccurrence] = []
+    for node in _walk(tree.root_node):
+        if node.type != "macro_invocation":
+            continue
+        macro = node.child_by_field_name("macro")
+        if macro is None or _node_text(source_bytes, macro) != "anyhow::ensure":
+            continue
+        for literal_node in _walk(node):
+            if literal_node.type != "string_literal":
+                continue
+            source = parse_rust_string_literal(_node_text(source_bytes, literal_node))
+            if source not in BINARY_FILES_ERROR_SOURCES:
+                continue
+            occurrences.append(
+                StringOccurrence(
+                    source=source,
+                    file=relative_path,
+                    line=literal_node.start_point[0] + 1,
+                    call="anyhow::ensure!",
+                    kind="error_message",
                     start_byte=literal_node.start_byte,
                     end_byte=literal_node.end_byte,
                 )

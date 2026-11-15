@@ -737,6 +737,7 @@
   "Behaves like `\"replace\"` if the text that would be replaced is a subsequence of the completion text,": "Behaves like `\"replace\"` if the text that would be replaced is a subsequence of the completion text,",
   "Behavior Settings": "Behavior Settings",
   "Binary": "Binary",
+  "Binary files are not supported": "Binary files are not supported",
   "Black ANSI terminal color.": "Black ANSI terminal color.",
   "Blame Previous Revision": "Blame Previous Revision",
   "Blame Revision": "Blame Revision",
