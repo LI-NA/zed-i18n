@@ -1597,6 +1597,25 @@ const INTERNAL_ID: &str = "pending-bindings";
             "agent_tool_output",
         )
 
+    def test_extracts_binary_file_errors_from_all_production_sources(self) -> None:
+        cases = [
+            "crates/project/src/git_store.rs",
+            "crates/worktree/src/worktree.rs",
+            "crates/language/src/buffer.rs",
+        ]
+        source = (
+            'anyhow::ensure!(!is_binary, "Binary files are not supported");\n'
+            'assert_eq!(error.to_string(), "Binary files are not supported");\n'
+        )
+        for relative_path in cases:
+            with self.subTest(relative_path=relative_path):
+                occurrences = extract_ui_strings_from_source(source, relative_path)
+                self.assertEqual(
+                    [occurrence.source for occurrence in occurrences],
+                    ["Binary files are not supported"],
+                )
+                self.assertEqual(occurrences[0].kind, "error_message")
+
     def test_extracts_deferred_skill_share_link_errors(self) -> None:
         source = "\n".join(
             [
