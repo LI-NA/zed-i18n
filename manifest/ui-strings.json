@@ -11175,7 +11175,7 @@
         "call": "anyhow::ensure!",
         "end_byte": 59977,
         "file": "crates/language/src/buffer.rs",
-        "kind": "error_message",
+        "kind": "error_detail",
         "line": 1713,
         "start_byte": 59945
       },
@@ -11183,7 +11183,7 @@
         "call": "anyhow::ensure!",
         "end_byte": 7927,
         "file": "crates/project/src/git_store.rs",
-        "kind": "error_message",
+        "kind": "error_detail",
         "line": 222,
         "start_byte": 7895
       },
@@ -11191,12 +11191,12 @@
         "call": "anyhow::ensure!",
         "end_byte": 270640,
         "file": "crates/worktree/src/worktree.rs",
-        "kind": "error_message",
+        "kind": "error_detail",
         "line": 7287,
         "start_byte": 270608
       }
     ],
-    "status": "needs_review"
+    "status": "accepted"
   },
   "Black ANSI terminal color.": {
     "occurrences": [

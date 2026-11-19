@@ -3379,7 +3379,7 @@ def _extract_binary_files_error_occurrences(
                     file=relative_path,
                     line=literal_node.start_point[0] + 1,
                     call="anyhow::ensure!",
-                    kind="error_message",
+                    kind="error_detail",
                     start_byte=literal_node.start_byte,
                     end_byte=literal_node.end_byte,
                 )

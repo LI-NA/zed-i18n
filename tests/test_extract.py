@@ -1614,7 +1614,7 @@ const INTERNAL_ID: &str = "pending-bindings";
                     [occurrence.source for occurrence in occurrences],
                     ["Binary files are not supported"],
                 )
-                self.assertEqual(occurrences[0].kind, "error_message")
+                self.assertEqual(occurrences[0].kind, "error_detail")
 
     def test_extracts_deferred_skill_share_link_errors(self) -> None:
         source = "\n".join(
