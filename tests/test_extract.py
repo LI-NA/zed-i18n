@@ -7,6 +7,65 @@ from tools.zed_i18n.extract import extract_repository, extract_ui_strings_from_s
 
 
 class ExtractTests(unittest.TestCase):
+    def test_extracts_git_entry_menu_titles_from_their_constructor(self) -> None:
+        source = """
+            impl EntryMenuTitles {
+                fn new(plural: bool) -> Self {
+                    Self {
+                        copy_path: if plural { "Copy Paths" } else { "Copy Path" },
+                        view_file_history: if plural { "View File Histories" } else { "View File History" },
+                    }
+                }
+            }
+            impl Internal { fn new() -> &'static str { "Copy Paths" } }
+        """
+        occurrences = extract_ui_strings_from_source(source, "crates/git_ui/src/git_panel.rs")
+        self.assertCountEqual(
+            [entry.source for entry in occurrences],
+            ["Copy Paths", "Copy Path", "View File Histories", "View File History"],
+        )
+
+    def test_extracts_native_open_dialog_button_labels(self) -> None:
+        source = """
+            fn prompt_for_open_path(mode: OpenPathPromptMode) {
+                options.prompt = match mode {
+                    SelectPath => None,
+                    CurrentWindow => Some("Open in This Window"),
+                    NewWindow => Some("Open in New Window"),
+                }.map(SharedString::from);
+            }
+            fn internal() { let value = "Open in This Window"; }
+        """
+        occurrences = extract_ui_strings_from_source(source, "crates/workspace/src/workspace.rs")
+        self.assertCountEqual(
+            [(entry.source, entry.kind) for entry in occurrences],
+            [("Open in This Window", "path_prompt"), ("Open in New Window", "path_prompt")],
+        )
+
+    def test_extracts_move_unit_schema_docs_without_implementation_comments(self) -> None:
+        source = """
+            /// Internal adapter.
+            struct Adapter;
+            enum MoveUnit {
+                /// Default when `unit` is omitted.
+                #[default]
+                Cell,
+                // Internal note.
+                /// Jump to the first or last cell.
+                Edge,
+            }
+        """
+        entries = extract_ui_strings_from_source(
+            source, "crates/tabular_data_preview/src/tabular_data_preview.rs",
+        )
+        self.assertCountEqual(
+            [entry.source for entry in entries],
+            ["Default when `unit` is omitted.", "Jump to the first or last cell."],
+        )
+        for entry in entries:
+            self.assertEqual(entry.kind, "rust_doc_comment")
+            self.assertEqual(source.encode()[entry.start_byte:entry.end_byte], entry.source.encode())
+
     def test_extracts_v1_27_indirect_ui_literals_in_production_only(self) -> None:
         cases = [
             (

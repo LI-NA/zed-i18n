@@ -921,6 +921,16 @@ def extract_ui_strings_from_source(source: str, relative_path: str) -> list[Stri
         occurrences.extend(_extract_ui_return_method_occurrences(source_bytes, node, relative_path))
 
     occurrences.extend(_extract_action_doc_comments(source, relative_path))
+    if relative_path == "crates/tabular_data_preview/src/tabular_data_preview.rs":
+        for item in tree.root_node.named_children:
+            if item.type != "enum_item" or item.child_by_field_name("name").text != b"MoveUnit":
+                continue
+            for child in item.child_by_field_name("body").named_children:
+                if child.type == "line_comment":
+                    occurrences.extend(_occurrences_for_line_pattern(
+                        SCHEMA_DOC_COMMENT_PATTERN, _node_text(source_bytes, child),
+                        child.start_byte, child.start_point[0] + 1, relative_path,
+                    ))
     occurrences.extend(_extract_line_candidates(source, relative_path))
     occurrences.extend(_extract_agent_dirty_buffer_prompt_occurrences(source_bytes, relative_path))
     occurrences.extend(_extract_agent_permission_option_occurrences(source, relative_path))
@@ -2555,12 +2565,23 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
         "diff_change_label": ({"Added {}", "Deleted {}", "Modified {}", "Moved {} → {}", "Copied {} → {}", "Unsupported file operation"}, "label"),
     },
     "crates/git_ui/src/git_panel.rs": {
+        "EntryMenuTitles::new": (
+            {
+                "Copy Path", "Copy Paths", "Copy Relative Path", "Copy Relative Paths",
+                "Open Diff", "Open Diffs", "Open File Diff", "Open File Diffs",
+                "View File", "View Files", "View File History", "View File Histories",
+            },
+            "context_menu_action",
+        ),
         "revert_entries": ({"Trash ", "Trash", "changes", "unstaged changes", "Are you sure you want to restore ", "Restore File", "Are you sure you want to discard {changes} to ", "Discard Changes", "Discard {changes} to {tracked_count} files?", "Discard", "Trash {untracked_count} files?", "Discard {changes} to {tracked_count} files and trash {untracked_count} files?", "Discard and Trash", "Failed to revert changes"}, "prompt_message"),
         "build_context_menu": ({"File", "Files"}, "label"),
     },
     "crates/tabular_data_preview/src/parser.rs": {
         "parse_in_background": ({"Preview requires a single file"}, "input_error"),
         "from_json_lines": ({"Cannot preview JSONL line {}: expected a JSON object"}, "input_error"),
+    },
+    "crates/workspace/src/workspace.rs": {
+        "prompt_for_open_path": ({"Open in This Window", "Open in New Window"}, "path_prompt"),
     },
 }
 
@@ -2577,6 +2598,12 @@ def _function_ui_literal_rule(source_bytes: bytes, node, rules):
             name = current.child_by_field_name("name")
             if name is not None:
                 function_name = _node_text(source_bytes, name)
+        if current.type == "impl_item" and function_name is not None:
+            impl_type = current.child_by_field_name("type")
+            if impl_type is not None:
+                qualified_name = f"{_node_text(source_bytes, impl_type)}::{function_name}"
+                if qualified_name in rules:
+                    function_name = qualified_name
         sibling = current.prev_named_sibling
         while sibling is not None and sibling.type == "attribute_item":
             attribute = _node_text(source_bytes, sibling)
@@ -4739,14 +4766,12 @@ SETTINGS_UI_ROOT_LINE_PATTERNS: tuple[LinePattern, ...] = (
     ),
 )
 
+SCHEMA_DOC_COMMENT_PATTERN = LinePattern(
+    ACTION_DOC_COMMENT_PATTERN, "rust_doc_comment", "rust_doc_comment", 1, rust_literal=False,
+)
+
 SETTINGS_CONTENT_LINE_PATTERNS: tuple[LinePattern, ...] = (
-    LinePattern(
-        re.compile(r'^\s*///\s+(.+\S)\s*$'),
-        "rust_doc_comment",
-        "rust_doc_comment",
-        1,
-        rust_literal=False,
-    ),
+    SCHEMA_DOC_COMMENT_PATTERN,
     LinePattern(
         re.compile(r'\bToolPermissionMode::[A-Za-z0-9_]+\s*=>\s*write!\(\s*f,\s*("(?:\\.|[^"\\])*")\s*\)'),
         "ToolPermissionMode.display",
