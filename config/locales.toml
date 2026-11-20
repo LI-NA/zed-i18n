@@ -41,6 +41,15 @@ direction = "ltr"
 enabled = true
 
 [[locale]]
+id = "id-ID"
+english_name = "Indonesian"
+native_name = "Bahasa Indonesia"
+aliases = ["id"]
+direction = "ltr"
+enabled = true
+
+
+[[locale]]
 id = "it-IT"
 english_name = "Italian"
 native_name = "Italiano"

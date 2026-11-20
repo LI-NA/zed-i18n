@@ -41,7 +41,7 @@ class RuntimeBundleTests(unittest.TestCase):
         translated = {path.stem for path in (repository_root / "translations").glob("*.json")}
         self.assertEqual(configured - {"en-US"}, translated)
         self.assertEqual(config.source_locale, "en-US")
-        self.assertEqual(len(translated), 13)
+        self.assertEqual(len(translated), 14)
 
     def test_rejects_duplicate_locale_aliases(self) -> None:
         path = self.root / "locales.toml"
