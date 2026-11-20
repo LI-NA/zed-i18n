@@ -33419,11 +33419,11 @@
       },
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 28926,
+        "end_byte": 29133,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 802,
-        "start_byte": 28920
+        "line": 810,
+        "start_byte": 29127
       },
       {
         "call": "strum::VariantNames",
@@ -37920,11 +37920,11 @@
       },
       {
         "call": "reasoning_effort_display",
-        "end_byte": 26700,
+        "end_byte": 26541,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "language_model_effort_label",
-        "line": 741,
-        "start_byte": 26688
+        "line": 738,
+        "start_byte": 26529
       },
       {
         "call": "reasoning_effort_display",
@@ -41963,11 +41963,11 @@
     "occurrences": [
       {
         "call": "tooltip",
-        "end_byte": 40471,
+        "end_byte": 40527,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "tooltip",
-        "line": 1128,
-        "start_byte": 40465
+        "line": 1133,
+        "start_byte": 40521
       }
     ],
     "status": "accepted"
@@ -46608,11 +46608,11 @@
       },
       {
         "call": "reasoning_effort_display",
-        "end_byte": 26634,
+        "end_byte": 26475,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "language_model_effort_label",
-        "line": 740,
-        "start_byte": 26628
+        "line": 737,
+        "start_byte": 26469
       },
       {
         "call": "reasoning_effort_display",
@@ -52688,11 +52688,11 @@
       },
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 28525,
+        "end_byte": 28732,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 793,
-        "start_byte": 28519
+        "line": 801,
+        "start_byte": 28726
       },
       {
         "call": "strum::VariantNames",
@@ -53921,11 +53921,11 @@
       },
       {
         "call": "reasoning_effort_display",
-        "end_byte": 26511,
+        "end_byte": 26352,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "language_model_effort_label",
-        "line": 738,
-        "start_byte": 26506
+        "line": 735,
+        "start_byte": 26347
       },
       {
         "call": "reasoning_effort_display",
@@ -54443,11 +54443,11 @@
       },
       {
         "call": "reasoning_effort_display",
-        "end_byte": 26758,
+        "end_byte": 26599,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "language_model_effort_label",
-        "line": 742,
-        "start_byte": 26753
+        "line": 739,
+        "start_byte": 26594
       }
     ],
     "status": "accepted"
@@ -54952,11 +54952,11 @@
       },
       {
         "call": "reasoning_effort_display",
-        "end_byte": 26573,
+        "end_byte": 26414,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "language_model_effort_label",
-        "line": 739,
-        "start_byte": 26565
+        "line": 736,
+        "start_byte": 26406
       },
       {
         "call": "strum::VariantNames",
@@ -55359,11 +55359,11 @@
       },
       {
         "call": "reasoning_effort_display",
-        "end_byte": 26451,
+        "end_byte": 26292,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "language_model_effort_label",
-        "line": 737,
-        "start_byte": 26442
+        "line": 734,
+        "start_byte": 26283
       },
       {
         "call": "reasoning_effort_display",
@@ -62816,11 +62816,11 @@
       },
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 29246,
+        "end_byte": 29453,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 810,
-        "start_byte": 29235
+        "line": 818,
+        "start_byte": 29442
       },
       {
         "call": "action",
@@ -63185,11 +63185,11 @@
     "occurrences": [
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 29189,
+        "end_byte": 29396,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 808,
-        "start_byte": 29174
+        "line": 816,
+        "start_byte": 29381
       }
     ],
     "status": "accepted"
@@ -63792,11 +63792,11 @@
     "occurrences": [
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 29380,
+        "end_byte": 29587,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 814,
-        "start_byte": 29367
+        "line": 822,
+        "start_byte": 29574
       }
     ],
     "status": "accepted"
@@ -75240,11 +75240,11 @@
       },
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 28676,
+        "end_byte": 28883,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 797,
-        "start_byte": 28669
+        "line": 805,
+        "start_byte": 28876
       },
       {
         "call": "strum::VariantNames",
@@ -77773,11 +77773,11 @@
       },
       {
         "call": "placeholder_text",
-        "end_byte": 26504,
+        "end_byte": 26711,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "placeholder",
-        "line": 730,
-        "start_byte": 26483
+        "line": 738,
+        "start_byte": 26690
       }
     ],
     "status": "accepted"
@@ -87419,11 +87419,11 @@
       },
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 28458,
+        "end_byte": 28665,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 791,
-        "start_byte": 28448
+        "line": 799,
+        "start_byte": 28655
       }
     ],
     "status": "accepted"
@@ -101709,11 +101709,11 @@
     "occurrences": [
       {
         "call": "tooltip",
-        "end_byte": 40336,
+        "end_byte": 40392,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "tooltip",
-        "line": 1126,
-        "start_byte": 40328
+        "line": 1131,
+        "start_byte": 40384
       }
     ],
     "status": "accepted"
@@ -102816,11 +102816,11 @@
       },
       {
         "call": "TextFinder.picker_action",
-        "end_byte": 28808,
+        "end_byte": 29015,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "picker_action",
-        "line": 800,
-        "start_byte": 28804
+        "line": 808,
+        "start_byte": 29011
       },
       {
         "call": "strum::VariantNames",
@@ -114001,11 +114001,11 @@
     "occurrences": [
       {
         "call": "SubscriptionState.last_auth_error",
-        "end_byte": 36691,
+        "end_byte": 36532,
         "file": "crates/openai_subscribed/src/openai_subscribed.rs",
         "kind": "provider_credential_error",
-        "line": 995,
-        "start_byte": 36642
+        "line": 992,
+        "start_byte": 36483
       }
     ],
     "status": "accepted"
@@ -115706,11 +115706,11 @@
       },
       {
         "call": "SharedString::from",
-        "end_byte": 73124,
+        "end_byte": 73320,
         "file": "crates/open_ai/src/completion.rs",
         "kind": "shared_string",
-        "line": 1858,
-        "start_byte": 73114
+        "line": 1865,
+        "start_byte": 73310
       }
     ],
     "status": "ignored"
@@ -124298,11 +124298,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 26543,
+        "end_byte": 26728,
         "file": "crates/language_model/src/language_model.rs",
         "kind": "shared_string",
-        "line": 752,
-        "start_byte": 26536
+        "line": 755,
+        "start_byte": 26721
       }
     ],
     "status": "ignored"
@@ -124324,11 +124324,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 26615,
+        "end_byte": 26800,
         "file": "crates/language_model/src/language_model.rs",
         "kind": "shared_string",
-        "line": 754,
-        "start_byte": 26608
+        "line": 757,
+        "start_byte": 26793
       }
     ],
     "status": "ignored"
@@ -125123,11 +125123,11 @@
     "occurrences": [
       {
         "call": "from_provider_response",
-        "end_byte": 44165,
+        "end_byte": 44857,
         "file": "crates/anthropic/src/anthropic.rs",
         "kind": "provider_model_error",
-        "line": 1396,
-        "start_byte": 44127
+        "line": 1417,
+        "start_byte": 44819
       }
     ],
     "status": "accepted"
@@ -125149,11 +125149,11 @@
     "occurrences": [
       {
         "call": "from_provider_response",
-        "end_byte": 44632,
+        "end_byte": 45324,
         "file": "crates/anthropic/src/anthropic.rs",
         "kind": "provider_model_error",
-        "line": 1410,
-        "start_byte": 44581
+        "line": 1431,
+        "start_byte": 45273
       }
     ],
     "status": "accepted"
@@ -126391,11 +126391,11 @@
       },
       {
         "call": "Tooltip::with_meta",
-        "end_byte": 40866,
+        "end_byte": 40922,
         "file": "crates/search/src/text_finder/delegate.rs",
         "kind": "tooltip_meta",
-        "line": 1134,
-        "start_byte": 40848
+        "line": 1139,
+        "start_byte": 40904
       }
     ],
     "status": "accepted"
@@ -126611,11 +126611,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 26320,
+        "end_byte": 26505,
         "file": "crates/language_model/src/language_model.rs",
         "kind": "shared_string",
-        "line": 745,
-        "start_byte": 26311
+        "line": 748,
+        "start_byte": 26496
       }
     ],
     "status": "ignored"
@@ -127001,11 +127001,11 @@
     "occurrences": [
       {
         "call": "SharedString::from",
-        "end_byte": 25837,
+        "end_byte": 26022,
         "file": "crates/language_model/src/language_model.rs",
         "kind": "shared_string",
-        "line": 736,
-        "start_byte": 25831
+        "line": 739,
+        "start_byte": 26016
       }
     ],
     "status": "ignored"
