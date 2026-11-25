@@ -38,6 +38,66 @@ from tools.zed_i18n.ci_release import (
 from tools.zed_i18n.distribution import DistributionConfig
 
 
+MACOS_GIT_DOWNLOAD_FIXTURE = r'''
+function download_and_unpack() {
+    local url=$1
+    local expected_sha256=$2
+    local path_to_unpack=$3
+    local target_path=$4
+
+    temp_dir=$(mktemp -d)
+
+    if ! command -v curl &> /dev/null; then
+        echo "curl is not installed. Please install curl to continue."
+        exit 1
+    fi
+
+    local archive="$temp_dir/archive.tar.gz"
+    curl --silent --fail --location --output "$archive" "$url"
+
+    local actual_sha256
+    actual_sha256=$(shasum --algorithm 256 "$archive" | cut -d ' ' -f 1)
+    if [[ "$actual_sha256" != "$expected_sha256" ]]; then
+        echo "SHA-256 mismatch for $url: expected $expected_sha256, got $actual_sha256"
+        rm -rf "$temp_dir"
+        exit 1
+    fi
+
+    tar -xvz -C "$temp_dir" -f "$archive" $path_to_unpack
+
+    mv "$temp_dir/$path_to_unpack" "$target_path"
+
+    rm -rf "$temp_dir"
+}
+
+function download_git() {
+    local architecture=$1
+    local target_binary=$2
+
+    tmp_dir=$(mktemp -d)
+    pushd "$tmp_dir"
+
+    case "$architecture" in
+        aarch64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" "$GIT_ARM64_SHA256" bin/git ./git
+            ;;
+        x86_64-apple-darwin)
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" "$GIT_X64_SHA256" bin/git ./git
+            ;;
+        *)
+            echo "Unsupported architecture: $architecture"
+            exit 1
+            ;;
+    esac
+
+    popd
+
+    mv "${tmp_dir}/git" "${target_binary}"
+    rm -rf "$tmp_dir"
+}
+'''.lstrip()
+
+
 class CiReleaseTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temp_root = Path.cwd() / "tests" / ".tmp" / self._testMethodName
@@ -1521,50 +1581,7 @@ cargo --config .cargo/bundle-config.toml build ${build_flag} ${zed_features} --p
 # Build remote_server in separate invocation to prevent feature unification from other crates
 # from influencing dynamic libraries required by it.
 cargo --config .cargo/bundle-config.toml build ${build_flag} ${remote_server_features} --package remote_server --target $target_triple
-function download_and_unpack() {
-    local url=$1
-    local path_to_unpack=$2
-    local target_path=$3
-
-    temp_dir=$(mktemp -d)
-
-    if ! command -v curl &> /dev/null; then
-        echo "curl is not installed. Please install curl to continue."
-        exit 1
-    fi
-
-    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
-
-    mv "$temp_dir/$path_to_unpack" "$target_path"
-
-    rm -rf "$temp_dir"
-}
-
-function download_git() {
-    local architecture=$1
-    local target_binary=$2
-
-    tmp_dir=$(mktemp -d)
-    pushd "$tmp_dir"
-
-    case "$architecture" in
-        aarch64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
-            ;;
-        x86_64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
-            ;;
-        *)
-            echo "Unsupported architecture: $architecture"
-            exit 1
-            ;;
-    esac
-
-    popd
-
-    mv "${tmp_dir}/git" "${target_binary}"
-    rm -rf "$tmp_dir"
-}
+""" + MACOS_GIT_DOWNLOAD_FIXTURE + """
 
 function sign_app_binaries() {
         hdiutil create -volname Zed -srcfolder "${dmg_source_directory}" -ov -format UDZO "${dmg_file_path}"
@@ -1716,52 +1733,7 @@ function sign_app_binaries() {
     def test_patches_macos_bundle_script_to_retry_git_download_locally(self) -> None:
         script = self.temp_root / "bundle-mac"
         script.write_text(
-            """
-function download_and_unpack() {
-    local url=$1
-    local path_to_unpack=$2
-    local target_path=$3
-
-    temp_dir=$(mktemp -d)
-
-    if ! command -v curl &> /dev/null; then
-        echo "curl is not installed. Please install curl to continue."
-        exit 1
-    fi
-
-    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
-
-    mv "$temp_dir/$path_to_unpack" "$target_path"
-
-    rm -rf "$temp_dir"
-}
-
-function download_git() {
-    local architecture=$1
-    local target_binary=$2
-
-    tmp_dir=$(mktemp -d)
-    pushd "$tmp_dir"
-
-    case "$architecture" in
-        aarch64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
-            ;;
-        x86_64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
-            ;;
-        *)
-            echo "Unsupported architecture: $architecture"
-            exit 1
-            ;;
-    esac
-
-    popd
-
-    mv "${tmp_dir}/git" "${target_binary}"
-    rm -rf "$tmp_dir"
-}
-""".lstrip(),
+            MACOS_GIT_DOWNLOAD_FIXTURE,
             encoding="utf-8",
         )
 
@@ -1770,8 +1742,15 @@ function download_git() {
         patched = script.read_text(encoding="utf-8")
         self.assertIn("for attempt in 1 2 3; do", patched)
         self.assertIn("Retrying git binary download", patched)
-        self.assertIn('curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir"', patched)
-        self.assertIn('if mv "$temp_dir/$path_to_unpack" "$target_path"; then', patched)
+        download = 'curl --silent --fail --location --output "$archive" "$url"'
+        verify = '[[ "$actual_sha256" != "$expected_sha256" ]]'
+        unpack = 'tar -xvz -C "$temp_dir" -f "$archive" "$path_to_unpack"'
+        self.assertLess(patched.index(download), patched.index(verify))
+        self.assertLess(patched.index(verify), patched.index(unpack))
+        self.assertIn('shasum --algorithm 256 "$archive"', patched)
+        for digest in ("GIT_ARM64_SHA256", "GIT_X64_SHA256"):
+            self.assertIn(f'"${digest}" bin/git ./git || rc=$?', patched)
+        self.assertIn('mv "$temp_dir/$path_to_unpack" "$target_path" || rc=$?', patched)
         self.assertIn('rm -rf "$temp_dir"', patched)
         self.assertIn("local rc=0", patched)
         self.assertIn("|| rc=$?", patched)
@@ -1782,52 +1761,7 @@ function download_git() {
     def test_macos_git_download_retry_patch_is_idempotent(self) -> None:
         script = self.temp_root / "bundle-mac"
         script.write_text(
-            """
-function download_and_unpack() {
-    local url=$1
-    local path_to_unpack=$2
-    local target_path=$3
-
-    temp_dir=$(mktemp -d)
-
-    if ! command -v curl &> /dev/null; then
-        echo "curl is not installed. Please install curl to continue."
-        exit 1
-    fi
-
-    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
-
-    mv "$temp_dir/$path_to_unpack" "$target_path"
-
-    rm -rf "$temp_dir"
-}
-
-function download_git() {
-    local architecture=$1
-    local target_binary=$2
-
-    tmp_dir=$(mktemp -d)
-    pushd "$tmp_dir"
-
-    case "$architecture" in
-        aarch64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
-            ;;
-        x86_64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
-            ;;
-        *)
-            echo "Unsupported architecture: $architecture"
-            exit 1
-            ;;
-    esac
-
-    popd
-
-    mv "${tmp_dir}/git" "${target_binary}"
-    rm -rf "$tmp_dir"
-}
-""".lstrip(),
+            MACOS_GIT_DOWNLOAD_FIXTURE,
             encoding="utf-8",
         )
 

@@ -539,9 +539,11 @@ def patch_macos_remote_server_build(path: Path) -> None:
 MACOS_GIT_DOWNLOAD_RETRY_FUNCTION = r'''
 function download_and_unpack() {
     local url=$1
-    local path_to_unpack=$2
-    local target_path=$3
+    local expected_sha256=$2
+    local path_to_unpack=$3
+    local target_path=$4
     local temp_dir=""
+    local archive actual_sha256 attempt
     local rc=0
 
     if ! command -v curl &> /dev/null; then
@@ -550,25 +552,30 @@ function download_and_unpack() {
     fi
 
     for attempt in 1 2 3; do
-        temp_dir=$(mktemp -d)
-        if curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - "$path_to_unpack"; then
-            if mv "$temp_dir/$path_to_unpack" "$target_path"; then
+        temp_dir=$(mktemp -d) || return $?
+        archive="$temp_dir/archive.tar.gz"
+        rc=0
+        curl --silent --fail --location --output "$archive" "$url" || rc=$?
+        if [[ "$rc" -eq 0 ]]; then
+            if ! actual_sha256=$(shasum --algorithm 256 "$archive" | cut -d ' ' -f 1) ||
+                [[ "$actual_sha256" != "$expected_sha256" ]]; then
+                echo "SHA-256 mismatch for $url: expected $expected_sha256, got $actual_sha256" >&2
                 rm -rf "$temp_dir"
-                return 0
-            else
-                rc=$?
-                rm -rf "$temp_dir"
-                return "$rc"
+                return 1
             fi
-        else
-            rc=$?
-            rm -rf "$temp_dir"
-            if [[ "$attempt" = "3" ]]; then
-                return "$rc"
-            fi
-            echo "Retrying git binary download after failed unpack attempt $attempt"
-            sleep 5
+            tar -xvz -C "$temp_dir" -f "$archive" "$path_to_unpack" || rc=$?
         fi
+        if [[ "$rc" -eq 0 ]]; then
+            mv "$temp_dir/$path_to_unpack" "$target_path" || rc=$?
+            rm -rf "$temp_dir"
+            return "$rc"
+        fi
+        rm -rf "$temp_dir"
+        if [[ "$attempt" = "3" ]]; then
+            return "$rc"
+        fi
+        echo "Retrying git binary download after failed unpack attempt $attempt"
+        sleep 5
     done
 }
 '''.lstrip()
@@ -586,10 +593,10 @@ function download_git() {
 
     case "$architecture" in
         aarch64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git || rc=$?
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" "$GIT_ARM64_SHA256" bin/git ./git || rc=$?
             ;;
         x86_64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git || rc=$?
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" "$GIT_X64_SHA256" bin/git ./git || rc=$?
             ;;
         *)
             echo "Unsupported architecture: $architecture"
@@ -690,8 +697,9 @@ def patch_macos_git_download_transient_retries(path: Path) -> None:
     original_unpack = r'''
 function download_and_unpack() {
     local url=$1
-    local path_to_unpack=$2
-    local target_path=$3
+    local expected_sha256=$2
+    local path_to_unpack=$3
+    local target_path=$4
 
     temp_dir=$(mktemp -d)
 
@@ -700,14 +708,25 @@ function download_and_unpack() {
         exit 1
     fi
 
-    curl --silent --fail --location "$url" | tar -xvz -C "$temp_dir" -f - $path_to_unpack
+    local archive="$temp_dir/archive.tar.gz"
+    curl --silent --fail --location --output "$archive" "$url"
+
+    local actual_sha256
+    actual_sha256=$(shasum --algorithm 256 "$archive" | cut -d ' ' -f 1)
+    if [[ "$actual_sha256" != "$expected_sha256" ]]; then
+        echo "SHA-256 mismatch for $url: expected $expected_sha256, got $actual_sha256"
+        rm -rf "$temp_dir"
+        exit 1
+    fi
+
+    tar -xvz -C "$temp_dir" -f "$archive" $path_to_unpack
 
     mv "$temp_dir/$path_to_unpack" "$target_path"
 
     rm -rf "$temp_dir"
 }
 '''.lstrip()
-    if "Retrying git binary download after failed unpack attempt" not in script:
+    if MACOS_GIT_DOWNLOAD_RETRY_FUNCTION not in script:
         if script.count(original_unpack) != 1:
             raise ValueError(f"expected one download_and_unpack target in {path}")
         script = script.replace(original_unpack, MACOS_GIT_DOWNLOAD_RETRY_FUNCTION, 1)
@@ -722,10 +741,10 @@ function download_git() {
 
     case "$architecture" in
         aarch64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" bin/git ./git
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" "$GIT_ARM64_SHA256" bin/git ./git
             ;;
         x86_64-apple-darwin)
-            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" bin/git ./git
+            download_and_unpack "https://github.com/desktop/dugite-native/releases/download/${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-x64.tar.gz" "$GIT_X64_SHA256" bin/git ./git
             ;;
         *)
             echo "Unsupported architecture: $architecture"
@@ -739,12 +758,7 @@ function download_git() {
     rm -rf "$tmp_dir"
 }
 '''.lstrip()
-    patched_download_git_marker = (
-        'download_and_unpack "https://github.com/desktop/dugite-native/releases/download/'
-        '${GIT_VERSION}/dugite-native-${GIT_VERSION}-${GIT_VERSION_SHA}-macOS-arm64.tar.gz" '
-        "bin/git ./git || rc=$?"
-    )
-    if patched_download_git_marker not in script:
+    if MACOS_GIT_DOWNLOAD_FUNCTION not in script:
         if script.count(original_download_git) != 1:
             raise ValueError(f"expected one download_git target in {path}")
         script = script.replace(original_download_git, MACOS_GIT_DOWNLOAD_FUNCTION, 1)

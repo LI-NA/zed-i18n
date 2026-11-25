@@ -2418,6 +2418,15 @@ NATIVE_CONTENT_ERROR_SOURCES = {
 }
 
 FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
+    "crates/zed/src/main.rs": {
+        "restore_errors_message": (
+            {
+                "Failed to restore 1 workspace. Check logs for details.",
+                "Failed to restore {} workspaces. Check logs for details.",
+            },
+            "toast",
+        ),
+    },
     "crates/agent_ui/src/config_options.rs": {
         "render": ({"On", "Off"}, "label"),
     },
@@ -2550,6 +2559,7 @@ FUNCTION_UI_LITERAL_RULES: dict[str, dict[str, tuple[set[str], str]]] = {
         "new": ({"Also possible by placing your cursor inside the terminal and using regular terminal bindings."}, "tooltip_meta"),
     },
     "crates/acp_thread/src/acp_thread.rs": {
+        "ToolCallContent::to_markdown": ({"Session {}"}, "label"),
         "cancel_tool_call": ({"Unknown tool call", "This tool call cannot be stopped"}, "thread_error_message"),
         "cancel_terminal": ({"This terminal cannot be stopped"}, "thread_error_message"),
         "unsupported": ({"Audio content is not supported.", "Unknown content type is not supported.", "This content is not supported."}, "thread_error_message"),
@@ -4016,7 +4026,7 @@ def _is_configure_context_server_modal_path(relative_path: str) -> bool:
 
 def _is_agent_model_selector_path(relative_path: str) -> bool:
     return relative_path in {
-        "crates/agent_ui/src/language_model_selector.rs",
+        "crates/language_model_selector/src/language_model_selector.rs",
         "crates/agent_ui/src/model_selector.rs",
     }
 

@@ -7,6 +7,34 @@ from tools.zed_i18n.extract import extract_repository, extract_ui_strings_from_s
 
 
 class ExtractTests(unittest.TestCase):
+    def test_extracts_workspace_restore_error_messages(self) -> None:
+        source = """
+            fn restore_errors_message(count: usize) -> String {
+                if count == 1 {
+                    "Failed to restore 1 workspace. Check logs for details.".to_string()
+                } else {
+                    format!("Failed to restore {} workspaces. Check logs for details.", count)
+                }
+            }
+        """
+        occurrences = extract_ui_strings_from_source(source, "crates/zed/src/main.rs")
+        self.assertCountEqual([entry.source for entry in occurrences], [
+            "Failed to restore 1 workspace. Check logs for details.",
+            "Failed to restore {} workspaces. Check logs for details.",
+        ])
+
+    def test_extracts_session_reference_in_markdown(self) -> None:
+        source = """
+            impl ToolCallContent {
+                fn to_markdown(&self) -> String { format!("Session {}", self.session_id) }
+            }
+            impl Internal {
+                fn to_markdown(&self) -> String { format!("Session {}", self.id) }
+            }
+        """
+        occurrences = extract_ui_strings_from_source(source, "crates/acp_thread/src/acp_thread.rs")
+        self.assertEqual([(entry.source, entry.line) for entry in occurrences], [("Session {}", 3)])
+
     def test_extracts_git_entry_menu_titles_from_their_constructor(self) -> None:
         source = """
             impl EntryMenuTitles {
@@ -5665,7 +5693,7 @@ fn group_bindings() {
                         "}",
                     ]
                 ),
-                "crates/agent_ui/src/language_model_selector.rs",
+                "crates/language_model_selector/src/language_model_selector.rs",
                 {"Favorite", "Recommended", "All"},
                 "model_selector_separator",
             ),
