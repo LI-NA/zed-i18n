@@ -17,6 +17,7 @@
     English ·
     <a href="docs/readme/es-ES.md">Español</a> ·
     <a href="docs/readme/fr-FR.md">Français</a> ·
+    <a href="docs/readme/id-ID.md">Bahasa Indonesia</a> ·
     <a href="docs/readme/it-IT.md">Italiano</a> ·
     <a href="docs/readme/ja-JP.md">日本語</a> ·
     <a href="docs/readme/ko-KR.md">한국어</a> ·
@@ -37,9 +38,9 @@ Zed-i18n is a tool that extracts UI strings from release versions of the [Zed](h
 
 ## Supported Languages
 
-Translations for 13 languages are currently bundled under `translations/`. All current translations are AI-generated; contributions from native speakers are welcome.
+Translations for 14 languages are currently bundled under `translations/`. All current translations are AI-generated; contributions from native speakers are welcome.
 
-cs-CZ · de-DE · es-ES · fr-FR · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
+cs-CZ · de-DE · es-ES · fr-FR · id-ID · it-IT · ja-JP · ko-KR · pl-PL · pt-BR · ru-RU · tr-TR · zh-CN · zh-TW
 
 ## Downloads
 
